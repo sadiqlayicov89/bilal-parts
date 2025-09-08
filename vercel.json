@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "name": "bilal-parts-ecommerce",
   "builds": [
     {
       "src": "frontend/package.json",
@@ -20,19 +19,8 @@
       "dest": "/backend/server.js"
     },
     {
-      "src": "/static/(.*)",
-      "dest": "/static/$1"
-    },
-    {
-      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot))",
-      "dest": "/$1"
-    },
-    {
       "src": "/(.*)",
-      "dest": "/index.html"
+      "dest": "/frontend/build/$1"
     }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  }
+  ]
 }
