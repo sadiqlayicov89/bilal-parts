@@ -1,0 +1,5 @@
+[33m60e8328[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m Initial commit: Complete e-commerce platform with 1C integration and Supabase
+[33m95fa347[m Add Supabase integration with authentication and database
+[33m2db43b7[m Add Supabase integration: PostgreSQL database and authentication
+[33m4c88c88[m Add deployment configuration for Vercel and GitHub
+[33m0ed7241[m Initial commit: E-commerce platform with 1C integration
