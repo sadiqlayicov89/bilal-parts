@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  # Main application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bilal-parts-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=file:./data/production.db
+      - JWT_SECRET=${JWT_SECRET:-your-super-secret-jwt-key-production}
+      - PORT=3000
+      - CORS_ORIGIN=${CORS_ORIGIN:-https://yourdomain.com}
+    volumes:
+      - ./data:/app/data
+      - ./uploads:/app/uploads
+      - ./logs:/app/logs
+      - ./1c_data:/app/1c_data
+    networks:
+      - bilal-parts-network
+    depends_on:
+      - nginx
+
+  # Nginx reverse proxy
+  nginx:
+    image: nginx:alpine
+    container_name: bilal-parts-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/sites-available:/etc/nginx/sites-available
+      - ./ssl:/etc/nginx/ssl
+      - ./uploads:/var/www/uploads
+    networks:
+      - bilal-parts-network
+
+  # SSL Certificate renewal
+  certbot:
+    image: certbot/certbot
+    container_name: bilal-parts-certbot
+    volumes:
+      - ./ssl:/etc/letsencrypt
+      - ./nginx/sites-available:/var/www/certbot
+    command: certonly --webroot --webroot-path=/var/www/certbot --email your-email@domain.com --agree-tos --no-eff-email -d yourdomain.com -d www.yourdomain.com
+
+networks:
+  bilal-parts-network:
+    driver: bridge
+
+volumes:
+  data:
+  uploads:
+  logs:
+  1c_data:
+  ssl:

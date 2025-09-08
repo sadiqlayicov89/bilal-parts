@@ -1,0 +1,322 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String
+  first_name    String
+  last_name     String
+  phone         String?
+  company_name  String?
+  country       String?
+  city          String?
+  vat_number    String?
+  role          String    @default("CUSTOMER")
+  status        String    @default("PENDING")
+  is_active     Boolean   @default(false)
+  discount      Float     @default(0)
+  email_verified Boolean  @default(false)
+  email_verification_token String?
+  password_reset_token String?
+  password_reset_expires DateTime?
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+
+  // Relations
+  orders        Order[]
+  cart_items    CartItem[]
+  wishlist_items WishlistItem[]
+  reviews       Review[]
+  addresses     Address[]
+
+  @@map("users")
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  image       String?
+  parent_id   String?
+  external_id String?   @unique // 1C integration ID
+  is_active   Boolean   @default(true)
+  sort_order  Int       @default(0)
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+
+  // Relations
+  parent      Category? @relation("CategoryHierarchy", fields: [parent_id], references: [id])
+  children    Category[] @relation("CategoryHierarchy")
+  products    Product[] @relation("ProductCategory")
+  subcategory_products Product[] @relation("ProductSubcategory")
+
+  @@map("categories")
+}
+
+model Product {
+  id              String    @id @default(cuid())
+  name            String
+  sku             String    @unique
+  catalog_number  String?
+  description     String?
+  short_description String?
+  price           Float
+  original_price  Float?
+  cost_price      Float?
+  stock_quantity  Int       @default(0)
+  min_stock_level Int       @default(5)
+  in_stock        Boolean   @default(true)
+  is_active       Boolean   @default(true)
+  is_featured     Boolean   @default(false)
+  weight          Float?
+  dimensions      String?
+  brand           String?
+  model           String?
+  year            Int?
+  external_id     String?   @unique // 1C integration ID
+  category_id     String
+  subcategory_id  String?
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+
+  // Relations
+  category        Category  @relation("ProductCategory", fields: [category_id], references: [id])
+  subcategory     Category? @relation("ProductSubcategory", fields: [subcategory_id], references: [id])
+  images          ProductImage[]
+  specifications  ProductSpecification[]
+  cart_items      CartItem[]
+  wishlist_items  WishlistItem[]
+  order_items     OrderItem[]
+  reviews         Review[]
+
+  @@map("products")
+}
+
+model ProductImage {
+  id         String  @id @default(cuid())
+  product_id String
+  image_url  String
+  alt_text   String?
+  is_primary Boolean @default(false)
+  sort_order Int     @default(0)
+  created_at DateTime @default(now())
+
+  // Relations
+  product    Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  @@map("product_images")
+}
+
+model ProductSpecification {
+  id         String @id @default(cuid())
+  product_id String
+  name       String
+  value      String
+  unit       String?
+  sort_order Int    @default(0)
+
+  // Relations
+  product    Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  @@map("product_specifications")
+}
+
+model CartItem {
+  id         String  @id @default(cuid())
+  user_id    String
+  product_id String
+  quantity   Int     @default(1)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // Relations
+  user       User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  product    Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, product_id])
+  @@map("cart_items")
+}
+
+model WishlistItem {
+  id         String  @id @default(cuid())
+  user_id    String
+  product_id String
+  created_at DateTime @default(now())
+
+  // Relations
+  user       User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  product    Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, product_id])
+  @@map("wishlist_items")
+}
+
+model Address {
+  id           String  @id @default(cuid())
+  user_id      String
+  type         String @default("SHIPPING")
+  first_name   String
+  last_name    String
+  company      String?
+  address_line_1 String
+  address_line_2 String?
+  city         String
+  state        String?
+  postal_code  String
+  country      String
+  phone        String?
+  is_default   Boolean @default(false)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  // Relations
+  user         User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  shipping_orders Order[] @relation("ShippingAddress")
+  billing_orders  Order[] @relation("BillingAddress")
+
+  @@map("addresses")
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  order_number    String      @unique
+  user_id         String
+  status          String @default("PENDING")
+  payment_status  String @default("PENDING")
+  payment_method  String?
+  payment_id      String?
+  subtotal        Float
+  tax_amount      Float       @default(0)
+  shipping_amount Float       @default(0)
+  discount_amount Float       @default(0)
+  total_amount    Float
+  currency        String      @default("USD")
+  notes           String?
+  shipping_address_id String?
+  billing_address_id String?
+  created_at      DateTime    @default(now())
+  updated_at      DateTime    @updatedAt
+
+  // Relations
+  user            User        @relation(fields: [user_id], references: [id])
+  shipping_address Address?   @relation("ShippingAddress", fields: [shipping_address_id], references: [id])
+  billing_address Address?    @relation("BillingAddress", fields: [billing_address_id], references: [id])
+  items           OrderItem[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id         String  @id @default(cuid())
+  order_id   String
+  product_id String
+  quantity   Int
+  price      Float
+  total      Float
+  created_at DateTime @default(now())
+
+  // Relations
+  order      Order   @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  product    Product @relation(fields: [product_id], references: [id])
+
+  @@map("order_items")
+}
+
+model Review {
+  id         String  @id @default(cuid())
+  user_id    String
+  product_id String
+  rating     Int     // 1-5 stars
+  title      String?
+  comment    String?
+  is_verified Boolean @default(false)
+  is_approved Boolean @default(false)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // Relations
+  user       User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  product    Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, product_id])
+  @@map("reviews")
+}
+
+model ContactMessage {
+  id         String  @id @default(cuid())
+  name       String
+  email      String
+  phone      String?
+  subject    String?
+  message    String
+  is_read    Boolean @default(false)
+  created_at DateTime @default(now())
+
+  @@map("contact_messages")
+}
+
+model NewsletterSubscriber {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  is_active    Boolean  @default(true)
+  subscribed_at DateTime @default(now())
+  unsubscribed_at DateTime?
+
+  @@map("newsletter_subscribers")
+}
+
+model NewsArticle {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  excerpt     String?
+  content     String?
+  image       String?
+  category    String?
+  is_published Boolean @default(false)
+  published_at DateTime?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@map("news_articles")
+}
+
+model CompanyInfo {
+  id          String   @id @default(cuid())
+  name        String
+  chinese_name String?
+  stock_code  String?
+  established String?
+  headquarters String?
+  outlets     String?
+  countries   String?
+  parts_in_stock String?
+  experience  String?
+  email       String
+  phone       String?
+  fax         String?
+  address     String?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@map("company_info")
+}
+
+// Note: SQLite doesn't support enums, so we use strings with validation in the application layer
+// Valid values:
+// UserRole: "ADMIN", "CUSTOMER", "MANAGER"
+// UserStatus: "PENDING", "ACTIVE", "SUSPENDED", "DELETED"
+// AddressType: "SHIPPING", "BILLING"
+// OrderStatus: "PENDING", "CONFIRMED", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED", "REFUNDED"
+// PaymentStatus: "PENDING", "PAID", "FAILED", "REFUNDED", "PARTIALLY_REFUNDED"

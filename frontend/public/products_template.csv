@@ -1,0 +1,17 @@
+Name,Category,Subcategory,SKU,Catalog Number,Price,Stock Quantity,Description,In Stock
+"FORWARD and REVERSE SWITCH","Electrical Parts","Switches","FLS#: A-LB32-101A-0479A","CAT-001",55.00,15,"High-quality forward and reverse switch for forklift control systems. Features durable construction and reliable performance.","Yes"
+"COMBINATION SWITCH","Electrical Parts","Switches","FLS#: A-LB31-912B-0377A","CAT-002",48.00,8,"Multi-function combination switch for forklift lighting and control systems. Includes turn signals, wipers, and horn controls.","Yes"
+"HYDRAULIC PUMP ASSEMBLY","Hydraulic Parts","Hydraulic Pumps","FLS#: HP-001","CAT-003",180.00,3,"Complete hydraulic pump assembly for forklift lifting systems. High-pressure performance with excellent reliability.","Yes"
+"BRAKE PAD SET","Brake Parts","Brake Pads","FLS#: BP-002","CAT-004",35.00,0,"Premium brake pad set for forklift braking systems. High-friction material for optimal stopping power.","No"
+"ENGINE AIR FILTER","Filters","Air Filters","FLS#: AF-001","CAT-005",22.00,25,"High-efficiency air filter for forklift engines. Provides excellent filtration and extended engine life.","Yes"
+"OIL FILTER CARTRIDGE","Filters","Oil Filters","FLS#: OF-001","CAT-006",15.00,40,"Premium oil filter cartridge for engine lubrication systems. Ensures clean oil circulation.","Yes"
+"WATER PUMP ASSEMBLY","Cooling Parts","Water Pumps","FLS#: WP-001","CAT-007",95.00,12,"Complete water pump assembly for engine cooling systems. High-flow design for optimal heat dissipation.","Yes"
+"RADIATOR CORE","Cooling Parts","Radiators","FLS#: RC-001","CAT-008",140.00,8,"High-performance radiator core for efficient engine cooling. Copper-brass construction for durability.","Yes"
+"PISTON RING SET","Engine Parts","Pistons & Rings","FLS#: PR-001","CAT-009",75.00,18,"Complete piston ring set for engine rebuilds. High-quality materials for optimal compression.","Yes"
+"CRANKSHAFT BEARING","Engine Parts","Crankshafts","FLS#: CB-001","CAT-010",55.00,22,"Precision-engineered crankshaft bearing for smooth engine operation. High-load capacity design.","Yes"
+"GEAR SET","Transmission Parts","Gears","FLS#: GS-001","CAT-011",220.00,6,"Complete gear set for transmission systems. Hardened steel construction for long service life.","Yes"
+"CLUTCH DISC","Transmission Parts","Clutches","FLS#: CD-001","CAT-012",110.00,15,"High-performance clutch disc for smooth engagement. Organic friction material for excellent feel.","Yes"
+"HYDRAULIC CYLINDER","Hydraulic Parts","Hydraulic Cylinders","FLS#: HC-001","CAT-013",320.00,4,"Heavy-duty hydraulic cylinder for lifting applications. Chrome-plated rod for corrosion resistance.","Yes"
+"CONTROL VALVE","Hydraulic Parts","Control Valves","FLS#: CV-001","CAT-014",85.00,20,"Precision control valve for hydraulic systems. Smooth operation with minimal leakage.","Yes"
+"THERMOSTAT","Cooling Parts","Thermostats","FLS#: TH-001","CAT-015",25.00,30,"Temperature control thermostat for engine cooling systems. Reliable operation in all conditions.","Yes"
+

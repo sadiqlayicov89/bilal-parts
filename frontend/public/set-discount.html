@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Set User Discount</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #dc2626;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #b91c1c;
+        }
+        .info {
+            background-color: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Set User Discount</h1>
+        
+        <div class="info">
+            <strong>Info:</strong> This utility allows you to set discount percentage for users. 
+            The discount will be applied to all products for the selected user.
+        </div>
+
+        <div class="form-group">
+            <label for="userEmail">User Email:</label>
+            <select id="userEmail">
+                <option value="">Select a user...</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="discount">Discount Percentage:</label>
+            <input type="number" id="discount" min="0" max="100" placeholder="Enter discount percentage (0-100)">
+        </div>
+
+        <button onclick="setDiscount()">Set Discount</button>
+        <button onclick="clearDiscount()">Clear Discount</button>
+        <button onclick="showCurrentData()">Show Current Data</button>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        // Load users on page load
+        window.onload = function() {
+            loadUsers();
+        };
+
+        function loadUsers() {
+            const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+            const userSelect = document.getElementById('userEmail');
+            
+            userSelect.innerHTML = '<option value="">Select a user...</option>';
+            
+            registeredUsers.forEach(user => {
+                const option = document.createElement('option');
+                option.value = user.email;
+                option.textContent = `${user.first_name} ${user.last_name} (${user.email})`;
+                userSelect.appendChild(option);
+            });
+        }
+
+        function setDiscount() {
+            const userEmail = document.getElementById('userEmail').value;
+            const discount = parseInt(document.getElementById('discount').value);
+
+            if (!userEmail) {
+                showResult('Please select a user.', 'error');
+                return;
+            }
+
+            if (isNaN(discount) || discount < 0 || discount > 100) {
+                showResult('Please enter a valid discount percentage (0-100).', 'error');
+                return;
+            }
+
+            try {
+                const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+                const userIndex = registeredUsers.findIndex(u => u.email === userEmail);
+                
+                if (userIndex === -1) {
+                    showResult('User not found.', 'error');
+                    return;
+                }
+
+                // Update user discount
+                registeredUsers[userIndex].discount = discount;
+                localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
+
+                // Also update current user if they are logged in
+                const currentUser = JSON.parse(localStorage.getItem('user') || 'null');
+                if (currentUser && currentUser.email === userEmail) {
+                    currentUser.discount = discount;
+                    localStorage.setItem('user', JSON.stringify(currentUser));
+                }
+
+                showResult(`Discount of ${discount}% has been set for ${userEmail}`, 'success');
+                
+                // Clear form
+                document.getElementById('discount').value = '';
+                
+            } catch (error) {
+                showResult('Error setting discount: ' + error.message, 'error');
+            }
+        }
+
+        function clearDiscount() {
+            const userEmail = document.getElementById('userEmail').value;
+
+            if (!userEmail) {
+                showResult('Please select a user.', 'error');
+                return;
+            }
+
+            try {
+                const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+                const userIndex = registeredUsers.findIndex(u => u.email === userEmail);
+                
+                if (userIndex === -1) {
+                    showResult('User not found.', 'error');
+                    return;
+                }
+
+                // Clear user discount
+                registeredUsers[userIndex].discount = 0;
+                localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
+
+                // Also update current user if they are logged in
+                const currentUser = JSON.parse(localStorage.getItem('user') || 'null');
+                if (currentUser && currentUser.email === userEmail) {
+                    currentUser.discount = 0;
+                    localStorage.setItem('user', JSON.stringify(currentUser));
+                }
+
+                showResult(`Discount has been cleared for ${userEmail}`, 'success');
+                
+            } catch (error) {
+                showResult('Error clearing discount: ' + error.message, 'error');
+            }
+        }
+
+        function showCurrentData() {
+            try {
+                const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+                const currentUser = JSON.parse(localStorage.getItem('user') || 'null');
+                
+                let result = '<h3>Current Data:</h3>';
+                result += '<h4>Registered Users:</h4>';
+                result += '<ul>';
+                registeredUsers.forEach(user => {
+                    result += `<li>${user.first_name} ${user.last_name} (${user.email}) - Discount: ${user.discount || 0}%</li>`;
+                });
+                result += '</ul>';
+                
+                if (currentUser) {
+                    result += '<h4>Current User:</h4>';
+                    result += `<p>${currentUser.first_name} ${currentUser.last_name} (${currentUser.email}) - Discount: ${currentUser.discount || 0}%</p>`;
+                }
+                
+                showResult(result, 'success');
+                
+            } catch (error) {
+                showResult('Error showing data: ' + error.message, 'error');
+            }
+        }
+
+        function showResult(message, type) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `<div class="${type}">${message}</div>`;
+        }
+    </script>
+</body>
+</html>
+
+
+
+

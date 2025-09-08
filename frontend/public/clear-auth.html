@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clear Auth Data</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        button { padding: 10px 20px; margin: 10px; font-size: 16px; }
+        .clear-btn { background: #dc3545; color: white; border: none; border-radius: 5px; }
+        .show-btn { background: #007bff; color: white; border: none; border-radius: 5px; }
+        .output { margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Auth Data Manager</h1>
+    
+    <button class="show-btn" onclick="showCurrentData()">📋 Show Current Data</button>
+    <button class="clear-btn" onclick="clearAllData()">🗑️ Clear All Auth Data</button>
+    <button class="clear-btn" onclick="clearAndReload()">🔄 Clear & Reload Site</button>
+    
+    <div id="output" class="output"></div>
+
+    <script>
+        function showCurrentData() {
+            const user = localStorage.getItem('user');
+            const token = localStorage.getItem('token');
+            const registeredUsers = localStorage.getItem('registeredUsers');
+            
+            let output = '<h3>📊 Current LocalStorage Data:</h3>';
+            
+            if (user) {
+                try {
+                    const userObj = JSON.parse(user);
+                    output += `<p><strong>👤 User:</strong> ${userObj.first_name} ${userObj.last_name} (${userObj.email}) - Role: ${userObj.role}</p>`;
+                } catch (e) {
+                    output += `<p><strong>👤 User:</strong> ${user}</p>`;
+                }
+            } else {
+                output += '<p><strong>👤 User:</strong> <em>No user data</em></p>';
+            }
+            
+            output += `<p><strong>🔑 Token:</strong> ${token ? 'Present' : 'None'}</p>`;
+            output += `<p><strong>👥 Registered Users:</strong> ${registeredUsers ? 'Present' : 'None'}</p>`;
+            
+            document.getElementById('output').innerHTML = output;
+        }
+
+        function clearAllData() {
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+            localStorage.removeItem('registeredUsers');
+            
+            document.getElementById('output').innerHTML = 
+                '<p style="color: green; font-weight: bold;">✅ All auth data cleared successfully!</p>';
+        }
+
+        function clearAndReload() {
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+            localStorage.removeItem('registeredUsers');
+            
+            document.getElementById('output').innerHTML = 
+                '<p style="color: green; font-weight: bold;">✅ Data cleared! Reloading site...</p>';
+            
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 1000);
+        }
+
+        // Show current data on page load
+        showCurrentData();
+    </script>
+</body>
+</html>
+
