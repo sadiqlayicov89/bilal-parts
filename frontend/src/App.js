@@ -1,7 +1,7 @@
 import React from "react";
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { SupabaseAuthProvider } from "./contexts/SupabaseAuthContext";
+import { AuthProvider } from "./contexts/SupabaseAuthContext";
 import { CartProvider } from "./contexts/CartContext";
 import { WishlistProvider } from "./contexts/WishlistContext";
 import { CategoryProvider } from "./contexts/CategoryContext";
@@ -24,7 +24,7 @@ import MyOrdersPage from "./pages/MyOrdersPage";
 function App() {
   return (
     <div className="App">
-      <SupabaseAuthProvider>
+      <AuthProvider>
         <CartProvider>
           <WishlistProvider>
             <CategoryProvider>
@@ -49,7 +49,7 @@ function App() {
             </CategoryProvider>
           </WishlistProvider>
         </CartProvider>
-      </SupabaseAuthProvider>
+      </AuthProvider>
     </div>
   );
 }
