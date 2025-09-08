@@ -27,6 +27,7 @@ const oneC_Routes = require('./routes/1c');
 // Import middleware
 const errorHandler = require('./middleware/errorHandler');
 const { authenticateToken } = require('./middleware/auth');
+const { authenticateSupabaseToken, optionalSupabaseAuth, requireAdmin } = require('./middleware/supabaseAuth');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
