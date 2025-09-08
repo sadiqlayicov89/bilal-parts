@@ -16,17 +16,8 @@
         "maxLambdaSize": "50mb"
       }
     },
-    {
-      "src": "backend/1c_exchange.php",
-      "use": "@vercel/php"
-    }
   ],
   "routes": [
-    {
-      "src": "/backend/1c_exchange.php",
-      "dest": "/backend/1c_exchange.php",
-      "methods": ["GET", "POST"]
-    },
     {
       "src": "/api/(.*)",
       "dest": "/backend/server.js"
