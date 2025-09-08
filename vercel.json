@@ -51,14 +51,6 @@
   "env": {
     "NODE_ENV": "production"
   },
-  "functions": {
-    "backend/server.js": {
-      "maxDuration": 30
-    },
-    "backend/1c_exchange.php": {
-      "maxDuration": 60
-    }
-  },
   "regions": ["fra1"],
   "github": {
     "silent": true
