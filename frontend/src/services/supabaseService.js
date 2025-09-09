@@ -432,6 +432,180 @@ export class SupabaseService {
       throw error;
     }
   }
+
+  // ====================================
+  // USERS
+  // ====================================
+  
+  static async getUsers() {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('SupabaseService: Error fetching users:', error);
+      throw error;
+    }
+  }
+
+  static async updateUser(userId, userData) {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .update(userData)
+        .eq('id', userId)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('SupabaseService: Error updating user:', error);
+      throw error;
+    }
+  }
+
+  // ====================================
+  // ORDERS
+  // ====================================
+  
+  static async getOrders() {
+    try {
+      const { data, error } = await supabase
+        .from('orders')
+        .select(`
+          *,
+          profiles!orders_user_id_fkey(email, first_name, last_name),
+          order_items(*)
+        `)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('SupabaseService: Error fetching orders:', error);
+      throw error;
+    }
+  }
+
+  static async updateOrderStatus(orderId, status) {
+    try {
+      const { data, error } = await supabase
+        .from('orders')
+        .update({ status, updated_at: new Date().toISOString() })
+        .eq('id', orderId)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('SupabaseService: Error updating order status:', error);
+      throw error;
+    }
+  }
+
+  // ====================================
+  // NOTIFICATIONS
+  // ====================================
+  
+  static async getNotifications(userId = null) {
+    try {
+      let query = supabase
+        .from('notifications')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (userId) {
+        query = query.eq('user_id', userId);
+      } else {
+        // Admin notifications (no user_id)
+        query = query.is('user_id', null);
+      }
+      
+      const { data, error } = await query;
+      
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('SupabaseService: Error fetching notifications:', error);
+      throw error;
+    }
+  }
+
+  static async createNotification(notificationData) {
+    try {
+      const { data, error } = await supabase
+        .from('notifications')
+        .insert([notificationData])
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('SupabaseService: Error creating notification:', error);
+      throw error;
+    }
+  }
+
+  static async markNotificationAsRead(notificationId) {
+    try {
+      const { data, error } = await supabase
+        .from('notifications')
+        .update({ is_read: true, updated_at: new Date().toISOString() })
+        .eq('id', notificationId)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('SupabaseService: Error marking notification as read:', error);
+      throw error;
+    }
+  }
+
+  static async markAllNotificationsAsRead(userId = null) {
+    try {
+      let query = supabase
+        .from('notifications')
+        .update({ is_read: true, updated_at: new Date().toISOString() });
+      
+      if (userId) {
+        query = query.eq('user_id', userId);
+      } else {
+        query = query.is('user_id', null);
+      }
+      
+      const { data, error } = await query;
+      
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('SupabaseService: Error marking all notifications as read:', error);
+      throw error;
+    }
+  }
+
+  static async deleteNotification(notificationId) {
+    try {
+      const { error } = await supabase
+        .from('notifications')
+        .delete()
+        .eq('id', notificationId);
+      
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      console.error('SupabaseService: Error deleting notification:', error);
+      throw error;
+    }
+  }
 }
 
 export default SupabaseService;

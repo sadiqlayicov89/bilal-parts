@@ -242,6 +242,21 @@ CREATE TABLE IF NOT EXISTS public.news_articles (
 );
 
 -- ====================================
+-- NOTIFICATIONS TABLE
+-- ====================================
+CREATE TABLE IF NOT EXISTS public.notifications (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users,
+  type TEXT NOT NULL CHECK (type IN ('order', 'payment', 'system', 'admin', 'user')),
+  title TEXT NOT NULL,
+  message TEXT NOT NULL,
+  is_read BOOLEAN DEFAULT false,
+  data JSONB, -- Additional data for the notification
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ====================================
 -- COMPANY INFO TABLE
 -- ====================================
 CREATE TABLE IF NOT EXISTS public.company_info (
@@ -305,6 +320,7 @@ ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.contact_messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.newsletter_subscribers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.news_articles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.company_info ENABLE ROW LEVEL SECURITY;
 
 -- Public read policies (no authentication required)
@@ -331,6 +347,23 @@ CREATE POLICY "Published news articles are viewable by everyone" ON public.news_
 DROP POLICY IF EXISTS "Company info is viewable by everyone" ON public.company_info;
 CREATE POLICY "Company info is viewable by everyone" ON public.company_info
   FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Notifications are viewable by owner" ON public.notifications;
+CREATE POLICY "Notifications are viewable by owner" ON public.notifications
+  FOR SELECT USING (auth.uid() = user_id OR user_id IS NULL);
+
+DROP POLICY IF EXISTS "Notifications can be updated by owner" ON public.notifications;
+CREATE POLICY "Notifications can be updated by owner" ON public.notifications
+  FOR UPDATE USING (auth.uid() = user_id OR user_id IS NULL);
+
+DROP POLICY IF EXISTS "Admin can manage all notifications" ON public.notifications;
+CREATE POLICY "Admin can manage all notifications" ON public.notifications
+  FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles 
+      WHERE id = auth.uid() AND role = 'admin'
+    )
+  );
 
 -- User-specific policies
 DROP POLICY IF EXISTS "Users can view own profile" ON public.profiles;
