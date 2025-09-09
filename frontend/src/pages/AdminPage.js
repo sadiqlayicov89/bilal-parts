@@ -757,9 +757,13 @@ const AdminPage = () => {
           }
           
           // Find category ID
+          console.log('Available categories in Supabase:', supabaseCategories.map(c => c.name));
+          console.log('Looking for category:', editProductFormData.category);
+          
           const category = supabaseCategories.find(cat => cat.name === editProductFormData.category);
           if (!category) {
-            throw new Error('Category not found in Supabase');
+            console.error('Category not found. Available categories:', supabaseCategories);
+            throw new Error(`Category "${editProductFormData.category}" not found in Supabase. Available: ${supabaseCategories.map(c => c.name).join(', ')}`);
           }
           
           console.log('Found category:', category);
