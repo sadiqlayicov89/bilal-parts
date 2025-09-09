@@ -57,12 +57,13 @@
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^1.1.2",
     "xlsx": "^0.18.5",
-    "zod": "^3.24.4"
+    "zod": "^3.24.4",
+    "@craco/craco": "^7.1.0"
   },
   "scripts": {
-    "start": "npx craco start",
-    "build": "npx craco build",
-    "test": "npx craco test"
+    "start": "craco start",
+    "build": "craco build", 
+    "test": "craco test"
   },
   "browserslist": {
     "production": [
@@ -77,7 +78,6 @@
     ]
   },
   "devDependencies": {
-    "@craco/craco": "^7.1.0",
     "@eslint/js": "9.23.0",
     "autoprefixer": "^10.4.20",
     "eslint": "9.23.0",
