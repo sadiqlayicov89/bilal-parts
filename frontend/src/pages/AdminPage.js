@@ -746,11 +746,24 @@ const AdminPage = () => {
       } else {
         // Create new product in Supabase
         try {
-          // Find category ID
-          const category = categories.find(cat => cat.name === editProductFormData.category);
-          if (!category) {
-            throw new Error('Category not found');
+          // Get categories from Supabase instead of localStorage
+          const { data: supabaseCategories, error: catError } = await supabase
+            .from('categories')
+            .select('id, name')
+            .eq('is_active', true);
+          
+          if (catError) {
+            throw new Error(`Failed to fetch categories: ${catError.message}`);
           }
+          
+          // Find category ID
+          const category = supabaseCategories.find(cat => cat.name === editProductFormData.category);
+          if (!category) {
+            throw new Error('Category not found in Supabase');
+          }
+          
+          console.log('Found category:', category);
+          console.log('Category ID:', category.id, 'Type:', typeof category.id);
           
           // Prepare product data for Supabase (don't include ID, let Supabase generate it)
           const productData = {
