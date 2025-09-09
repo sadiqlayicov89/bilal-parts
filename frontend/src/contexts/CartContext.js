@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
-import { useAuth } from './AuthContext';
+import { useAuth } from './SupabaseAuthContext';
 import { useToast } from '../hooks/use-toast';
 import { mockData } from '../data/mockData';
 import { calculateCartTotals, getProductPriceInfo } from '../utils/priceUtils';
