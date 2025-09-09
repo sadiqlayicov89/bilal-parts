@@ -500,6 +500,12 @@ const ProductsPage = () => {
        console.log('Sample products:', products.slice(0, 3).map(p => ({ name: p.name, category: p.category })));
        console.log('All product categories:', [...new Set(products.map(p => p.category))]);
       
+      // Early return if no products
+      if (!products || products.length === 0) {
+        console.log('No products to filter, returning empty array');
+        return [];
+      }
+      
       // Get filtered and sorted products
       let filtered = [...products];
       
@@ -625,6 +631,7 @@ const ProductsPage = () => {
       return [];
     }
   }, [
+    products,
     searchQuery, 
     selectedCategory, 
     selectedSubcategory, 
