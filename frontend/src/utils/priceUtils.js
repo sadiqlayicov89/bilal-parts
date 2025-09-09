@@ -38,7 +38,9 @@ export const calculateDiscountAmount = (originalPrice, userDiscount = 0) => {
  */
 export const formatPrice = (price, currency = '₽') => {
   if (!price || price <= 0) return `0 ${currency}`;
-  return `${price.toFixed(2)} ${currency}`;
+  const numPrice = typeof price === 'number' ? price : parseFloat(price);
+  if (isNaN(numPrice)) return `0 ${currency}`;
+  return `${numPrice.toFixed(2)} ${currency}`;
 };
 
 /**

@@ -95,6 +95,7 @@ const AdminPage = () => {
 
   // Additional states for new sections
   const [localCategories, setLocalCategories] = useState([]);
+  const [adminCategories, setAdminCategories] = useState([]);
   const [payments, setPayments] = useState([]);
   const [reviews, setReviews] = useState([]);
   
@@ -1161,7 +1162,7 @@ const AdminPage = () => {
       const savedCategories = localStorage.getItem('adminCategories');
       
       if (savedCategories) {
-        setCategories(JSON.parse(savedCategories));
+        setAdminCategories(JSON.parse(savedCategories));
         return;
       }
       
@@ -1267,7 +1268,7 @@ const AdminPage = () => {
         }
       ];
       
-      setCategories(mockCategories);
+      setAdminCategories(mockCategories);
       // Save default categories to localStorage
       localStorage.setItem('adminCategories', JSON.stringify(mockCategories));
       
@@ -1409,7 +1410,7 @@ const AdminPage = () => {
   };
 
   const handleDeleteAllCategories = () => {
-    setCategories([]);
+    setAdminCategories([]);
     setSelectedCategories([]);
     
     // Save to localStorage
@@ -2783,7 +2784,7 @@ const AdminPage = () => {
                                            size="sm" 
                                            variant="destructive"
                                            onClick={() => {
-                                             setCategories(prev => prev.filter(c => c.id !== category.id));
+                                             setAdminCategories(prev => prev.filter(c => c.id !== category.id));
                                            }}
                                          >
                                            <Trash2 className="w-4 h-4" />
@@ -2838,7 +2839,7 @@ const AdminPage = () => {
                                                  }
                                                  return c;
                                                });
-                                               setCategories(updatedCategories);
+                                               setAdminCategories(updatedCategories);
                                                
                                                // Save to localStorage
                                                localStorage.setItem('adminCategories', JSON.stringify(updatedCategories));
