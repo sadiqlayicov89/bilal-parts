@@ -308,54 +308,70 @@ ALTER TABLE public.news_articles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.company_info ENABLE ROW LEVEL SECURITY;
 
 -- Public read policies (no authentication required)
+DROP POLICY IF EXISTS "Categories are viewable by everyone" ON public.categories;
 CREATE POLICY "Categories are viewable by everyone" ON public.categories
   FOR SELECT USING (is_active = true);
 
+DROP POLICY IF EXISTS "Products are viewable by everyone" ON public.products;
 CREATE POLICY "Products are viewable by everyone" ON public.products
   FOR SELECT USING (is_active = true);
 
+DROP POLICY IF EXISTS "Product images are viewable by everyone" ON public.product_images;
 CREATE POLICY "Product images are viewable by everyone" ON public.product_images
   FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "Product specifications are viewable by everyone" ON public.product_specifications;
 CREATE POLICY "Product specifications are viewable by everyone" ON public.product_specifications
   FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "Published news articles are viewable by everyone" ON public.news_articles;
 CREATE POLICY "Published news articles are viewable by everyone" ON public.news_articles
   FOR SELECT USING (is_published = true);
 
+DROP POLICY IF EXISTS "Company info is viewable by everyone" ON public.company_info;
 CREATE POLICY "Company info is viewable by everyone" ON public.company_info
   FOR SELECT USING (true);
 
 -- User-specific policies
+DROP POLICY IF EXISTS "Users can view own profile" ON public.profiles;
 CREATE POLICY "Users can view own profile" ON public.profiles
   FOR SELECT USING (auth.uid() = id);
 
+DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
 CREATE POLICY "Users can update own profile" ON public.profiles
   FOR UPDATE USING (auth.uid() = id);
 
+DROP POLICY IF EXISTS "Users can view own addresses" ON public.addresses;
 CREATE POLICY "Users can view own addresses" ON public.addresses
   FOR ALL USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can view own orders" ON public.orders;
 CREATE POLICY "Users can view own orders" ON public.orders
   FOR SELECT USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can view own cart items" ON public.cart_items;
 CREATE POLICY "Users can view own cart items" ON public.cart_items
   FOR ALL USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can view own wishlist items" ON public.wishlist_items;
 CREATE POLICY "Users can view own wishlist items" ON public.wishlist_items
   FOR ALL USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can create reviews" ON public.reviews;
 CREATE POLICY "Users can create reviews" ON public.reviews
   FOR INSERT WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can view approved reviews" ON public.reviews;
 CREATE POLICY "Users can view approved reviews" ON public.reviews
   FOR SELECT USING (is_approved = true);
 
 -- Contact messages - anyone can create
+DROP POLICY IF EXISTS "Anyone can create contact messages" ON public.contact_messages;
 CREATE POLICY "Anyone can create contact messages" ON public.contact_messages
   FOR INSERT WITH CHECK (true);
 
 -- Newsletter - anyone can subscribe
+DROP POLICY IF EXISTS "Anyone can subscribe to newsletter" ON public.newsletter_subscribers;
 CREATE POLICY "Anyone can subscribe to newsletter" ON public.newsletter_subscribers
   FOR INSERT WITH CHECK (true);
 
