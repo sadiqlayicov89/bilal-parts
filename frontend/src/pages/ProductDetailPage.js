@@ -7,6 +7,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { getProductPriceInfo } from '../utils/priceUtils';
 import LoginModal from '../components/auth/LoginModal';
+import SupabaseService from '../services/supabaseService';
 import mockData from '../data/mockData';
 
 const ProductDetailPage = () => {
@@ -18,10 +19,25 @@ const ProductDetailPage = () => {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [similarProducts, setSimilarProducts] = useState([]);
 
   useEffect(() => {
-    const fetchProduct = () => {
+    const fetchProduct = async () => {
       try {
+        setLoading(true);
+        
+        // First try to fetch from Supabase
+        const supabaseProducts = await SupabaseService.getProducts();
+        if (supabaseProducts && supabaseProducts.length > 0) {
+          const product = supabaseProducts.find(p => p.id === productId);
+          if (product) {
+            setCurrentProduct(product);
+            setLoading(false);
+            return;
+          }
+        }
+        
+        // Fallback to localStorage or mockData
         const savedProducts = JSON.parse(localStorage.getItem('adminProducts') || '[]');
         const allProducts = savedProducts.length > 0 ? savedProducts : mockData.products;
         
@@ -45,15 +61,41 @@ const ProductDetailPage = () => {
     }
   }, [productId, navigate]);
 
-  const getSimilarProducts = () => {
+  // Load similar products when currentProduct changes
+  useEffect(() => {
+    const loadSimilarProducts = async () => {
+      if (currentProduct) {
+        const similar = await getSimilarProducts();
+        setSimilarProducts(similar);
+      }
+    };
+    
+    loadSimilarProducts();
+  }, [currentProduct]);
+
+  const getSimilarProducts = async () => {
     if (!currentProduct) return [];
     
-    const savedProducts = JSON.parse(localStorage.getItem('adminProducts') || '[]');
-    const allProducts = savedProducts.length > 0 ? savedProducts : mockData.products;
-    
-    return allProducts
-      .filter(p => p.category === currentProduct.category && p.id !== currentProduct.id)
-      .slice(0, 4);
+    try {
+      // First try to fetch from Supabase
+      const supabaseProducts = await SupabaseService.getProducts();
+      if (supabaseProducts && supabaseProducts.length > 0) {
+        return supabaseProducts
+          .filter(p => p.category === currentProduct.category && p.id !== currentProduct.id)
+          .slice(0, 4);
+      }
+      
+      // Fallback to localStorage or mockData
+      const savedProducts = JSON.parse(localStorage.getItem('adminProducts') || '[]');
+      const allProducts = savedProducts.length > 0 ? savedProducts : mockData.products;
+      
+      return allProducts
+        .filter(p => p.category === currentProduct.category && p.id !== currentProduct.id)
+        .slice(0, 4);
+    } catch (error) {
+      console.error('Error fetching similar products:', error);
+      return [];
+    }
   };
 
   const handleAddToCart = async () => {
@@ -116,7 +158,6 @@ const ProductDetailPage = () => {
 
   const images = currentProduct.images && currentProduct.images.length > 0 ? currentProduct.images : 
                  currentProduct.image ? [currentProduct.image] : [];
-  const similarProducts = getSimilarProducts();
   const priceInfo = getProductPriceInfo(currentProduct, userDiscount) || {
     displayPrice: currentProduct.price || 0,
     originalPrice: currentProduct.price || 0,
