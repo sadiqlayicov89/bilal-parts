@@ -8,7 +8,7 @@ CREATE EXTENSION IF NOT EXISTS "pg_trgm";
 -- ====================================
 -- PROFILES TABLE (User profiles linked to auth.users)
 -- ====================================
-CREATE TABLE public.profiles (
+CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID REFERENCES auth.users NOT NULL PRIMARY KEY,
   email TEXT UNIQUE NOT NULL,
   first_name TEXT,
@@ -30,7 +30,7 @@ CREATE TABLE public.profiles (
 -- ====================================
 -- CATEGORIES TABLE
 -- ====================================
-CREATE TABLE public.categories (
+CREATE TABLE IF NOT EXISTS public.categories (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   name TEXT UNIQUE NOT NULL,
   slug TEXT UNIQUE NOT NULL,
@@ -47,7 +47,7 @@ CREATE TABLE public.categories (
 -- ====================================
 -- PRODUCTS TABLE
 -- ====================================
-CREATE TABLE public.products (
+CREATE TABLE IF NOT EXISTS public.products (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   name TEXT NOT NULL,
   sku TEXT UNIQUE NOT NULL,
@@ -77,7 +77,7 @@ CREATE TABLE public.products (
 -- ====================================
 -- PRODUCT IMAGES TABLE
 -- ====================================
-CREATE TABLE public.product_images (
+CREATE TABLE IF NOT EXISTS public.product_images (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   product_id UUID REFERENCES public.products(id) ON DELETE CASCADE NOT NULL,
   image_url TEXT NOT NULL,
@@ -90,7 +90,7 @@ CREATE TABLE public.product_images (
 -- ====================================
 -- PRODUCT SPECIFICATIONS TABLE
 -- ====================================
-CREATE TABLE public.product_specifications (
+CREATE TABLE IF NOT EXISTS public.product_specifications (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   product_id UUID REFERENCES public.products(id) ON DELETE CASCADE NOT NULL,
   name TEXT NOT NULL,
@@ -102,7 +102,7 @@ CREATE TABLE public.product_specifications (
 -- ====================================
 -- ADDRESSES TABLE
 -- ====================================
-CREATE TABLE public.addresses (
+CREATE TABLE IF NOT EXISTS public.addresses (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID REFERENCES auth.users NOT NULL,
   type TEXT DEFAULT 'shipping' CHECK (type IN ('shipping', 'billing')),
@@ -124,7 +124,7 @@ CREATE TABLE public.addresses (
 -- ====================================
 -- ORDERS TABLE
 -- ====================================
-CREATE TABLE public.orders (
+CREATE TABLE IF NOT EXISTS public.orders (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   order_number TEXT UNIQUE NOT NULL,
   user_id UUID REFERENCES auth.users NOT NULL,
@@ -148,7 +148,7 @@ CREATE TABLE public.orders (
 -- ====================================
 -- ORDER ITEMS TABLE
 -- ====================================
-CREATE TABLE public.order_items (
+CREATE TABLE IF NOT EXISTS public.order_items (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   order_id UUID REFERENCES public.orders(id) ON DELETE CASCADE NOT NULL,
   product_id UUID REFERENCES public.products(id) NOT NULL,
@@ -161,7 +161,7 @@ CREATE TABLE public.order_items (
 -- ====================================
 -- CART ITEMS TABLE
 -- ====================================
-CREATE TABLE public.cart_items (
+CREATE TABLE IF NOT EXISTS public.cart_items (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID REFERENCES auth.users NOT NULL,
   product_id UUID REFERENCES public.products(id) ON DELETE CASCADE NOT NULL,
@@ -174,7 +174,7 @@ CREATE TABLE public.cart_items (
 -- ====================================
 -- WISHLIST ITEMS TABLE
 -- ====================================
-CREATE TABLE public.wishlist_items (
+CREATE TABLE IF NOT EXISTS public.wishlist_items (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID REFERENCES auth.users NOT NULL,
   product_id UUID REFERENCES public.products(id) ON DELETE CASCADE NOT NULL,
@@ -185,7 +185,7 @@ CREATE TABLE public.wishlist_items (
 -- ====================================
 -- REVIEWS TABLE
 -- ====================================
-CREATE TABLE public.reviews (
+CREATE TABLE IF NOT EXISTS public.reviews (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID REFERENCES auth.users NOT NULL,
   product_id UUID REFERENCES public.products(id) ON DELETE CASCADE NOT NULL,
@@ -202,7 +202,7 @@ CREATE TABLE public.reviews (
 -- ====================================
 -- CONTACT MESSAGES TABLE
 -- ====================================
-CREATE TABLE public.contact_messages (
+CREATE TABLE IF NOT EXISTS public.contact_messages (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   name TEXT NOT NULL,
   email TEXT NOT NULL,
@@ -216,7 +216,7 @@ CREATE TABLE public.contact_messages (
 -- ====================================
 -- NEWSLETTER SUBSCRIBERS TABLE
 -- ====================================
-CREATE TABLE public.newsletter_subscribers (
+CREATE TABLE IF NOT EXISTS public.newsletter_subscribers (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   email TEXT UNIQUE NOT NULL,
   is_active BOOLEAN DEFAULT true,
@@ -227,7 +227,7 @@ CREATE TABLE public.newsletter_subscribers (
 -- ====================================
 -- NEWS ARTICLES TABLE
 -- ====================================
-CREATE TABLE public.news_articles (
+CREATE TABLE IF NOT EXISTS public.news_articles (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   title TEXT NOT NULL,
   slug TEXT UNIQUE NOT NULL,
@@ -244,7 +244,7 @@ CREATE TABLE public.news_articles (
 -- ====================================
 -- COMPANY INFO TABLE
 -- ====================================
-CREATE TABLE public.company_info (
+CREATE TABLE IF NOT EXISTS public.company_info (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   name TEXT NOT NULL,
   chinese_name TEXT,
@@ -441,7 +441,8 @@ CREATE TRIGGER set_company_info_updated_at
 
 -- Insert default company info
 INSERT INTO public.company_info (name, chinese_name, stock_code, email, phone, address) VALUES
-('BILAL-PARTS CO.,LTD', '比拉尔零件有限公司', '02499.HK', 'admin@bilal-parts.com', '0086-18520438258', 'No. 999,Asian Games Avenue,Shiqi Town,Panyu District,Guangzhou,China.');
+('BILAL-PARTS CO.,LTD', '比拉尔零件有限公司', '02499.HK', 'admin@bilal-parts.com', '0086-18520438258', 'No. 999,Asian Games Avenue,Shiqi Town,Panyu District,Guangzhou,China.')
+ON CONFLICT (name) DO NOTHING;
 
 -- Insert some default categories
 INSERT INTO public.categories (name, slug, description) VALUES
@@ -451,20 +452,25 @@ INSERT INTO public.categories (name, slug, description) VALUES
 ('Brake Parts', 'brake-parts', 'Braking system components'),
 ('Filters', 'filters', 'Various types of filters'),
 ('Cooling Parts', 'cooling-parts', 'Cooling system components'),
-('Transmission Parts', 'transmission-parts', 'Transmission system components');
+('Transmission Parts', 'transmission-parts', 'Transmission system components')
+ON CONFLICT (slug) DO NOTHING;
 
 -- Insert subcategories
 INSERT INTO public.categories (name, slug, description, parent_id) 
-SELECT 'Switches', 'switches', 'Electrical switches', id FROM public.categories WHERE slug = 'electrical-parts';
+SELECT 'Switches', 'switches', 'Electrical switches', id FROM public.categories WHERE slug = 'electrical-parts'
+ON CONFLICT (slug) DO NOTHING;
 
 INSERT INTO public.categories (name, slug, description, parent_id) 
-SELECT 'Pumps', 'pumps', 'Hydraulic pumps', id FROM public.categories WHERE slug = 'hydraulic-parts';
+SELECT 'Pumps', 'pumps', 'Hydraulic pumps', id FROM public.categories WHERE slug = 'hydraulic-parts'
+ON CONFLICT (slug) DO NOTHING;
 
 INSERT INTO public.categories (name, slug, description, parent_id) 
-SELECT 'Air Filters', 'air-filters', 'Air filtration systems', id FROM public.categories WHERE slug = 'filters';
+SELECT 'Air Filters', 'air-filters', 'Air filtration systems', id FROM public.categories WHERE slug = 'filters'
+ON CONFLICT (slug) DO NOTHING;
 
 INSERT INTO public.categories (name, slug, description, parent_id) 
-SELECT 'Oil Filters', 'oil-filters', 'Oil filtration systems', id FROM public.categories WHERE slug = 'filters';
+SELECT 'Oil Filters', 'oil-filters', 'Oil filtration systems', id FROM public.categories WHERE slug = 'filters'
+ON CONFLICT (slug) DO NOTHING;
 
 -- Success message
 SELECT 'Database schema created successfully! 🎉' as message;
