@@ -29,6 +29,7 @@ const Header = () => {
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [customerNotifications, setCustomerNotifications] = useState([]);
   const [unreadCustomerNotifications, setUnreadCustomerNotifications] = useState(0);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   // Auth and Cart/Wishlist contexts
   const { user, isAuthenticated, logout, isAdmin } = useAuth();
@@ -232,6 +233,14 @@ const Header = () => {
                 Premium Parts & Accessories
               </div>
             </Link>
+
+            {/* Mobile Menu Button */}
+            <button
+              className="lg:hidden p-2 text-gray-600 hover:text-red-600"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
 
             {/* Navigation */}
             <nav className="hidden lg:flex items-center space-x-8">
@@ -673,6 +682,118 @@ const Header = () => {
           )}
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="lg:hidden bg-white border-t border-gray-200 shadow-lg">
+          <div className="px-4 py-4 space-y-4">
+            {/* Mobile Navigation Links */}
+            <div className="space-y-2">
+              <Link
+                to="/"
+                className="block px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-md transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Home
+              </Link>
+              
+              <Link
+                to="/products"
+                className="block px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-md transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Products
+              </Link>
+              
+              <Link
+                to="/company"
+                className="block px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-md transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Company
+              </Link>
+              
+              <Link
+                to="/contact"
+                className="block px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-md transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Contact
+              </Link>
+            </div>
+
+            {/* Mobile Categories */}
+            <div className="border-t border-gray-200 pt-4">
+              <h3 className="px-4 py-2 text-sm font-semibold text-gray-500 uppercase tracking-wider">
+                Categories
+              </h3>
+              <div className="space-y-1">
+                {productCategories.slice(0, 6).map((category, index) => (
+                  <Link
+                    key={index}
+                    to={`/products?category=${encodeURIComponent(category.name)}`}
+                    className="block px-4 py-2 text-sm text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-md transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {category.name}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Mobile Auth Buttons */}
+            <div className="border-t border-gray-200 pt-4 space-y-2">
+              {isAuthenticated ? (
+                <div className="space-y-2">
+                  <div className="px-4 py-2 text-sm text-gray-600">
+                    Welcome, {user?.first_name || user?.email}
+                  </div>
+                  <Link
+                    to="/profile"
+                    className="block px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-md transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Profile
+                  </Link>
+                  {isAdmin && (
+                    <Link
+                      to="/admin"
+                      className="block px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-md transition-colors"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Admin Panel
+                    </Link>
+                  )}
+                  <button
+                    onClick={() => {
+                      logout();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-md transition-colors"
+                  >
+                    Logout
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <LoginModal>
+                    <button className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-md transition-colors">
+                      Login
+                    </button>
+                  </LoginModal>
+                  <Link
+                    to="/register"
+                    className="block px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded-md transition-colors text-center"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Register
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 };

@@ -54,7 +54,7 @@ const HeroSection = () => {
   };
 
   return (
-    <section className="relative h-[600px] overflow-hidden">
+    <section className="relative h-[400px] md:h-[500px] lg:h-[600px] overflow-hidden">
       {/* Slides */}
       <div className="relative h-full">
         {slides.map((slide, index) => (
@@ -74,18 +74,18 @@ const HeroSection = () => {
             <div className="relative z-10 h-full flex items-center">
               <div className="container mx-auto px-4">
                 <div className="max-w-2xl text-white">
-                  <h2 className="text-sm font-medium mb-2 tracking-wide">
+                  <h2 className="text-xs md:text-sm font-medium mb-2 tracking-wide">
                     {slide.subtitle}
                   </h2>
-                  <h1 className="text-5xl font-bold mb-4 leading-tight">
+                  <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight">
                     {slide.title}
                   </h1>
-                  <p className="text-xl mb-8 opacity-90">
+                  <p className="text-sm md:text-lg lg:text-xl mb-6 md:mb-8 opacity-90">
                     {slide.description}
                   </p>
                   <Button 
                     size="lg" 
-                    className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 text-lg font-medium"
+                    className="bg-red-600 hover:bg-red-700 text-white px-6 md:px-8 py-2 md:py-3 text-sm md:text-lg font-medium"
                     onClick={() => {
                       if (slide.buttonText === "CONTACT") {
                         navigate('/contact');

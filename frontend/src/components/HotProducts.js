@@ -129,7 +129,7 @@ const HotProducts = () => {
               style={{ transform: `translateX(-${currentIndex * 20}%)` }}
             >
               {products.map((product, index) => (
-                <div key={index} className="w-1/5 flex-shrink-0 px-2">
+                <div key={index} className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 flex-shrink-0 px-2">
                   <Card className="group hover:shadow-lg transition-all duration-300">
                     <div className="relative overflow-hidden">
                       <div 
