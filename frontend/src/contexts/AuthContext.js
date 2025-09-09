@@ -135,6 +135,7 @@ export const AuthProvider = ({ children }) => {
         } catch (apiError) {
           // Fallback to localStorage login for development
           console.log('Backend API not available, using localStorage login');
+        }
         
         // Check admin user first - simple admin/admin login
         if (email === "admin" && password === "admin") {
@@ -284,6 +285,7 @@ export const AuthProvider = ({ children }) => {
         } catch (apiError) {
           // Fallback to localStorage registration for development
           console.log('Backend API not available, using localStorage registration');
+        }
         
         // Check if user already exists
         const existingUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
