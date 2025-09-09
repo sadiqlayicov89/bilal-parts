@@ -467,7 +467,7 @@ CREATE TRIGGER set_company_info_updated_at
 -- Insert default company info
 INSERT INTO public.company_info (name, chinese_name, stock_code, email, phone, address) VALUES
 ('BILAL-PARTS CO.,LTD', '比拉尔零件有限公司', '02499.HK', 'admin@bilal-parts.com', '0086-18520438258', 'No. 999,Asian Games Avenue,Shiqi Town,Panyu District,Guangzhou,China.')
-ON CONFLICT (name) DO NOTHING;
+ON CONFLICT DO NOTHING;
 
 -- Insert some default categories
 INSERT INTO public.categories (name, slug, description) VALUES
