@@ -1333,7 +1333,7 @@ const AdminPage = () => {
       // If no saved categories, load default mock categories
       const mockCategories = [
         {
-          id: "1",
+          id: "550e8400-e29b-41d4-a716-446655440001",
           name: "Forklift",
           description: "Forklift parts and accessories",
           product_count: 45,
@@ -1654,12 +1654,30 @@ const AdminPage = () => {
     try {
       console.log('Creating category with data:', categoryFormData);
       
+      // Validate parent_id is a valid UUID
+      let parentId = null;
+      if (categoryFormData.parent_id && categoryFormData.parent_id !== "main" && categoryFormData.parent_id !== null) {
+        // Check if it's a valid UUID format
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+        if (uuidRegex.test(categoryFormData.parent_id)) {
+          parentId = categoryFormData.parent_id;
+        } else {
+          console.error('Invalid UUID format for parent_id:', categoryFormData.parent_id);
+          toast({
+            title: 'Error',
+            description: 'Invalid parent category selection. Please select a valid category.',
+            variant: 'destructive'
+          });
+          return;
+        }
+      }
+      
       // Prepare category data for Supabase
       const categoryData = {
         name: categoryFormData.name,
         description: categoryFormData.description || '',
         slug: categoryFormData.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
-        parent_id: categoryFormData.parent_id && categoryFormData.parent_id !== "main" ? categoryFormData.parent_id : null,
+        parent_id: parentId,
         is_active: categoryFormData.is_active,
         image: 'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=400&h=300&fit=crop'
       };
