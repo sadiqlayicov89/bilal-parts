@@ -8,6 +8,7 @@ import { Search, Filter, X, SlidersHorizontal } from "lucide-react";
 import ProductCard from "../components/ProductCard";
 import ProductDetailModal from "../components/ProductDetailModal";
 import { mockData } from "../data/mockData";
+import SupabaseService from "../services/supabaseService";
 
 const ProductsPage = () => {
   const navigate = useNavigate();
@@ -275,6 +276,66 @@ const ProductsPage = () => {
   ];
 
   const [categories, setCategories] = useState(defaultCategories);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Load products from Supabase
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        setLoading(true);
+        const supabaseProducts = await SupabaseService.getProducts();
+        
+        if (supabaseProducts && supabaseProducts.length > 0) {
+          // Format products for the frontend
+          const formattedProducts = supabaseProducts.map(product => ({
+            id: product.id,
+            name: product.name,
+            sku: product.sku,
+            catalogNumber: product.catalog_number,
+            price: parseFloat(product.price) || 0,
+            originalPrice: parseFloat(product.original_price) || parseFloat(product.price) || 0,
+            description: product.description || '',
+            shortDescription: product.short_description || '',
+            category: product.categories?.name || 'Unknown',
+            subcategory: product.subcategories?.name || '',
+            images: product.product_images ? product.product_images.map(img => img.image_url) : [],
+            image: product.product_images && product.product_images.length > 0 
+              ? product.product_images[0].image_url 
+              : 'https://images.unsplash.com/photo-1581093458791-9d42e30754c4?w=300&h=200&fit=crop',
+            in_stock: product.in_stock,
+            stock_quantity: product.stock_quantity || 0,
+            brand: product.brand || '',
+            model: product.model || '',
+            year: product.year || null,
+            weight: product.weight || null,
+            dimensions: product.dimensions || '',
+            specifications: product.product_specifications ? 
+              product.product_specifications.reduce((acc, spec) => {
+                acc[spec.name] = spec.value;
+                return acc;
+              }, {}) : {}
+          }));
+          setProducts(formattedProducts);
+        } else {
+          // Fallback to localStorage or mockData
+          const savedProducts = JSON.parse(localStorage.getItem('adminProducts') || '[]');
+          const sourceProducts = savedProducts.length > 0 ? savedProducts : mockData.products;
+          setProducts(sourceProducts);
+        }
+      } catch (error) {
+        console.error('Error loading products:', error);
+        // Fallback to localStorage or mockData
+        const savedProducts = JSON.parse(localStorage.getItem('adminProducts') || '[]');
+        const sourceProducts = savedProducts.length > 0 ? savedProducts : mockData.products;
+        setProducts(sourceProducts);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProducts();
+  }, []);
 
   // Debug: Log categories state changes
   // useEffect(() => {
@@ -434,7 +495,7 @@ const ProductsPage = () => {
        // console.log('Available categories:', categories.map(cat => cat.name)); // Commented out to reduce console spam
       
       // Get filtered and sorted products
-      let filtered = [...mockData.products];
+      let filtered = [...products];
       
       // Add test products for admin panel categories that don't exist in mockData
       if (categories && Array.isArray(categories) && categories.length > 0) {
@@ -596,6 +657,23 @@ const ProductsPage = () => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white">
+        <Header />
+        <div className="container mx-auto px-4 py-16 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-red-600">
+            FORKLIFT PARTS & ACCESSORIES
+          </h1>
+          <p className="text-xl mb-8 text-gray-600">
+            Loading products...
+          </p>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white">

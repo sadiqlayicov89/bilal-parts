@@ -7,29 +7,78 @@ import { Badge } from "./ui/badge";
 import { mockData } from "../data/mockData";
 import { useAuth } from "../contexts/AuthContext";
 import { getProductPriceInfo, formatPrice } from "../utils/priceUtils";
+import SupabaseService from "../services/supabaseService";
 
 const HotProducts = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { userDiscount } = useAuth();
   
-  // Get first 6 products from localStorage or mockData
-  const getProducts = () => {
-    const savedProducts = JSON.parse(localStorage.getItem('adminProducts') || '[]');
-    const sourceProducts = savedProducts.length > 0 ? savedProducts : mockData.products;
-    
-    return sourceProducts.slice(0, 6).map(product => ({
-      name: product.name,
-      code: product.sku,
-      image: product.images && product.images.length > 0 ? product.images[0] : product.image,
-      images: product.images || (product.image ? [product.image] : []),
-      price: product.price,
-      originalPrice: product.originalPrice,
-      id: product.id
-    }));
-  };
+  // Load products from Supabase
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        setLoading(true);
+        const supabaseProducts = await SupabaseService.getProducts();
+        
+        if (supabaseProducts && supabaseProducts.length > 0) {
+          // Get first 6 products from Supabase
+          const formattedProducts = supabaseProducts.slice(0, 6).map(product => ({
+            name: product.name,
+            code: product.sku,
+            image: product.product_images && product.product_images.length > 0 
+              ? product.product_images[0].image_url 
+              : 'https://images.unsplash.com/photo-1581093458791-9d42e30754c4?w=300&h=200&fit=crop',
+            images: product.product_images ? product.product_images.map(img => img.image_url) : [],
+            price: parseFloat(product.price) || 0,
+            originalPrice: parseFloat(product.original_price) || parseFloat(product.price) || 0,
+            id: product.id,
+            category: product.categories?.name || 'Unknown',
+            in_stock: product.in_stock,
+            stock_quantity: product.stock_quantity || 0
+          }));
+          setProducts(formattedProducts);
+        } else {
+          // Fallback to localStorage or mockData
+          const savedProducts = JSON.parse(localStorage.getItem('adminProducts') || '[]');
+          const sourceProducts = savedProducts.length > 0 ? savedProducts : mockData.products;
+          
+          const formattedProducts = sourceProducts.slice(0, 6).map(product => ({
+            name: product.name,
+            code: product.sku,
+            image: product.images && product.images.length > 0 ? product.images[0] : product.image,
+            images: product.images || (product.image ? [product.image] : []),
+            price: product.price,
+            originalPrice: product.originalPrice,
+            id: product.id
+          }));
+          setProducts(formattedProducts);
+        }
+      } catch (error) {
+        console.error('Error loading products:', error);
+        // Fallback to localStorage or mockData
+        const savedProducts = JSON.parse(localStorage.getItem('adminProducts') || '[]');
+        const sourceProducts = savedProducts.length > 0 ? savedProducts : mockData.products;
+        
+        const formattedProducts = sourceProducts.slice(0, 6).map(product => ({
+          name: product.name,
+          code: product.sku,
+          image: product.images && product.images.length > 0 ? product.images[0] : product.image,
+          images: product.images || (product.image ? [product.image] : []),
+          price: product.price,
+          originalPrice: product.originalPrice,
+          id: product.id
+        }));
+        setProducts(formattedProducts);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const products = getProducts();
+    loadProducts();
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -45,6 +94,23 @@ const HotProducts = () => {
   const prevSlide = () => {
     setCurrentIndex((prev) => (prev - 1 + (products.length - 5)) % (products.length - 5));
   };
+
+  if (loading) {
+    return (
+      <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-red-600 mb-4">
+              HOT PRODUCTS
+            </h2>
+            <p className="text-lg text-gray-600">
+              Loading products...
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-16 bg-gray-50">
