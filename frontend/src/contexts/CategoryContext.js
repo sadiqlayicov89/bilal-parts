@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { mockData } from '../data/mockData';
+import SupabaseService from '../services/supabaseService';
 
 const CategoryContext = createContext();
 
@@ -15,22 +16,64 @@ export const CategoryProvider = ({ children }) => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Load categories from localStorage or use mockData as fallback
-  const loadCategories = () => {
+  // Load categories from Supabase or use mockData as fallback
+  const loadCategories = async () => {
     try {
-      const savedCategories = localStorage.getItem('adminCategories');
-      if (savedCategories) {
-        const parsedCategories = JSON.parse(savedCategories);
-        setCategories(parsedCategories);
+      setLoading(true);
+      
+      // Try to load from Supabase first
+      const supabaseCategories = await SupabaseService.getCategories();
+      
+      if (supabaseCategories && supabaseCategories.length > 0) {
+        // Convert Supabase categories to the format expected by the context
+        const formattedCategories = supabaseCategories.map(cat => ({
+          id: cat.id,
+          name: cat.name,
+          slug: cat.slug || cat.name.toLowerCase().replace(/\s+/g, '-'),
+          description: cat.description || '',
+          image: cat.image || cat.image_url || '',
+          parent_id: cat.parent_id,
+          is_active: cat.is_active,
+          sort_order: cat.sort_order || 0,
+          subcategories: supabaseCategories
+            .filter(sub => sub.parent_id === cat.id)
+            .map(sub => ({
+              id: sub.id,
+              name: sub.name,
+              slug: sub.slug || sub.name.toLowerCase().replace(/\s+/g, '-')
+            }))
+        }));
+        
+        setCategories(formattedCategories);
+        console.log('Categories loaded from Supabase in context:', formattedCategories);
       } else {
-        // Use mockData categories as default
-        setCategories(mockData.productCategories);
-        // Save to localStorage for consistency
-        localStorage.setItem('adminCategories', JSON.stringify(mockData.productCategories));
+        // Fallback to localStorage
+        const savedCategories = localStorage.getItem('adminCategories');
+        if (savedCategories) {
+          const parsedCategories = JSON.parse(savedCategories);
+          setCategories(parsedCategories);
+        } else {
+          // Use mockData categories as final fallback
+          setCategories(mockData.productCategories);
+          localStorage.setItem('adminCategories', JSON.stringify(mockData.productCategories));
+        }
       }
     } catch (error) {
       console.error('Error loading categories:', error);
-      setCategories(mockData.productCategories);
+      
+      // Fallback to localStorage on error
+      try {
+        const savedCategories = localStorage.getItem('adminCategories');
+        if (savedCategories) {
+          const parsedCategories = JSON.parse(savedCategories);
+          setCategories(parsedCategories);
+        } else {
+          setCategories(mockData.productCategories);
+        }
+      } catch (localError) {
+        console.error('Error loading from localStorage:', localError);
+        setCategories(mockData.productCategories);
+      }
     } finally {
       setLoading(false);
     }

@@ -1322,7 +1322,30 @@ const AdminPage = () => {
 
   const fetchCategories = async () => {
     try {
-      // First try to load from localStorage
+      // Load categories from Supabase
+      const supabaseCategories = await SupabaseService.getCategories();
+      
+      if (supabaseCategories && supabaseCategories.length > 0) {
+        // Convert Supabase categories to admin format
+        const formattedCategories = supabaseCategories.map(cat => ({
+          id: cat.id,
+          name: cat.name,
+          description: cat.description || '',
+          image: cat.image || cat.image_url || '',
+          parent_id: cat.parent_id,
+          is_active: cat.is_active,
+          sort_order: cat.sort_order || 0,
+          slug: cat.slug || '',
+          created_at: cat.created_at,
+          updated_at: cat.updated_at
+        }));
+        
+        setAdminCategories(formattedCategories);
+        console.log('Admin categories loaded from Supabase:', formattedCategories);
+        return;
+      }
+      
+      // Fallback to localStorage if Supabase is empty
       const savedCategories = localStorage.getItem('adminCategories');
       
       if (savedCategories) {

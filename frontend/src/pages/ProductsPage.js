@@ -279,6 +279,42 @@ const ProductsPage = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Load categories from Supabase
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const supabaseCategories = await SupabaseService.getCategories();
+        if (supabaseCategories && supabaseCategories.length > 0) {
+          // Convert Supabase categories to the format expected by the UI
+          const formattedCategories = supabaseCategories
+            .filter(cat => cat.parent_id === null) // Only main categories
+            .map(mainCat => {
+              const subcategories = supabaseCategories
+                .filter(sub => sub.parent_id === mainCat.id)
+                .map(sub => ({ name: sub.name }));
+              
+              return {
+                name: mainCat.name,
+                image: mainCat.image || mainCat.image_url || "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=400&h=300&fit=crop",
+                description: mainCat.description || "",
+                subcategories: subcategories
+              };
+            });
+          
+          setCategories(formattedCategories);
+          console.log('Categories loaded from Supabase:', formattedCategories);
+        } else {
+          console.log('No categories found in Supabase, using default categories');
+        }
+      } catch (error) {
+        console.error('Error loading categories from Supabase:', error);
+        console.log('Using default categories as fallback');
+      }
+    };
+
+    loadCategories();
+  }, []);
+
   // Load products from Supabase
   useEffect(() => {
     const loadProducts = async () => {
