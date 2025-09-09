@@ -6,7 +6,7 @@ import { mockData } from '../data/mockData';
 import { calculateCartTotals, getProductPriceInfo } from '../utils/priceUtils';
 import SupabaseService from '../services/supabaseService';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
 const API = `${BACKEND_URL}/api`;
 
 const CartContext = createContext();

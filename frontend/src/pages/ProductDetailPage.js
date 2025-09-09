@@ -307,12 +307,12 @@ const ProductDetailPage = () => {
                       </div>
                     </div>
 
-                    {currentProduct.catalogNumber && (
+                    {(currentProduct.catalogNumber || currentProduct.catalog_number) && (
                       <div className="flex items-center space-x-2">
                         <Package className="h-4 w-4 text-gray-500" />
                         <div>
                           <span className="text-sm font-bold text-gray-700">Kataloq №:</span>
-                          <span className="text-sm text-gray-900 ml-1">{currentProduct.catalogNumber}</span>
+                          <span className="text-sm text-gray-900 ml-1">{currentProduct.catalogNumber || currentProduct.catalog_number}</span>
                         </div>
                       </div>
                     )}
@@ -389,13 +389,43 @@ const ProductDetailPage = () => {
                 )}
 
                 {/* Specifications */}
-                {currentProduct.specifications && (
+                {(currentProduct.specifications || currentProduct.brand || currentProduct.weight || currentProduct.dimensions) && (
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <h3 className="text-lg font-semibold text-gray-900 mb-3">Texniki Xüsusiyyətlər</h3>
                     <div className="space-y-2">
-                      {Object.entries(currentProduct.specifications).map(([key, value]) => (
+                      {currentProduct.brand && (
+                        <div className="flex justify-between py-2 border-b border-gray-200">
+                          <span className="text-sm font-medium text-gray-600">Marka:</span>
+                          <span className="text-sm text-gray-900">{currentProduct.brand}</span>
+                        </div>
+                      )}
+                      {currentProduct.weight && (
+                        <div className="flex justify-between py-2 border-b border-gray-200">
+                          <span className="text-sm font-medium text-gray-600">Çəki:</span>
+                          <span className="text-sm text-gray-900">{currentProduct.weight}</span>
+                        </div>
+                      )}
+                      {currentProduct.dimensions && (
+                        <div className="flex justify-between py-2 border-b border-gray-200">
+                          <span className="text-sm font-medium text-gray-600">Ölçülər:</span>
+                          <span className="text-sm text-gray-900">{currentProduct.dimensions}</span>
+                        </div>
+                      )}
+                      {currentProduct.material && (
+                        <div className="flex justify-between py-2 border-b border-gray-200">
+                          <span className="text-sm font-medium text-gray-600">Material:</span>
+                          <span className="text-sm text-gray-900">{currentProduct.material}</span>
+                        </div>
+                      )}
+                      {currentProduct.color && (
+                        <div className="flex justify-between py-2 border-b border-gray-200">
+                          <span className="text-sm font-medium text-gray-600">Rəng:</span>
+                          <span className="text-sm text-gray-900">{currentProduct.color}</span>
+                        </div>
+                      )}
+                      {currentProduct.specifications && Object.entries(currentProduct.specifications).map(([key, value]) => (
                         <div key={key} className="flex justify-between py-2 border-b border-gray-200 last:border-b-0">
-                          <span className="text-sm font-medium text-gray-600">{key}</span>
+                          <span className="text-sm font-medium text-gray-600">{key}:</span>
                           <span className="text-sm text-gray-900">{value}</span>
                         </div>
                       ))}
