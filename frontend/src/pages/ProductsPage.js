@@ -584,26 +584,35 @@ const ProductsPage = () => {
 
              // Apply category filter - check both mockData categories and admin panel categories
        if (selectedCategory) {
-         // console.log('Applying category filter for:', selectedCategory); // Commented out to reduce console spam
+         console.log('Applying category filter for:', selectedCategory);
          const beforeFilter = filtered.length;
          
          filtered = filtered.filter(product => {
-           // Direct match with product category
+           // Direct match with product category field
            if (product.category === selectedCategory) {
+             console.log('Direct match found:', product.name, 'category:', product.category);
              return true;
            }
            
            // Check if product category matches any admin panel category name
            const adminCategory = categories.find(cat => cat.name === selectedCategory);
            if (adminCategory && product.category === adminCategory.name) {
+             console.log('Admin category match found:', product.name, 'category:', product.category);
              return true;
            }
            
+           // Check if product's categories.name matches selected category
+           if (product.categories && product.categories.name === selectedCategory) {
+             console.log('Categories.name match found:', product.name, 'categories.name:', product.categories.name);
+             return true;
+           }
+           
+           console.log('No match for product:', product.name, 'product.category:', product.category, 'product.categories:', product.categories);
            return false;
          });
          
-         // console.log(`Category filter: ${beforeFilter} -> ${filtered.length} products`); // Commented out to reduce console spam
-         // console.log('Filtered products:', filtered.map(p => ({ name: p.name, category: p.category }))); // Commented out to reduce console spam
+         console.log(`Category filter: ${beforeFilter} -> ${filtered.length} products`);
+         console.log('Filtered products:', filtered.map(p => ({ name: p.name, category: p.category, categories: p.categories })));
        }
 
              // Apply subcategory filter - check both mockData subcategories and admin panel subcategories
