@@ -606,6 +606,138 @@ export class SupabaseService {
       throw error;
     }
   }
+
+  // ====================================
+  // CART OPERATIONS
+  // ====================================
+  
+  static async getCartItems(userId) {
+    try {
+      const { data, error } = await supabase
+        .from('cart_items')
+        .select(`
+          *,
+          products (
+            id,
+            name,
+            price,
+            images,
+            in_stock,
+            stock_quantity,
+            catalog_number,
+            sku,
+            category,
+            description,
+            specifications
+          )
+        `)
+        .eq('user_id', userId);
+      
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('SupabaseService: Error fetching cart items:', error);
+      throw error;
+    }
+  }
+
+  static async addToCart(userId, productId, quantity = 1) {
+    try {
+      // Check if item already exists in cart
+      const { data: existingItem, error: checkError } = await supabase
+        .from('cart_items')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('product_id', productId)
+        .single();
+
+      if (checkError && checkError.code !== 'PGRST116') {
+        throw checkError;
+      }
+
+      if (existingItem) {
+        // Update existing item quantity
+        const { error: updateError } = await supabase
+          .from('cart_items')
+          .update({ 
+            quantity: existingItem.quantity + quantity,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', existingItem.id);
+        
+        if (updateError) throw updateError;
+      } else {
+        // Add new item to cart
+        const { error: insertError } = await supabase
+          .from('cart_items')
+          .insert({
+            user_id: userId,
+            product_id: productId,
+            quantity: quantity
+          });
+        
+        if (insertError) throw insertError;
+      }
+
+      return { success: true };
+    } catch (error) {
+      console.error('SupabaseService: Error adding to cart:', error);
+      throw error;
+    }
+  }
+
+  static async updateCartItem(cartItemId, quantity) {
+    try {
+      if (quantity <= 0) {
+        // Remove item if quantity is 0 or negative
+        return await this.removeFromCart(cartItemId);
+      }
+
+      const { error } = await supabase
+        .from('cart_items')
+        .update({ 
+          quantity: quantity,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', cartItemId);
+      
+      if (error) throw error;
+      return { success: true };
+    } catch (error) {
+      console.error('SupabaseService: Error updating cart item:', error);
+      throw error;
+    }
+  }
+
+  static async removeFromCart(cartItemId) {
+    try {
+      const { error } = await supabase
+        .from('cart_items')
+        .delete()
+        .eq('id', cartItemId);
+      
+      if (error) throw error;
+      return { success: true };
+    } catch (error) {
+      console.error('SupabaseService: Error removing from cart:', error);
+      throw error;
+    }
+  }
+
+  static async clearCart(userId) {
+    try {
+      const { error } = await supabase
+        .from('cart_items')
+        .delete()
+        .eq('user_id', userId);
+      
+      if (error) throw error;
+      return { success: true };
+    } catch (error) {
+      console.error('SupabaseService: Error clearing cart:', error);
+      throw error;
+    }
+  }
 }
 
 export default SupabaseService;
