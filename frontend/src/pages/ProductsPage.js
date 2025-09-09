@@ -317,6 +317,8 @@ const ProductsPage = () => {
               }, {}) : {}
           }));
           console.log('Formatted products:', formattedProducts);
+          console.log('Formatted products count:', formattedProducts.length);
+          console.log('First product sample:', formattedProducts[0]);
           setProducts(formattedProducts);
         } else {
           // Fallback to localStorage or mockData
@@ -496,6 +498,7 @@ const ProductsPage = () => {
        console.log('Available categories:', categories.map(cat => cat.name));
        console.log('Products to filter:', products.length);
        console.log('Sample products:', products.slice(0, 3).map(p => ({ name: p.name, category: p.category })));
+       console.log('All product categories:', [...new Set(products.map(p => p.category))]);
       
       // Get filtered and sorted products
       let filtered = [...products];
@@ -612,9 +615,9 @@ const ProductsPage = () => {
         }
       });
 
-             // console.log('=== FILTERING COMPLETED ==='); // Commented out to reduce console spam
-       // console.log(`Final result: ${filtered.length} products`); // Commented out to reduce console spam
-       // console.log('Final products:', filtered.map(p => ({ name: p.name, category: p.category, subcategory: p.subcategory }))); // Commented out to reduce console spam
+       console.log('=== FILTERING COMPLETED ===');
+       console.log(`Final result: ${filtered.length} products`);
+       console.log('Final products:', filtered.map(p => ({ name: p.name, category: p.category, subcategory: p.subcategory })));
        
        return filtered;
     } catch (error) {
