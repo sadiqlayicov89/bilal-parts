@@ -297,8 +297,8 @@ const ProductsPage = () => {
             originalPrice: parseFloat(product.original_price) || parseFloat(product.price) || 0,
             description: product.description || '',
             shortDescription: product.short_description || '',
-            category: product.categories?.name || 'Unknown',
-            subcategory: product.subcategories?.name || '',
+            category: product.categories?.name || product.category || 'Unknown',
+            subcategory: product.subcategories?.name || product.subcategory || '',
             images: product.product_images ? product.product_images.map(img => img.image_url) : [],
             image: product.product_images && product.product_images.length > 0 
               ? product.product_images[0].image_url 
@@ -316,6 +316,7 @@ const ProductsPage = () => {
                 return acc;
               }, {}) : {}
           }));
+          console.log('Formatted products:', formattedProducts);
           setProducts(formattedProducts);
         } else {
           // Fallback to localStorage or mockData
@@ -484,15 +485,17 @@ const ProductsPage = () => {
   // Use useMemo to prevent unnecessary recalculations
   const filteredProducts = useMemo(() => {
          try {
-       // console.log('=== FILTERING PRODUCTS ==='); // Commented out to reduce console spam
-       // console.log('Current filters:', { // Commented out to reduce console spam
-       //   searchQuery,
-       //   selectedCategory,
-       //   selectedSubcategory,
-       //   priceRange,
-       //   sortBy
-       // });
-       // console.log('Available categories:', categories.map(cat => cat.name)); // Commented out to reduce console spam
+       console.log('=== FILTERING PRODUCTS ===');
+       console.log('Current filters:', {
+         searchQuery,
+         selectedCategory,
+         selectedSubcategory,
+         priceRange,
+         sortBy
+       });
+       console.log('Available categories:', categories.map(cat => cat.name));
+       console.log('Products to filter:', products.length);
+       console.log('Sample products:', products.slice(0, 3).map(p => ({ name: p.name, category: p.category })));
       
       // Get filtered and sorted products
       let filtered = [...products];

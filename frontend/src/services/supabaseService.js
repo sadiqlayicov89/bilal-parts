@@ -8,10 +8,13 @@ export class SupabaseService {
   
   static async getProducts(filters = {}) {
     try {
-      // First try simple query without joins
+      // Query with category join for proper filtering
       let query = supabase
         .from('products')
-        .select('*')
+        .select(`
+          *,
+          categories!products_category_id_fkey(name, slug)
+        `)
         .eq('is_active', true);
 
       // Apply filters
