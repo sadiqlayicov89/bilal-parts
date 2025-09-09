@@ -266,25 +266,25 @@ CREATE TABLE IF NOT EXISTS public.company_info (
 -- ====================================
 -- INDEXES FOR PERFORMANCE
 -- ====================================
-CREATE INDEX idx_products_category ON public.products(category_id);
-CREATE INDEX idx_products_subcategory ON public.products(subcategory_id);
-CREATE INDEX idx_products_sku ON public.products(sku);
-CREATE INDEX idx_products_external_id ON public.products(external_id);
-CREATE INDEX idx_products_active ON public.products(is_active);
-CREATE INDEX idx_products_featured ON public.products(is_featured);
-CREATE INDEX idx_products_in_stock ON public.products(in_stock);
-CREATE INDEX idx_products_name_search ON public.products USING GIN (name gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS idx_products_category ON public.products(category_id);
+CREATE INDEX IF NOT EXISTS idx_products_subcategory ON public.products(subcategory_id);
+CREATE INDEX IF NOT EXISTS idx_products_sku ON public.products(sku);
+CREATE INDEX IF NOT EXISTS idx_products_external_id ON public.products(external_id);
+CREATE INDEX IF NOT EXISTS idx_products_active ON public.products(is_active);
+CREATE INDEX IF NOT EXISTS idx_products_featured ON public.products(is_featured);
+CREATE INDEX IF NOT EXISTS idx_products_in_stock ON public.products(in_stock);
+CREATE INDEX IF NOT EXISTS idx_products_name_search ON public.products USING GIN (name gin_trgm_ops);
 
-CREATE INDEX idx_categories_parent ON public.categories(parent_id);
-CREATE INDEX idx_categories_external_id ON public.categories(external_id);
-CREATE INDEX idx_categories_active ON public.categories(is_active);
+CREATE INDEX IF NOT EXISTS idx_categories_parent ON public.categories(parent_id);
+CREATE INDEX IF NOT EXISTS idx_categories_external_id ON public.categories(external_id);
+CREATE INDEX IF NOT EXISTS idx_categories_active ON public.categories(is_active);
 
-CREATE INDEX idx_orders_user ON public.orders(user_id);
-CREATE INDEX idx_orders_status ON public.orders(status);
-CREATE INDEX idx_orders_created ON public.orders(created_at);
+CREATE INDEX IF NOT EXISTS idx_orders_user ON public.orders(user_id);
+CREATE INDEX IF NOT EXISTS idx_orders_status ON public.orders(status);
+CREATE INDEX IF NOT EXISTS idx_orders_created ON public.orders(created_at);
 
-CREATE INDEX idx_cart_user ON public.cart_items(user_id);
-CREATE INDEX idx_wishlist_user ON public.wishlist_items(user_id);
+CREATE INDEX IF NOT EXISTS idx_cart_user ON public.cart_items(user_id);
+CREATE INDEX IF NOT EXISTS idx_wishlist_user ON public.wishlist_items(user_id);
 
 -- ====================================
 -- ROW LEVEL SECURITY (RLS) POLICIES
