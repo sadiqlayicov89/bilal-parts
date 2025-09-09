@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, User, ChevronDown, Globe, ShoppingCart, Heart, LogOut, Settings, Package, X } from "lucide-react";
+import { Search, User, ChevronDown, Globe, ShoppingCart, Heart, LogOut, Settings, Package, X, Menu } from "lucide-react";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import {
