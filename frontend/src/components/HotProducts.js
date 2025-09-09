@@ -186,7 +186,7 @@ const HotProducts = () => {
                       <Button 
                         size="sm" 
                         className="w-full bg-red-600 hover:bg-red-700 text-white"
-                        onClick={() => navigate(`/products/${product.id}`)}
+                        onClick={() => navigate(`/product/${product.id}`)}
                       >
                         View Details
                       </Button>
