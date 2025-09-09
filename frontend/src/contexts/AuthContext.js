@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import { useToast } from '../hooks/use-toast';
+import { supabase } from '../config/supabase';
 
 const BACKEND_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 const API = `${BACKEND_URL}/api`;
@@ -33,34 +34,50 @@ export const AuthProvider = ({ children }) => {
   // Check if user is authenticated on app load
   useEffect(() => {
     const checkAuth = async () => {
-      if (token) {
-        try {
-          // Mock token kontrolü - backend olmadan çalışması için
+      try {
+        // Check Supabase session first
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Supabase auth error:', error);
+        }
+        
+        if (session?.user) {
+          console.log('Supabase session found:', session.user);
+          setUser(session.user);
+          setToken(session.access_token);
+          setLoading(false);
+          return;
+        }
+        
+        // Fallback to localStorage for backward compatibility
+        if (token) {
           if (token.startsWith('mock-token-')) {
-            // Mock token varsa, localStorage'dan user bilgisini al
             const storedUser = localStorage.getItem('user');
             if (storedUser) {
               const mockUser = JSON.parse(storedUser);
               setUser(mockUser);
             } else {
-              // Eğer localStorage'da user yoksa, token'ı temizle
               setToken(null);
               localStorage.removeItem('token');
             }
           } else {
-            // Gerçek backend API çağrısı
-            const response = await axios.get(`${API}/auth/me`);
-            setUser(response.data);
-          }
-        } catch (error) {
-          console.error('Auth check failed:', error);
-          // Backend hatası durumunda logout yapma, sadece mock data ile devam et
-          if (!token.startsWith('mock-token-')) {
-            logout();
+            try {
+              const response = await axios.get(`${API}/auth/me`);
+              setUser(response.data);
+            } catch (error) {
+              console.error('Backend auth check failed:', error);
+              if (!token.startsWith('mock-token-')) {
+                logout();
+              }
+            }
           }
         }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     checkAuth();
@@ -70,28 +87,54 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true);
       
-      // Try backend API first
+      // Try Supabase Auth first
       try {
-        const response = await axios.post(`${API}/auth/login`, {
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password
         });
 
-        const { token, user } = response.data;
-        
-        setUser(user);
-        setToken(token);
-        localStorage.setItem('token', token);
-        
-        toast({
-          title: 'Login Successful',
-          description: `Welcome back, ${user.first_name}!`,
-        });
+        if (error) {
+          throw error;
+        }
 
-        return { success: true };
-      } catch (apiError) {
-        // Fallback to localStorage login for development
-        console.log('Backend API not available, using localStorage login');
+        if (data.user) {
+          console.log('Supabase login successful:', data.user);
+          setUser(data.user);
+          setToken(data.session.access_token);
+          
+          toast({
+            title: 'Login Successful',
+            description: `Welcome back, ${data.user.email}!`,
+          });
+
+          return { success: true };
+        }
+      } catch (supabaseError) {
+        console.log('Supabase login failed, trying backend API:', supabaseError);
+        
+        // Try backend API as fallback
+        try {
+          const response = await axios.post(`${API}/auth/login`, {
+            email,
+            password
+          });
+
+          const { token, user } = response.data;
+          
+          setUser(user);
+          setToken(token);
+          localStorage.setItem('token', token);
+          
+          toast({
+            title: 'Login Successful',
+            description: `Welcome back, ${user.first_name}!`,
+          });
+
+          return { success: true };
+        } catch (apiError) {
+          // Fallback to localStorage login for development
+          console.log('Backend API not available, using localStorage login');
         
         // Check admin user first - simple admin/admin login
         if (email === "admin" && password === "admin") {
@@ -193,19 +236,54 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true);
       
-      // Try backend API first
+      // Try Supabase Auth first
       try {
-        const response = await axios.post(`${API}/auth/register`, userData);
-        
-        toast({
-          title: 'Registration Successful',
-          description: response.data.message || 'Your account has been created. Please check your email to verify your account.',
+        const { data, error } = await supabase.auth.signUp({
+          email: userData.email,
+          password: userData.password,
+          options: {
+            data: {
+              first_name: userData.first_name,
+              last_name: userData.last_name,
+              company_name: userData.company_name,
+              phone: userData.phone,
+              country: userData.country,
+              city: userData.city,
+              vat_number: userData.vat_number
+            }
+          }
         });
 
-        return { success: true, user: response.data.user };
-      } catch (apiError) {
-        // Fallback to localStorage registration for development
-        console.log('Backend API not available, using localStorage registration');
+        if (error) {
+          throw error;
+        }
+
+        if (data.user) {
+          console.log('Supabase registration successful:', data.user);
+          
+          toast({
+            title: 'Registration Successful',
+            description: 'Your account has been created. Please check your email to verify your account.',
+          });
+
+          return { success: true, user: data.user };
+        }
+      } catch (supabaseError) {
+        console.log('Supabase registration failed, trying backend API:', supabaseError);
+        
+        // Try backend API as fallback
+        try {
+          const response = await axios.post(`${API}/auth/register`, userData);
+          
+          toast({
+            title: 'Registration Successful',
+            description: response.data.message || 'Your account has been created. Please check your email to verify your account.',
+          });
+
+          return { success: true, user: response.data.user };
+        } catch (apiError) {
+          // Fallback to localStorage registration for development
+          console.log('Backend API not available, using localStorage registration');
         
         // Check if user already exists
         const existingUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
@@ -257,7 +335,14 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      // Sign out from Supabase
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error('Supabase logout error:', error);
+    }
+    
     setUser(null);
     setToken(null);
     localStorage.removeItem('token');
