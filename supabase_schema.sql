@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS public.categories (
   slug TEXT UNIQUE NOT NULL,
   description TEXT,
   image TEXT,
+  image_url TEXT, -- Add image_url column for compatibility
   parent_id UUID REFERENCES public.categories(id),
   external_id TEXT UNIQUE, -- For 1C integration
   is_active BOOLEAN DEFAULT true,

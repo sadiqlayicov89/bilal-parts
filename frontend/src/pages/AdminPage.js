@@ -1661,7 +1661,7 @@ const AdminPage = () => {
         slug: categoryFormData.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
         parent_id: categoryFormData.parent_id && categoryFormData.parent_id !== "main" ? categoryFormData.parent_id : null,
         is_active: categoryFormData.is_active,
-        image_url: 'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=400&h=300&fit=crop'
+        image: 'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=400&h=300&fit=crop'
       };
       
       console.log('Category data for Supabase:', categoryData);
