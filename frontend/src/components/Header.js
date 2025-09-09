@@ -362,24 +362,27 @@ const Header = () => {
                                   {category.name}
                                 </h3>
                               </Link>
-                              {category.subcategories.map((sub, subIndex) => (
-                                <Link
-                                  key={subIndex}
-                                  to={`/products?category=${encodeURIComponent(category.name)}&subcategory=${encodeURIComponent(sub)}`}
-                                  className="block py-2 px-4 text-gray-700 hover:text-red-600 hover:bg-red-50 transition-colors rounded-lg"
-                                  onClick={() => {
-                                    console.log('=== HEADER SUBCATEGORY CLICKED ===');
-                                    console.log('Category:', category.name);
-                                    console.log('Subcategory:', sub);
-                                    console.log('Current URL before navigation:', window.location.href);
-                                  }}
-                                >
-                                  <div className="flex items-center">
-                                    <div className="w-2 h-2 bg-red-600 rounded-full mr-3"></div>
-                                    <span className="text-sm">{sub}</span>
-                                  </div>
-                                </Link>
-                              ))}
+                              <div className="space-y-1">
+                                {category.subcategories.map((sub, subIndex) => (
+                                  <Link
+                                    key={subIndex}
+                                    to={`/products?category=${encodeURIComponent(category.name)}&subcategory=${encodeURIComponent(sub)}`}
+                                    className="block py-1.5 px-3 text-gray-700 hover:text-red-600 hover:bg-red-50 transition-colors rounded-md text-sm"
+                                    onClick={() => {
+                                      console.log('=== HEADER SUBCATEGORY CLICKED ===');
+                                      console.log('Category:', category.name);
+                                      console.log('Subcategory:', sub);
+                                      console.log('Generated URL:', `/products?category=${encodeURIComponent(category.name)}&subcategory=${encodeURIComponent(sub)}`);
+                                      console.log('Current URL before navigation:', window.location.href);
+                                    }}
+                                  >
+                                    <div className="flex items-center">
+                                      <div className="w-1.5 h-1.5 bg-red-600 rounded-full mr-2"></div>
+                                      <span>{sub}</span>
+                                    </div>
+                                  </Link>
+                                ))}
+                              </div>
                             </div>
                           ))}
                         </div>
