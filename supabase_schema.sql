@@ -415,38 +415,47 @@ END;
 $$ language plpgsql;
 
 -- Add updated_at triggers to relevant tables
+DROP TRIGGER IF EXISTS set_profiles_updated_at ON public.profiles;
 CREATE TRIGGER set_profiles_updated_at
   BEFORE UPDATE ON public.profiles
   FOR EACH ROW EXECUTE PROCEDURE public.set_updated_at();
 
+DROP TRIGGER IF EXISTS set_categories_updated_at ON public.categories;
 CREATE TRIGGER set_categories_updated_at
   BEFORE UPDATE ON public.categories
   FOR EACH ROW EXECUTE PROCEDURE public.set_updated_at();
 
+DROP TRIGGER IF EXISTS set_products_updated_at ON public.products;
 CREATE TRIGGER set_products_updated_at
   BEFORE UPDATE ON public.products
   FOR EACH ROW EXECUTE PROCEDURE public.set_updated_at();
 
+DROP TRIGGER IF EXISTS set_addresses_updated_at ON public.addresses;
 CREATE TRIGGER set_addresses_updated_at
   BEFORE UPDATE ON public.addresses
   FOR EACH ROW EXECUTE PROCEDURE public.set_updated_at();
 
+DROP TRIGGER IF EXISTS set_orders_updated_at ON public.orders;
 CREATE TRIGGER set_orders_updated_at
   BEFORE UPDATE ON public.orders
   FOR EACH ROW EXECUTE PROCEDURE public.set_updated_at();
 
+DROP TRIGGER IF EXISTS set_cart_items_updated_at ON public.cart_items;
 CREATE TRIGGER set_cart_items_updated_at
   BEFORE UPDATE ON public.cart_items
   FOR EACH ROW EXECUTE PROCEDURE public.set_updated_at();
 
+DROP TRIGGER IF EXISTS set_reviews_updated_at ON public.reviews;
 CREATE TRIGGER set_reviews_updated_at
   BEFORE UPDATE ON public.reviews
   FOR EACH ROW EXECUTE PROCEDURE public.set_updated_at();
 
+DROP TRIGGER IF EXISTS set_news_articles_updated_at ON public.news_articles;
 CREATE TRIGGER set_news_articles_updated_at
   BEFORE UPDATE ON public.news_articles
   FOR EACH ROW EXECUTE PROCEDURE public.set_updated_at();
 
+DROP TRIGGER IF EXISTS set_company_info_updated_at ON public.company_info;
 CREATE TRIGGER set_company_info_updated_at
   BEFORE UPDATE ON public.company_info
   FOR EACH ROW EXECUTE PROCEDURE public.set_updated_at();
