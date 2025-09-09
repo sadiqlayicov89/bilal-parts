@@ -1540,39 +1540,78 @@ const AdminPage = () => {
     }
   };
 
-  const handleDeleteSelectedCategories = () => {
+  const handleDeleteSelectedCategories = async () => {
     if (selectedCategories.length === 0) return;
     
-    const updatedCategories = localCategories.filter(c => !selectedCategories.includes(c.id));
-    setLocalCategories(updatedCategories);
-    setSelectedCategories([]);
-    
-    // Save to localStorage
-    localStorage.setItem('adminCategories', JSON.stringify(updatedCategories));
-    
-    // Dispatch custom event to notify other components
-    window.dispatchEvent(new CustomEvent('categoriesUpdated'));
-    
-    toast({
-      title: "Success",
-      description: `${selectedCategories.length} categories deleted successfully`,
-    });
+    try {
+      console.log('Deleting categories:', selectedCategories);
+      
+      // Delete categories from Supabase
+      const { error: deleteError } = await supabase
+        .from('categories')
+        .delete()
+        .in('id', selectedCategories);
+      
+      if (deleteError) {
+        console.error('Supabase category deletion error:', deleteError);
+        throw new Error(`Failed to delete categories: ${deleteError.message}`);
+      }
+      
+      console.log('Categories deleted successfully from Supabase');
+      
+      // Refresh categories and products
+      await fetchAllProducts();
+      
+      setSelectedCategories([]);
+      
+      toast({
+        title: "Success",
+        description: `${selectedCategories.length} categories deleted successfully from Supabase`,
+      });
+    } catch (error) {
+      console.error('Error deleting categories:', error);
+      toast({
+        title: "Error",
+        description: `Failed to delete categories: ${error.message}`,
+        variant: "destructive"
+      });
+    }
   };
 
-  const handleDeleteAllCategories = () => {
-    setAdminCategories([]);
-    setSelectedCategories([]);
-    
-    // Save to localStorage
-    localStorage.setItem('adminCategories', JSON.stringify([]));
-    
-    // Dispatch custom event to notify other components
-    window.dispatchEvent(new CustomEvent('categoriesUpdated'));
-    
-    toast({
-      title: "Success",
-      description: "All categories deleted successfully",
-    });
+  const handleDeleteAllCategories = async () => {
+    try {
+      console.log('Deleting all categories from Supabase');
+      
+      // Delete all categories from Supabase
+      const { error: deleteError } = await supabase
+        .from('categories')
+        .delete()
+        .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all (this condition is always true)
+      
+      if (deleteError) {
+        console.error('Supabase delete all categories error:', deleteError);
+        throw new Error(`Failed to delete all categories: ${deleteError.message}`);
+      }
+      
+      console.log('All categories deleted successfully from Supabase');
+      
+      // Refresh categories and products
+      await fetchAllProducts();
+      
+      setSelectedCategories([]);
+      
+      toast({
+        title: "Success",
+        description: "All categories deleted successfully from Supabase",
+      });
+    } catch (error) {
+      console.error('Error deleting all categories:', error);
+      toast({
+        title: "Error",
+        description: `Failed to delete all categories: ${error.message}`,
+        variant: "destructive"
+      });
+    }
   };
 
   const openAddCategoryModal = () => {
@@ -1598,42 +1637,40 @@ const AdminPage = () => {
 
   const handleAddCategory = async () => {
     try {
-      const newCategory = {
-        ...categoryFormData,
+      console.log('Creating category with data:', categoryFormData);
+      
+      // Prepare category data for Supabase
+      const categoryData = {
+        name: categoryFormData.name,
         description: categoryFormData.description || '',
-        image: categoryFormData.image || 'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=400&h=300&fit=crop'
+        slug: categoryFormData.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+        parent_id: categoryFormData.parent_id && categoryFormData.parent_id !== "main" ? categoryFormData.parent_id : null,
+        is_active: categoryFormData.is_active,
+        image_url: 'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=400&h=300&fit=crop'
       };
       
-      if (categoryFormData.parent_id && categoryFormData.parent_id !== "main") {
-        // Add as subcategory - find parent and add subcategory
-        const parentCategory = localCategories.find(c => c.id === categoryFormData.parent_id);
-        if (parentCategory) {
-          const newSubcategory = {
-            id: Date.now(),
-            name: newCategory.name,
-            slug: newCategory.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
-          };
-          
-          const updatedParent = {
-            ...parentCategory,
-            subcategories: [...(parentCategory.subcategories || []), newSubcategory]
-          };
-          
-          updateCategory(parentCategory.id, updatedParent);
-        }
-      } else {
-        // Add as main category using CategoryContext
-        addCategory(newCategory);
+      console.log('Category data for Supabase:', categoryData);
+      
+      // Insert category into Supabase
+      const { data: newCategory, error: categoryError } = await supabase
+        .from('categories')
+        .insert([categoryData])
+        .select()
+        .single();
+      
+      if (categoryError) {
+        console.error('Supabase category creation error:', categoryError);
+        throw new Error(`Failed to create category: ${categoryError.message}`);
       }
       
-      // Force refresh of products to show new categories
-      if (activeTab === "products") {
-        fetchAllProducts();
-      }
+      console.log('Category created successfully:', newCategory);
+      
+      // Refresh categories and products
+      await fetchAllProducts();
       
       toast({
         title: "Success",
-        description: "Category added successfully",
+        description: "Category added successfully to Supabase",
       });
       
       setAddCategoryModal(false);
@@ -1644,9 +1681,10 @@ const AdminPage = () => {
         is_active: true
       });
     } catch (error) {
+      console.error('Error creating category:', error);
       toast({
         title: "Error",
-        description: "Failed to add category",
+        description: `Failed to add category: ${error.message}`,
         variant: "destructive"
       });
     }
@@ -1654,38 +1692,48 @@ const AdminPage = () => {
 
   const handleEditCategory = async () => {
     try {
-      const categoryIndex = localCategories.findIndex(c => c.id === editingCategory.id);
-      if (categoryIndex !== -1) {
-        const updatedCategories = [...localCategories];
-        updatedCategories[categoryIndex] = {
-          ...updatedCategories[categoryIndex],
-          ...categoryFormData
-        };
-        setLocalCategories(updatedCategories);
-        
-        // Save to localStorage
-        localStorage.setItem('adminCategories', JSON.stringify(updatedCategories));
-        
-        // Dispatch custom event to notify other components
-        window.dispatchEvent(new CustomEvent('categoriesUpdated'));
-        
-        // Force refresh of products to show updated categories
-        if (activeTab === "products") {
-          fetchAllProducts();
-        }
-        
-        toast({
-          title: "Success",
-          description: "Category updated successfully",
-        });
-        
-        setEditCategoryModal(false);
-        setEditingCategory(null);
+      console.log('Updating category:', editingCategory.id, 'with data:', categoryFormData);
+      
+      // Prepare update data for Supabase
+      const updateData = {
+        name: categoryFormData.name,
+        description: categoryFormData.description || '',
+        slug: categoryFormData.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+        is_active: categoryFormData.is_active
+      };
+      
+      console.log('Update data for Supabase:', updateData);
+      
+      // Update category in Supabase
+      const { data: updatedCategory, error: updateError } = await supabase
+        .from('categories')
+        .update(updateData)
+        .eq('id', editingCategory.id)
+        .select()
+        .single();
+      
+      if (updateError) {
+        console.error('Supabase category update error:', updateError);
+        throw new Error(`Failed to update category: ${updateError.message}`);
       }
+      
+      console.log('Category updated successfully:', updatedCategory);
+      
+      // Refresh categories and products
+      await fetchAllProducts();
+      
+      toast({
+        title: "Success",
+        description: "Category updated successfully in Supabase",
+      });
+      
+      setEditCategoryModal(false);
+      setEditingCategory(null);
     } catch (error) {
+      console.error('Error updating category:', error);
       toast({
         title: "Error",
-        description: "Failed to update category",
+        description: `Failed to update category: ${error.message}`,
         variant: "destructive"
       });
     }
