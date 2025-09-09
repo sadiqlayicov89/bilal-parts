@@ -255,13 +255,13 @@ const Header = () => {
                 
                 {/* Mega Menu Dropdown */}
                 {isProductsHovered && (
-                  <div className="absolute top-full left-0 w-screen max-w-6xl bg-white shadow-2xl border-t-4 border-red-600 z-50 transform -translate-x-1/4">
+                  <div className="absolute top-full left-0 w-screen max-w-7xl bg-white shadow-2xl border-t-4 border-red-600 z-50 transform -translate-x-1/3">
                     <div className="p-8">
-                      <div className="grid grid-cols-3 gap-8">
+                      <div className="grid grid-cols-4 gap-6">
                         {/* Column 1 */}
                         <div>
                           {productCategories.slice(0, 3).map((category, index) => (
-                            <div key={index} className="mb-4">
+                            <div key={index} className="mb-6">
                               <Link
                                 to={`/products?category=${encodeURIComponent(category.name)}`}
                                 className="block mb-2"
@@ -276,33 +276,78 @@ const Header = () => {
                                   {category.name}
                                 </h3>
                               </Link>
-                              {category.subcategories.map((sub, subIndex) => (
-                                <Link
-                                  key={subIndex}
-                                  to={`/products?category=${encodeURIComponent(category.name)}&subcategory=${encodeURIComponent(sub)}`}
-                                  className="block py-2 px-4 text-gray-700 hover:text-red-600 hover:bg-red-50 transition-colors rounded-lg"
-                                  onClick={() => {
-                                    console.log('=== HEADER SUBCATEGORY CLICKED ===');
-                                    console.log('Category:', category.name);
-                                    console.log('Subcategory:', sub);
-                                    console.log('Generated URL:', `/products?category=${encodeURIComponent(category.name)}&subcategory=${encodeURIComponent(sub)}`);
-                                    console.log('Current URL before navigation:', window.location.href);
-                                  }}
-                                >
-                                  <div className="flex items-center">
-                                    <div className="w-2 h-2 bg-red-600 rounded-full mr-3"></div>
-                                    <span className="text-sm">{sub}</span>
-                                  </div>
-                                </Link>
-                              ))}
+                              <div className="space-y-1">
+                                {category.subcategories.map((sub, subIndex) => (
+                                  <Link
+                                    key={subIndex}
+                                    to={`/products?category=${encodeURIComponent(category.name)}&subcategory=${encodeURIComponent(sub)}`}
+                                    className="block py-1.5 px-3 text-gray-700 hover:text-red-600 hover:bg-red-50 transition-colors rounded-md text-sm"
+                                    onClick={() => {
+                                      console.log('=== HEADER SUBCATEGORY CLICKED ===');
+                                      console.log('Category:', category.name);
+                                      console.log('Subcategory:', sub);
+                                      console.log('Generated URL:', `/products?category=${encodeURIComponent(category.name)}&subcategory=${encodeURIComponent(sub)}`);
+                                      console.log('Current URL before navigation:', window.location.href);
+                                    }}
+                                  >
+                                    <div className="flex items-center">
+                                      <div className="w-1.5 h-1.5 bg-red-600 rounded-full mr-2"></div>
+                                      <span>{sub}</span>
+                                    </div>
+                                  </Link>
+                                ))}
+                              </div>
                             </div>
                           ))}
                         </div>
                         
                         {/* Column 2 */}
                         <div>
-                          {productCategories.slice(3, 5).map((category, index) => (
-                            <div key={index} className="mb-4">
+                          {productCategories.slice(3, 6).map((category, index) => (
+                            <div key={index} className="mb-6">
+                              <Link
+                                to={`/products?category=${encodeURIComponent(category.name)}`}
+                                className="block mb-2"
+                                onClick={() => {
+                                  console.log('=== HEADER CATEGORY CLICKED ===');
+                                  console.log('Category:', category.name);
+                                  console.log('Generated URL:', `/products?category=${encodeURIComponent(category.name)}`);
+                                  console.log('Current URL before navigation:', window.location.href);
+                                }}
+                              >
+                                <h3 className="font-semibold text-red-600 hover:text-red-700 text-lg cursor-pointer">
+                                  {category.name}
+                                </h3>
+                              </Link>
+                              <div className="space-y-1">
+                                {category.subcategories.map((sub, subIndex) => (
+                                  <Link
+                                    key={subIndex}
+                                    to={`/products?category=${encodeURIComponent(category.name)}&subcategory=${encodeURIComponent(sub)}`}
+                                    className="block py-1.5 px-3 text-gray-700 hover:text-red-600 hover:bg-red-50 transition-colors rounded-md text-sm"
+                                    onClick={() => {
+                                      console.log('=== HEADER SUBCATEGORY CLICKED ===');
+                                      console.log('Category:', category.name);
+                                      console.log('Subcategory:', sub);
+                                      console.log('Generated URL:', `/products?category=${encodeURIComponent(category.name)}&subcategory=${encodeURIComponent(sub)}`);
+                                      console.log('Current URL before navigation:', window.location.href);
+                                    }}
+                                  >
+                                    <div className="flex items-center">
+                                      <div className="w-1.5 h-1.5 bg-red-600 rounded-full mr-2"></div>
+                                      <span>{sub}</span>
+                                    </div>
+                                  </Link>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        
+                        {/* Column 3 */}
+                        <div>
+                          {productCategories.slice(6, 8).map((category, index) => (
+                            <div key={index} className="mb-6">
                               <Link
                                 to={`/products?category=${encodeURIComponent(category.name)}`}
                                 className="block mb-2"
@@ -326,7 +371,6 @@ const Header = () => {
                                     console.log('=== HEADER SUBCATEGORY CLICKED ===');
                                     console.log('Category:', category.name);
                                     console.log('Subcategory:', sub);
-                                    console.log('Generated URL:', `/products?category=${encodeURIComponent(category.name)}&subcategory=${encodeURIComponent(sub)}`);
                                     console.log('Current URL before navigation:', window.location.href);
                                   }}
                                 >
@@ -340,10 +384,10 @@ const Header = () => {
                           ))}
                         </div>
                         
-                        {/* Column 3 */}
+                        {/* Column 4 */}
                         <div>
-                          {productCategories.slice(5).map((category, index) => (
-                            <div key={index} className="mb-4">
+                          {productCategories.slice(8).map((category, index) => (
+                            <div key={index} className="mb-6">
                               <Link
                                 to={`/products?category=${encodeURIComponent(category.name)}`}
                                 className="block mb-2"
@@ -358,24 +402,27 @@ const Header = () => {
                                   {category.name}
                                 </h3>
                               </Link>
-                              {category.subcategories.map((sub, subIndex) => (
-                                <Link
-                                  key={subIndex}
-                                  to={`/products?category=${encodeURIComponent(category.name)}&subcategory=${encodeURIComponent(sub)}`}
-                                  className="block py-2 px-4 text-gray-700 hover:text-red-600 hover:bg-red-50 transition-colors rounded-lg"
-                                  onClick={() => {
-                                    console.log('=== HEADER SUBCATEGORY CLICKED ===');
-                                    console.log('Category:', category.name);
-                                    console.log('Subcategory:', sub);
-                                    console.log('Current URL before navigation:', window.location.href);
-                                  }}
-                                >
-                                  <div className="flex items-center">
-                                    <div className="w-2 h-2 bg-red-600 rounded-full mr-3"></div>
-                                    <span className="text-sm">{sub}</span>
-                                  </div>
-                                </Link>
-                              ))}
+                              <div className="space-y-1">
+                                {category.subcategories.map((sub, subIndex) => (
+                                  <Link
+                                    key={subIndex}
+                                    to={`/products?category=${encodeURIComponent(category.name)}&subcategory=${encodeURIComponent(sub)}`}
+                                    className="block py-1.5 px-3 text-gray-700 hover:text-red-600 hover:bg-red-50 transition-colors rounded-md text-sm"
+                                    onClick={() => {
+                                      console.log('=== HEADER SUBCATEGORY CLICKED ===');
+                                      console.log('Category:', category.name);
+                                      console.log('Subcategory:', sub);
+                                      console.log('Generated URL:', `/products?category=${encodeURIComponent(category.name)}&subcategory=${encodeURIComponent(sub)}`);
+                                      console.log('Current URL before navigation:', window.location.href);
+                                    }}
+                                  >
+                                    <div className="flex items-center">
+                                      <div className="w-1.5 h-1.5 bg-red-600 rounded-full mr-2"></div>
+                                      <span>{sub}</span>
+                                    </div>
+                                  </Link>
+                                ))}
+                              </div>
                             </div>
                           ))}
                         </div>
