@@ -1533,10 +1533,10 @@ const AdminPage = () => {
   };
 
   const handleSelectAllCategories = () => {
-    if (selectedCategories.length === localCategories.length) {
+    if (selectedCategories.length === adminCategories.length) {
       setSelectedCategories([]);
     } else {
-      setSelectedCategories(localCategories.map(c => c.id));
+      setSelectedCategories(adminCategories.map(c => c.id));
     }
   };
 
@@ -1625,10 +1625,11 @@ const AdminPage = () => {
   };
 
   const openEditCategoryModal = (category) => {
+    console.log('Opening edit modal for category:', category);
     setEditingCategory(category);
     setCategoryFormData({
       name: category.name,
-      description: category.description,
+      description: category.description || '',
       parent_id: category.parent_id,
       is_active: category.is_active
     });
@@ -1747,9 +1748,9 @@ const AdminPage = () => {
     }));
   };
 
-  const filteredCategories = localCategories.filter(category => {
+  const filteredCategories = adminCategories.filter(category => {
     const matchesSearch = category.name.toLowerCase().includes(categorySearchTerm.toLowerCase()) ||
-                         category.description.toLowerCase().includes(categorySearchTerm.toLowerCase());
+                         (category.description && category.description.toLowerCase().includes(categorySearchTerm.toLowerCase()));
     return matchesSearch;
   });
 
@@ -2533,14 +2534,9 @@ const AdminPage = () => {
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="all">Bütün kateqoriyalar</SelectItem>
-                              {localCategories.map((cat) => (
+                              {adminCategories.map((cat) => (
                                 <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
                               ))}
-                              {localCategories.map((cat) => 
-                                cat.subcategories?.map((sub) => (
-                                  <SelectItem key={sub.id} value={sub.name}>{sub.name}</SelectItem>
-                                ))
-                              )}
                             </SelectContent>
                           </Select>
                         </div>
@@ -2975,7 +2971,7 @@ const AdminPage = () => {
                                      </td>
                                      <td className="border border-gray-200 p-3 text-sm">{category.description}</td>
                                      <td className="border border-gray-200 p-3 text-sm">
-                                       <Badge variant="secondary">{category.subcategories?.length || 0} sub</Badge>
+                                       <Badge variant="secondary">0 sub</Badge>
                                      </td>
                                      <td className="border border-gray-200 p-3 text-sm font-medium">{category.product_count}</td>
                                      <td className="border border-gray-200 p-3">
@@ -3006,66 +3002,6 @@ const AdminPage = () => {
                                    </tr>
                                    
                                    {/* Subcategories */}
-                                   {category.subcategories?.map((subcategory) => (
-                                     <tr key={subcategory.id} className="hover:bg-gray-50">
-                                       <td className="border border-gray-200 p-3">
-                                         <Checkbox 
-                                           checked={selectedCategories.includes(subcategory.id)}
-                                           onCheckedChange={() => handleSelectCategory(subcategory.id)}
-                                         />
-                                       </td>
-                                       <td className="border border-gray-200 p-3">
-                                         <div className="flex items-center space-x-2">
-                                           <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
-                                           <span className="text-sm text-gray-600">{subcategory.name}</span>
-                                         </div>
-                                       </td>
-                                       <td className="border border-gray-200 p-3 text-sm text-gray-500">{subcategory.description}</td>
-                                       <td className="border border-gray-200 p-3 text-sm text-gray-400">-</td>
-                                       <td className="border border-gray-200 p-3 text-sm">{subcategory.product_count}</td>
-                                       <td className="border border-gray-200 p-3">
-                                         <Badge variant={subcategory.is_active ? "default" : "secondary"}>
-                                           {subcategory.is_active ? 'Aktiv' : 'Deaktiv'}
-                                         </Badge>
-                                       </td>
-                                       <td className="border border-gray-200 p-3">
-                                         <div className="flex items-center space-x-2">
-                                           <Button 
-                                             size="sm" 
-                                             variant="outline"
-                                             onClick={() => openEditCategoryModal(subcategory)}
-                                           >
-                                             <Edit className="w-4 h-4" />
-                                           </Button>
-                                           <Button 
-                                             size="sm" 
-                                             variant="destructive"
-                                             onClick={() => {
-                                               const updatedCategories = categories.map(c => {
-                                                 if (c.id === category.id) {
-                                                   return {
-                                                     ...c,
-                                                     subcategories: c.subcategories.filter(sub => sub.id !== subcategory.id),
-                                                     product_count: c.product_count - subcategory.product_count
-                                                   };
-                                                 }
-                                                 return c;
-                                               });
-                                               setAdminCategories(updatedCategories);
-                                               
-                                               // Save to localStorage
-                                               localStorage.setItem('adminCategories', JSON.stringify(updatedCategories));
-                                               
-                                               // Dispatch custom event to notify other components
-                                               window.dispatchEvent(new CustomEvent('categoriesUpdated'));
-                                             }}
-                                           >
-                                             <Trash2 className="w-4 h-4" />
-                                           </Button>
-                                         </div>
-                                       </td>
-                                     </tr>
-                                   ))}
                                  </React.Fragment>
                                ))}
                              </tbody>
