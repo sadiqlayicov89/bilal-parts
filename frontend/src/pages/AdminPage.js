@@ -823,9 +823,10 @@ const AdminPage = () => {
           
         } catch (error) {
           console.error('Error creating product:', error);
+          console.error('Error details:', JSON.stringify(error, null, 2));
           toast({
             title: "Error",
-            description: `Failed to create product: ${error.message}`,
+            description: `Failed to create product: ${error.message || 'Unknown error'}`,
             variant: "destructive"
           });
         }

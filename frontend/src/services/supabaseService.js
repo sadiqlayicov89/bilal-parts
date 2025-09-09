@@ -96,6 +96,7 @@ export class SupabaseService {
 
       if (error) {
         console.error('SupabaseService: Product creation error:', error);
+        console.error('SupabaseService: Error details:', JSON.stringify(error, null, 2));
         throw error;
       }
       
