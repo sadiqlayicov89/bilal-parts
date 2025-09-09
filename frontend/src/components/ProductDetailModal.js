@@ -303,8 +303,9 @@ const ProductDetailModal = ({ isOpen, onClose, product }) => {
                 </div>
               )}
 
-              {/* Add to Cart Button */}
-              <div className="pt-2">
+              {/* Action Buttons */}
+              <div className="pt-2 space-y-2">
+                {/* Add to Cart Button */}
                 {user ? (
                   <Button
                     onClick={handleAddToCart}
@@ -333,26 +334,49 @@ const ProductDetailModal = ({ isOpen, onClose, product }) => {
                     }
                   />
                 )}
+                
+                {/* Add to Wishlist Button */}
+                {user ? (
+                  <Button
+                    variant="outline"
+                    className="w-full border-red-600 text-red-600 hover:bg-red-50 py-2 text-sm"
+                  >
+                    <Heart className="h-4 w-4 mr-2" />
+                    Wishlist-ə əlavə et
+                  </Button>
+                ) : (
+                  <LoginModal
+                    trigger={
+                      <Button
+                        variant="outline"
+                        className="w-full border-red-600 text-red-600 hover:bg-red-50 py-2 text-sm"
+                      >
+                        <Heart className="h-4 w-4 mr-2" />
+                        Giriş edin
+                      </Button>
+                    }
+                  />
+                )}
               </div>
 
               {/* Similar Products */}
               {similarProducts.length > 0 && (
-                <div className="bg-gray-50 p-6 rounded-lg -mx-6 -mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-6">Oxşar Məhsullar</h3>
-                  <div className="grid grid-cols-4 gap-6">
+                <div className="bg-gray-50 p-4 md:p-6 rounded-lg -mx-4 md:-mx-6 -mb-4 md:-mb-6">
+                  <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-4 md:mb-6">Oxşar Məhsullar</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
                     {similarProducts.map((product) => (
-                      <div key={product.id} className="bg-white p-4 rounded-lg border hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:-translate-y-1">
-                        <div className="aspect-square mb-4">
+                      <div key={product.id} className="bg-white p-2 md:p-4 rounded-lg border hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:-translate-y-1">
+                        <div className="aspect-square mb-2 md:mb-4">
                           <img
                             src={product.images && product.images.length > 0 ? product.images[0] : product.image}
                             alt={product.name}
                             className="w-full h-full object-cover rounded-lg"
                           />
                         </div>
-                        <h4 className="text-sm font-semibold text-gray-900 line-clamp-2 mb-2 leading-tight">
+                        <h4 className="text-xs md:text-sm font-semibold text-gray-900 line-clamp-2 mb-1 md:mb-2 leading-tight">
                           {product.name}
                         </h4>
-                        <p className="text-lg text-red-600 font-bold">
+                        <p className="text-sm md:text-lg text-red-600 font-bold">
                           {(getProductPriceInfo(product, userDiscount)?.displayPrice || product.price || 0).toFixed(2)} ₽
                         </p>
                       </div>

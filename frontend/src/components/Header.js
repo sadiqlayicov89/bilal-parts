@@ -194,8 +194,8 @@ const Header = () => {
 
   return (
     <header className="bg-white shadow-sm">
-      {/* Top Bar */}
-      <div className="bg-gray-100 py-1 text-xs text-gray-600">
+      {/* Top Bar - Hidden on Mobile */}
+      <div className="hidden md:block bg-gray-100 py-1 text-xs text-gray-600">
         <div className="container mx-auto px-4 flex justify-between items-center">
           <div className="flex items-center space-x-4">
             <span>STOCK CODE: 02499. HK</span>
@@ -563,7 +563,7 @@ const Header = () => {
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <div className="flex items-center space-x-2">
+                <div className="hidden lg:flex items-center space-x-2">
                   <LoginModal>
                     <Button variant="ghost" size="sm" className="hover:text-red-600">
                       Login
