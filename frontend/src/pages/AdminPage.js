@@ -299,6 +299,20 @@ const AdminPage = () => {
     try {
       console.log('AdminPage: Fetching products from Supabase...');
       
+      // Fetch categories from Supabase first
+      const { data: supabaseCategories, error: catError } = await supabase
+        .from('categories')
+        .select('id, name, slug')
+        .eq('is_active', true)
+        .order('name');
+      
+      if (catError) {
+        console.error('Error fetching categories:', catError);
+      } else {
+        console.log('Fetched categories from Supabase:', supabaseCategories);
+        setAdminCategories(supabaseCategories || []);
+      }
+      
       // Fetch products from Supabase
       const supabaseProducts = await SupabaseService.getProducts();
       
@@ -3852,7 +3866,7 @@ const AdminPage = () => {
                            <SelectValue placeholder="Ana kateqoriya seçin" />
                          </SelectTrigger>
                          <SelectContent>
-                           {localCategories.map((cat) => (
+                           {adminCategories.map((cat) => (
                              <SelectItem key={cat.id || cat.name} value={cat.name}>
                                {cat.name}
                              </SelectItem>
