@@ -1327,21 +1327,67 @@ const AdminPage = () => {
       
       if (supabaseCategories && supabaseCategories.length > 0) {
         // Convert Supabase categories to admin format
-        const formattedCategories = supabaseCategories.map(cat => ({
-          id: cat.id,
-          name: cat.name,
-          description: cat.description || '',
-          image: cat.image || cat.image_url || '',
-          parent_id: cat.parent_id,
-          is_active: cat.is_active,
-          sort_order: cat.sort_order || 0,
-          slug: cat.slug || '',
-          created_at: cat.created_at,
-          updated_at: cat.updated_at
-        }));
+        // Show both main and sub categories, but format them properly
+        const formattedCategories = supabaseCategories.map(cat => {
+          const isSubcategory = cat.parent_id !== null;
+          const parentCategory = isSubcategory ? 
+            supabaseCategories.find(p => p.id === cat.parent_id) : null;
+          
+          return {
+            id: cat.id,
+            name: isSubcategory ? `  └─ ${cat.name}` : cat.name, // Indent subcategories
+            originalName: cat.name, // Keep original name for operations
+            description: cat.description || '',
+            image: cat.image || cat.image_url || '',
+            parent_id: cat.parent_id,
+            parent_name: parentCategory ? parentCategory.name : null,
+            is_active: cat.is_active,
+            sort_order: cat.sort_order || 0,
+            slug: cat.slug || '',
+            created_at: cat.created_at,
+            updated_at: cat.updated_at,
+            is_subcategory: isSubcategory
+          };
+        });
         
-        setAdminCategories(formattedCategories);
-        console.log('Admin categories loaded from Supabase:', formattedCategories);
+        // Sort categories: main categories first, then subcategories under their parents
+        const sortedCategories = formattedCategories.sort((a, b) => {
+          if (a.parent_id === null && b.parent_id === null) {
+            return a.sort_order - b.sort_order;
+          }
+          if (a.parent_id === null) return -1;
+          if (b.parent_id === null) return 1;
+          if (a.parent_id === b.parent_id) {
+            return a.sort_order - b.sort_order;
+          }
+          return 0;
+        });
+        
+        // Get product counts for each category
+        const categoriesWithCounts = await Promise.all(
+          sortedCategories.map(async (category) => {
+            try {
+              const { count } = await supabase
+                .from('products')
+                .select('*', { count: 'exact', head: true })
+                .eq('category_id', category.id);
+              
+              return {
+                ...category,
+                product_count: count || 0
+              };
+            } catch (error) {
+              console.error(`Error getting product count for category ${category.name}:`, error);
+              return {
+                ...category,
+                product_count: 0
+              };
+            }
+          })
+        );
+        
+        setAdminCategories(categoriesWithCounts);
+        console.log('Admin categories loaded from Supabase with product counts:', categoriesWithCounts);
         return;
       }
       
@@ -3026,7 +3072,10 @@ const AdminPage = () => {
                                      </td>
                                      <td className="border border-gray-200 p-3 text-sm">{category.description}</td>
                                      <td className="border border-gray-200 p-3 text-sm">
-                                       <Badge variant="secondary">0 sub</Badge>
+                                       <Badge variant="secondary">
+                                         {category.is_subcategory ? 'Alt kateqoriya' : 
+                                          adminCategories.filter(cat => cat.parent_id === category.id).length + ' sub'}
+                                       </Badge>
                                      </td>
                                      <td className="border border-gray-200 p-3 text-sm font-medium">{category.product_count}</td>
                                      <td className="border border-gray-200 p-3">

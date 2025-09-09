@@ -26,7 +26,10 @@ export const CategoryProvider = ({ children }) => {
       
       if (supabaseCategories && supabaseCategories.length > 0) {
         // Convert Supabase categories to the format expected by the context
-        const formattedCategories = supabaseCategories.map(cat => ({
+        // Only show main categories (parent_id is null), with their subcategories
+        const mainCategories = supabaseCategories.filter(cat => cat.parent_id === null);
+        
+        const formattedCategories = mainCategories.map(cat => ({
           id: cat.id,
           name: cat.name,
           slug: cat.slug || cat.name.toLowerCase().replace(/\s+/g, '-'),
@@ -45,7 +48,7 @@ export const CategoryProvider = ({ children }) => {
         }));
         
         setCategories(formattedCategories);
-        console.log('Categories loaded from Supabase in context:', formattedCategories);
+        console.log('Categories loaded from Supabase in context (main categories only):', formattedCategories);
       } else {
         // Fallback to localStorage
         const savedCategories = localStorage.getItem('adminCategories');
