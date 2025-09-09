@@ -258,9 +258,12 @@ const Header = () => {
                   <div className="absolute top-full left-0 w-screen max-w-7xl bg-white shadow-2xl border-t-4 border-red-600 z-50 transform -translate-x-1/3">
                     <div className="p-8">
                       <div className="grid grid-cols-4 gap-6">
-                        {/* Column 1 */}
+                        {/* Column 1 - Categories with subcategories */}
                         <div>
-                          {productCategories.slice(0, 3).map((category, index) => (
+                          {productCategories
+                            .filter(cat => cat.subcategories && cat.subcategories.length > 0)
+                            .slice(0, 3)
+                            .map((category, index) => (
                             <div key={index} className="mb-6">
                               <Link
                                 to={`/products?category=${encodeURIComponent(category.name)}`}
@@ -301,9 +304,12 @@ const Header = () => {
                           ))}
                         </div>
                         
-                        {/* Column 2 */}
+                        {/* Column 2 - More categories with subcategories */}
                         <div>
-                          {productCategories.slice(3, 6).map((category, index) => (
+                          {productCategories
+                            .filter(cat => cat.subcategories && cat.subcategories.length > 0)
+                            .slice(3, 6)
+                            .map((category, index) => (
                             <div key={index} className="mb-6">
                               <Link
                                 to={`/products?category=${encodeURIComponent(category.name)}`}
@@ -344,9 +350,12 @@ const Header = () => {
                           ))}
                         </div>
                         
-                        {/* Column 3 */}
+                        {/* Column 3 - Categories without subcategories */}
                         <div>
-                          {productCategories.slice(6, 8).map((category, index) => (
+                          {productCategories
+                            .filter(cat => !cat.subcategories || cat.subcategories.length === 0)
+                            .slice(0, 4)
+                            .map((category, index) => (
                             <div key={index} className="mb-6">
                               <Link
                                 to={`/products?category=${encodeURIComponent(category.name)}`}
@@ -362,34 +371,17 @@ const Header = () => {
                                   {category.name}
                                 </h3>
                               </Link>
-                              <div className="space-y-1">
-                                {category.subcategories.map((sub, subIndex) => (
-                                  <Link
-                                    key={subIndex}
-                                    to={`/products?category=${encodeURIComponent(category.name)}&subcategory=${encodeURIComponent(sub)}`}
-                                    className="block py-1.5 px-3 text-gray-700 hover:text-red-600 hover:bg-red-50 transition-colors rounded-md text-sm"
-                                    onClick={() => {
-                                      console.log('=== HEADER SUBCATEGORY CLICKED ===');
-                                      console.log('Category:', category.name);
-                                      console.log('Subcategory:', sub);
-                                      console.log('Generated URL:', `/products?category=${encodeURIComponent(category.name)}&subcategory=${encodeURIComponent(sub)}`);
-                                      console.log('Current URL before navigation:', window.location.href);
-                                    }}
-                                  >
-                                    <div className="flex items-center">
-                                      <div className="w-1.5 h-1.5 bg-red-600 rounded-full mr-2"></div>
-                                      <span>{sub}</span>
-                                    </div>
-                                  </Link>
-                                ))}
-                              </div>
+                              {/* No subcategories for categories without subcategories */}
                             </div>
                           ))}
                         </div>
                         
-                        {/* Column 4 */}
+                        {/* Column 4 - More categories without subcategories */}
                         <div>
-                          {productCategories.slice(8).map((category, index) => (
+                          {productCategories
+                            .filter(cat => !cat.subcategories || cat.subcategories.length === 0)
+                            .slice(4)
+                            .map((category, index) => (
                             <div key={index} className="mb-6">
                               <Link
                                 to={`/products?category=${encodeURIComponent(category.name)}`}
@@ -405,27 +397,7 @@ const Header = () => {
                                   {category.name}
                                 </h3>
                               </Link>
-                              <div className="space-y-1">
-                                {category.subcategories.map((sub, subIndex) => (
-                                  <Link
-                                    key={subIndex}
-                                    to={`/products?category=${encodeURIComponent(category.name)}&subcategory=${encodeURIComponent(sub)}`}
-                                    className="block py-1.5 px-3 text-gray-700 hover:text-red-600 hover:bg-red-50 transition-colors rounded-md text-sm"
-                                    onClick={() => {
-                                      console.log('=== HEADER SUBCATEGORY CLICKED ===');
-                                      console.log('Category:', category.name);
-                                      console.log('Subcategory:', sub);
-                                      console.log('Generated URL:', `/products?category=${encodeURIComponent(category.name)}&subcategory=${encodeURIComponent(sub)}`);
-                                      console.log('Current URL before navigation:', window.location.href);
-                                    }}
-                                  >
-                                    <div className="flex items-center">
-                                      <div className="w-1.5 h-1.5 bg-red-600 rounded-full mr-2"></div>
-                                      <span>{sub}</span>
-                                    </div>
-                                  </Link>
-                                ))}
-                              </div>
+                              {/* No subcategories for categories without subcategories */}
                             </div>
                           ))}
                         </div>
