@@ -20,6 +20,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useToast } from "../hooks/use-toast";
 import { mockData } from "../data/mockData";
 import { calculateCartTotals, formatPrice } from "../utils/priceUtils";
+import SupabaseService from "../services/supabaseService";
+import { supabase } from "../config/supabase";
 
 const AdminPage = () => {
   const { user, isAdmin } = useAuth();
@@ -295,18 +297,55 @@ const AdminPage = () => {
 
   const fetchAllProducts = async () => {
     try {
-      // Load products from localStorage first, then merge with mock data
-      const savedProducts = JSON.parse(localStorage.getItem('adminProducts') || '[]');
+      console.log('AdminPage: Fetching products from Supabase...');
       
-      if (savedProducts.length > 0) {
-        setProducts(savedProducts);
+      // Fetch products from Supabase
+      const supabaseProducts = await SupabaseService.getProducts();
+      
+      if (supabaseProducts && supabaseProducts.length > 0) {
+        // Format products for admin panel
+        const formattedProducts = supabaseProducts.map(product => ({
+          id: product.id,
+          name: product.name,
+          sku: product.sku,
+          catalogNumber: product.catalog_number,
+          price: parseFloat(product.price) || 0,
+          originalPrice: parseFloat(product.original_price) || parseFloat(product.price) || 0,
+          costPrice: parseFloat(product.cost_price) || 0,
+          description: product.description || '',
+          shortDescription: product.short_description || '',
+          category: product.categories?.name || 'Unknown',
+          subcategory: product.subcategories?.name || '',
+          brand: product.brand || '',
+          model: product.model || '',
+          year: product.year || null,
+          weight: product.weight || null,
+          dimensions: product.dimensions || '',
+          stock_quantity: product.stock_quantity || 0,
+          in_stock: product.in_stock,
+          is_featured: product.is_featured || false,
+          is_active: product.is_active,
+          images: product.product_images ? product.product_images.map(img => img.image_url) : [],
+          image: product.product_images && product.product_images.length > 0 
+            ? product.product_images[0].image_url 
+            : 'https://images.unsplash.com/photo-1581093458791-9d42e30754c4?w=300&h=200&fit=crop',
+          specifications: product.product_specifications ? 
+            product.product_specifications.reduce((acc, spec) => {
+              acc[spec.name] = spec.value;
+              return acc;
+            }, {}) : {},
+          createdAt: product.created_at,
+          updatedAt: product.updated_at
+        }));
+        
+        console.log(`AdminPage: Loaded ${formattedProducts.length} products from Supabase`);
+        setProducts(formattedProducts);
       } else {
-        // If no saved products, use mock data and save to localStorage
+        console.log('AdminPage: No products found in Supabase, using mock data');
         setProducts(mockData.products);
-        localStorage.setItem('adminProducts', JSON.stringify(mockData.products));
       }
     } catch (error) {
-      console.error("Failed to fetch products:", error);
+      console.error("AdminPage: Failed to fetch products from Supabase:", error);
       // Fallback to mock data
       setProducts(mockData.products);
     }
@@ -609,16 +648,31 @@ const AdminPage = () => {
     }
   };
 
-  const handleDeleteSelectedProducts = () => {
+  const handleDeleteSelectedProducts = async () => {
     if (selectedProducts.length === 0) return;
     
-    setProducts(prev => prev.filter(p => !selectedProducts.includes(p.id)));
-    setSelectedProducts([]);
-    
-    toast({
-      title: "Success",
-      description: `${selectedProducts.length} products deleted successfully`,
-    });
+    try {
+      // Delete products from Supabase
+      for (const productId of selectedProducts) {
+        await SupabaseService.deleteProduct(productId);
+      }
+      
+      // Refresh products list
+      await fetchAllProducts();
+      setSelectedProducts([]);
+      
+      toast({
+        title: "Success",
+        description: `${selectedProducts.length} products deleted successfully from Supabase`,
+      });
+    } catch (error) {
+      console.error('Error deleting products:', error);
+      toast({
+        title: "Error",
+        description: `Failed to delete products: ${error.message}`,
+        variant: "destructive"
+      });
+    }
   };
 
   const handleDeleteAllProducts = () => {
@@ -690,27 +744,89 @@ const AdminPage = () => {
           });
         }
       } else {
-        // Create new product
-        const newProduct = {
-          id: `product-${Date.now()}`,
-          ...editProductFormData,
-          originalPrice: editProductFormData.price, // Save original price
-          subcategory: editProductFormData.subcategory === 'none' ? '' : editProductFormData.subcategory,
-          specifications: specificationsObj,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        };
-        
-        const updatedProducts = [newProduct, ...products];
-        setProducts(updatedProducts);
-        
-        // Save to localStorage
-        localStorage.setItem('adminProducts', JSON.stringify(updatedProducts));
-        
-        toast({
-          title: "Success",
-          description: "New product created successfully",
-        });
+        // Create new product in Supabase
+        try {
+          // Find category ID
+          const category = categories.find(cat => cat.name === editProductFormData.category);
+          if (!category) {
+            throw new Error('Category not found');
+          }
+          
+          // Prepare product data for Supabase
+          const productData = {
+            name: editProductFormData.name,
+            sku: editProductFormData.sku,
+            catalog_number: editProductFormData.catalogNumber,
+            description: editProductFormData.description,
+            short_description: editProductFormData.shortDescription,
+            price: parseFloat(editProductFormData.price),
+            original_price: parseFloat(editProductFormData.originalPrice || editProductFormData.price),
+            cost_price: parseFloat(editProductFormData.costPrice || 0),
+            stock_quantity: parseInt(editProductFormData.stock_quantity || 0),
+            category_id: category.id,
+            brand: editProductFormData.brand || '',
+            model: editProductFormData.model || '',
+            year: editProductFormData.year ? parseInt(editProductFormData.year) : null,
+            weight: editProductFormData.weight ? parseFloat(editProductFormData.weight) : null,
+            dimensions: editProductFormData.dimensions || '',
+            is_active: true,
+            is_featured: editProductFormData.is_featured || false,
+            in_stock: parseInt(editProductFormData.stock_quantity || 0) > 0
+          };
+          
+          // Create product in Supabase
+          const { data: newProduct, error: productError } = await SupabaseService.createProduct(productData);
+          
+          if (productError) {
+            throw productError;
+          }
+          
+          // Add images if provided
+          if (editProductFormData.images && editProductFormData.images.length > 0) {
+            for (let i = 0; i < editProductFormData.images.length; i++) {
+              await supabase
+                .from('product_images')
+                .insert({
+                  product_id: newProduct.id,
+                  image_url: editProductFormData.images[i],
+                  alt_text: `${editProductFormData.name} - Image ${i + 1}`,
+                  is_primary: i === 0,
+                  sort_order: i + 1
+                });
+            }
+          }
+          
+          // Add specifications if provided
+          if (specifications && specifications.length > 0) {
+            for (let i = 0; i < specifications.length; i++) {
+              await supabase
+                .from('product_specifications')
+                .insert({
+                  product_id: newProduct.id,
+                  name: specifications[i].name,
+                  value: specifications[i].value,
+                  unit: specifications[i].unit || '',
+                  sort_order: i + 1
+                });
+            }
+          }
+          
+          // Refresh products list
+          await fetchAllProducts();
+          
+          toast({
+            title: "Success",
+            description: "New product created successfully in Supabase",
+          });
+          
+        } catch (error) {
+          console.error('Error creating product:', error);
+          toast({
+            title: "Error",
+            description: `Failed to create product: ${error.message}`,
+            variant: "destructive"
+          });
+        }
       }
       
       setEditProductModal(false);
@@ -2467,8 +2583,22 @@ const AdminPage = () => {
                                      <Button
                                        size="sm"
                                        variant="destructive"
-                                       onClick={() => {
-                                         setProducts(prev => prev.filter(p => p.id !== product.id));
+                                       onClick={async () => {
+                                         try {
+                                           await SupabaseService.deleteProduct(product.id);
+                                           await fetchAllProducts();
+                                           toast({
+                                             title: "Success",
+                                             description: "Product deleted successfully from Supabase",
+                                           });
+                                         } catch (error) {
+                                           console.error('Error deleting product:', error);
+                                           toast({
+                                             title: "Error",
+                                             description: `Failed to delete product: ${error.message}`,
+                                             variant: "destructive"
+                                           });
+                                         }
                                        }}
                                      >
                                        <Trash2 className="w-4 h-4" />
