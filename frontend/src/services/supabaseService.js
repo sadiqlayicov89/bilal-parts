@@ -86,16 +86,23 @@ export class SupabaseService {
 
   static async createProduct(productData) {
     try {
+      console.log('SupabaseService: Creating product with data:', productData);
+      
       const { data, error } = await supabase
         .from('products')
         .insert(productData)
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('SupabaseService: Product creation error:', error);
+        throw error;
+      }
+      
+      console.log('SupabaseService: Product created successfully:', data);
       return data;
     } catch (error) {
-      console.error('Error creating product:', error);
+      console.error('SupabaseService: Error creating product:', error);
       throw error;
     }
   }

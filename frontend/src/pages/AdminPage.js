@@ -752,7 +752,7 @@ const AdminPage = () => {
             throw new Error('Category not found');
           }
           
-          // Prepare product data for Supabase
+          // Prepare product data for Supabase (don't include ID, let Supabase generate it)
           const productData = {
             name: editProductFormData.name,
             sku: editProductFormData.sku,
@@ -773,6 +773,8 @@ const AdminPage = () => {
             is_featured: editProductFormData.is_featured || false,
             in_stock: parseInt(editProductFormData.stock_quantity || 0) > 0
           };
+          
+          console.log('Creating product with data:', productData);
           
           // Create product in Supabase
           const { data: newProduct, error: productError } = await SupabaseService.createProduct(productData);
