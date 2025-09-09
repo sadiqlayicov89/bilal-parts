@@ -8,13 +8,14 @@ export class SupabaseService {
   
   static async getProducts(filters = {}) {
     try {
-      // Query with category join for proper filtering
+      console.log('SupabaseService: Starting to fetch products...');
+      console.log('Supabase URL:', process.env.REACT_APP_SUPABASE_URL);
+      console.log('Supabase Key exists:', !!process.env.REACT_APP_SUPABASE_ANON_KEY);
+      
+      // First try simple query without joins to test basic access
       let query = supabase
         .from('products')
-        .select(`
-          *,
-          categories!products_category_id_fkey(name, slug)
-        `)
+        .select('*')
         .eq('is_active', true);
 
       // Apply filters
