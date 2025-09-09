@@ -1,9 +1,10 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
-import { useAuth } from './SupabaseAuthContext';
+import { useAuth } from './AuthContext';
 import { useToast } from '../hooks/use-toast';
 import { mockData } from '../data/mockData';
 import { calculateCartTotals, getProductPriceInfo } from '../utils/priceUtils';
+import SupabaseService from '../services/supabaseService';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
 const API = `${BACKEND_URL}/api`;
