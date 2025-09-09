@@ -12,11 +12,10 @@ export class SupabaseService {
       console.log('Supabase URL:', process.env.REACT_APP_SUPABASE_URL);
       console.log('Supabase Key exists:', !!process.env.REACT_APP_SUPABASE_ANON_KEY);
       
-      // First try simple query without joins to test basic access
+      // Test with simplest possible query
       let query = supabase
         .from('products')
-        .select('*')
-        .eq('is_active', true);
+        .select('*');
 
       // Apply filters
       if (filters.category) {
