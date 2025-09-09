@@ -738,12 +738,12 @@ const ProductsPage = () => {
       <Header />
       
       {/* Hero Section */}
-      <section className="bg-red-600 text-white py-16">
+      <section className="bg-red-600 text-white py-8 md:py-16">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
+          <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4">
             FORKLIFT PARTS & ACCESSORIES
           </h1>
-          <p className="text-xl mb-8 opacity-90">
+          <p className="text-sm md:text-lg lg:text-xl mb-6 md:mb-8 opacity-90">
             Over 3,000,000 parts in stock - Find exactly what you need
           </p>
           <form onSubmit={handleSearch} className="flex justify-center max-w-xl mx-auto px-4">
@@ -757,10 +757,10 @@ const ProductsPage = () => {
               />
               <Button 
                 type="submit" 
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-none min-w-[70px] text-sm font-medium transition-colors duration-200"
+                className="bg-red-600 hover:bg-red-700 text-white px-3 md:px-4 py-2 rounded-none min-w-[60px] md:min-w-[70px] text-xs md:text-sm font-medium transition-colors duration-200"
               >
-                <Search className="w-4 h-4 mr-1" />
-                Search
+                <Search className="w-3 h-3 md:w-4 md:h-4 mr-1" />
+                <span className="hidden sm:inline">Search</span>
               </Button>
             </div>
           </form>
@@ -768,13 +768,13 @@ const ProductsPage = () => {
       </section>
 
       {/* Products Grid */}
-      <section className="py-16">
+      <section className="py-8 md:py-16">
         <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-800">Products</h2>
+          <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-6 md:mb-8 space-y-4 lg:space-y-0">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-800">Products</h2>
             
             {/* Items per page selector and pagination on same line */}
-            <div className="flex items-center space-x-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-6">
               {/* Items per page selector */}
               <div className="flex items-center space-x-2">
                 <span className="text-sm text-gray-600">Show:</span>
@@ -792,33 +792,42 @@ const ProductsPage = () => {
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-1 overflow-x-auto">
                   <Button
                     onClick={goToPreviousPage}
                     disabled={currentPage === 1}
                     variant="outline"
                     size="sm"
+                    className="text-xs"
                   >
-                    Previous
+                    Prev
                   </Button>
                   
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <Button
-                      key={page}
-                      onClick={() => goToPage(page)}
-                      variant={currentPage === page ? "default" : "outline"}
-                      size="sm"
-                      className="w-10"
-                    >
-                      {page}
-                    </Button>
-                  ))}
+                  {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                    const page = i + 1;
+                    return (
+                      <Button
+                        key={page}
+                        onClick={() => goToPage(page)}
+                        variant={currentPage === page ? "default" : "outline"}
+                        size="sm"
+                        className="w-8 h-8 text-xs"
+                      >
+                        {page}
+                      </Button>
+                    );
+                  })}
+                  
+                  {totalPages > 5 && (
+                    <span className="text-sm text-gray-500 px-2">...</span>
+                  )}
                   
                   <Button
                     onClick={goToNextPage}
                     disabled={currentPage === totalPages}
                     variant="outline"
                     size="sm"
+                    className="text-xs"
                   >
                     Next
                   </Button>
@@ -827,9 +836,9 @@ const ProductsPage = () => {
             </div>
           </div>
 
-          <div className="flex gap-8">
+          <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
             {/* Left Sidebar - Filters */}
-            <div className="w-80 flex-shrink-0">
+            <div className="w-full lg:w-80 flex-shrink-0">
               <div className="bg-white p-6 rounded-lg border shadow-sm sticky top-4">
                 <h3 className="text-lg font-semibold text-gray-900 mb-6">Filters</h3>
                 

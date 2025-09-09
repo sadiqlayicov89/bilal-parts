@@ -40,23 +40,23 @@ const ContactForm = () => {
   };
 
   return (
-    <section className="py-16 bg-white">
+    <section className="py-8 md:py-16 bg-white">
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
           <Card className="shadow-xl">
             <CardHeader className="bg-red-600 text-white text-center">
-              <CardTitle className="flex items-center justify-center space-x-2 text-2xl">
-                <MessageSquare className="w-6 h-6" />
+              <CardTitle className="flex items-center justify-center space-x-2 text-lg md:text-2xl">
+                <MessageSquare className="w-5 h-5 md:w-6 md:h-6" />
                 <span>FEEDBACK</span>
               </CardTitle>
-              <p className="text-red-100 mt-2">
+              <p className="text-red-100 mt-2 text-sm md:text-base">
                 Any questions or suggestions? Please contact with us now!
               </p>
             </CardHeader>
             
-            <CardContent className="p-8">
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-6">
+            <CardContent className="p-4 md:p-8">
+              <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                   <div>
                     <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
                       Your Name <span className="text-red-600">*</span>
@@ -127,7 +127,7 @@ const ContactForm = () => {
                     type="submit"
                     size="lg"
                     disabled={isSubmitting}
-                    className="bg-red-600 hover:bg-red-700 text-white px-12 py-3"
+                    className="bg-red-600 hover:bg-red-700 text-white px-8 md:px-12 py-2 md:py-3 w-full sm:w-auto"
                   >
                     {isSubmitting ? (
                       <div className="flex items-center space-x-2">

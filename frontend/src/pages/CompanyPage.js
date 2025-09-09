@@ -41,39 +41,39 @@ const CompanyPage = () => {
       <Header />
       
       {/* Hero Section */}
-      <section className="bg-red-600 text-white py-16">
+      <section className="bg-red-600 text-white py-8 md:py-16">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
+          <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4">
             ABOUT BILAL-PARTS CO.,LTD
           </h1>
-          <p className="text-xl opacity-90 max-w-3xl mx-auto">
+          <p className="text-sm md:text-lg lg:text-xl opacity-90 max-w-3xl mx-auto">
             Leading logistics equipment operation management company based on IoT innovation and digital driving
           </p>
         </div>
       </section>
 
       {/* Company Profile */}
-      <section className="py-16">
+      <section className="py-8 md:py-16">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
+          <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
             <div>
-              <h2 className="text-3xl font-bold text-gray-800 mb-6">Our Story</h2>
-              <p className="text-lg text-gray-700 leading-relaxed mb-6">
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4 md:mb-6">Our Story</h2>
+              <p className="text-sm md:text-base lg:text-lg text-gray-700 leading-relaxed mb-4 md:mb-6">
                 Headquartered in Guangzhou, China, Folangsi Co., Ltd. was established in 2007 and has grown to become an industry leader in forklift parts and logistics equipment solutions. We are an in-plant logistics equipment operation management company based on IoT innovation and digital driving.
               </p>
-              <p className="text-lg text-gray-700 leading-relaxed mb-6">
+              <p className="text-sm md:text-base lg:text-lg text-gray-700 leading-relaxed mb-4 md:mb-6">
                 As a comprehensive service provider for forklift rentals, sales, repairs & parts, we specialize in forklift parts development and sales with a global one-stop service approach. Our commitment to quality and innovation has made us a trusted partner for businesses worldwide.
               </p>
             </div>
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
               {achievements.map((achievement, index) => (
-                <Card key={index} className="text-center p-6 hover:shadow-lg transition-shadow">
+                <Card key={index} className="text-center p-4 md:p-6 hover:shadow-lg transition-shadow">
                   <CardContent className="p-0">
-                    <div className="flex justify-center mb-4">
+                    <div className="flex justify-center mb-3 md:mb-4">
                       {achievement.icon}
                     </div>
-                    <h3 className="font-bold text-gray-800 mb-2">{achievement.title}</h3>
-                    <p className="text-sm text-gray-600">{achievement.description}</p>
+                    <h3 className="font-bold text-gray-800 mb-2 text-sm md:text-base">{achievement.title}</h3>
+                    <p className="text-xs md:text-sm text-gray-600">{achievement.description}</p>
                   </CardContent>
                 </Card>
               ))}
@@ -83,24 +83,24 @@ const CompanyPage = () => {
       </section>
 
       {/* Company History */}
-      <section className="py-16 bg-gray-50" id="companyhistory">
+      <section className="py-8 md:py-16 bg-gray-50" id="companyhistory">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">Company History</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-8 md:mb-12">Company History</h2>
           <div className="max-w-4xl mx-auto">
             <div className="relative">
-              <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-red-600"></div>
+              <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-red-600"></div>
               {milestones.map((milestone, index) => (
-                <div key={index} className={`flex items-center mb-8 ${index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'}`}>
-                  <div className={`w-1/2 ${index % 2 === 0 ? 'pr-8 text-right' : 'pl-8'}`}>
-                    <Card className="p-6 hover:shadow-lg transition-shadow">
+                <div key={index} className="flex items-center mb-6 md:mb-8">
+                  <div className="w-full md:w-1/2 md:pr-8">
+                    <Card className="p-4 md:p-6 hover:shadow-lg transition-shadow">
                       <CardContent className="p-0">
-                        <h3 className="text-2xl font-bold text-red-600 mb-2">{milestone.year}</h3>
-                        <p className="text-gray-700">{milestone.event}</p>
+                        <h3 className="text-xl md:text-2xl font-bold text-red-600 mb-2">{milestone.year}</h3>
+                        <p className="text-sm md:text-base text-gray-700">{milestone.event}</p>
                       </CardContent>
                     </Card>
                   </div>
-                  <div className="w-6 h-6 bg-red-600 rounded-full border-4 border-white shadow-lg relative z-10"></div>
-                  <div className="w-1/2"></div>
+                  <div className="hidden md:block w-6 h-6 bg-red-600 rounded-full border-4 border-white shadow-lg relative z-10"></div>
+                  <div className="hidden md:block w-1/2"></div>
                 </div>
               ))}
             </div>

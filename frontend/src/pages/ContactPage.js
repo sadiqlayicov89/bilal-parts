@@ -68,33 +68,33 @@ const ContactPage = () => {
       <Header />
       
       {/* Hero Section */}
-      <section className="bg-red-600 text-white py-16">
+      <section className="bg-red-600 text-white py-8 md:py-16">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
+          <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4">
             CONTACT US
           </h1>
-          <p className="text-xl opacity-90">
+          <p className="text-sm md:text-lg lg:text-xl opacity-90">
             Get in touch with our team for expert assistance
           </p>
         </div>
       </section>
 
       {/* Contact Information */}
-      <section className="py-16">
+      <section className="py-8 md:py-16">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 mb-8 md:mb-16">
             {contactInfo.map((info, index) => (
-              <Card key={index} className="text-center p-6 hover:shadow-lg transition-shadow">
+              <Card key={index} className="text-center p-4 md:p-6 hover:shadow-lg transition-shadow">
                 <CardContent className="p-0">
-                  <div className="flex justify-center mb-4">
-                    <div className="p-3 bg-red-50 rounded-full">
+                  <div className="flex justify-center mb-3 md:mb-4">
+                    <div className="p-2 md:p-3 bg-red-50 rounded-full">
                       {info.icon}
                     </div>
                   </div>
-                  <h3 className="font-bold text-gray-800 mb-3">{info.title}</h3>
+                  <h3 className="font-bold text-gray-800 mb-2 md:mb-3 text-sm md:text-base">{info.title}</h3>
                   <div className="space-y-1">
                     {info.details.map((detail, idx) => (
-                      <p key={idx} className="text-gray-600 text-sm">{detail}</p>
+                      <p key={idx} className="text-gray-600 text-xs md:text-sm">{detail}</p>
                     ))}
                   </div>
                 </CardContent>

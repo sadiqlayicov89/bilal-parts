@@ -64,20 +64,20 @@ const Footer = () => {
   return (
     <footer className="bg-gray-900 text-white">
       {/* Main Footer */}
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid md:grid-cols-3 gap-8">
+      <div className="container mx-auto px-4 py-8 md:py-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
           {/* About Us */}
           <div>
-            <div className="flex items-center mb-6">
-              <div className="w-8 h-8 bg-red-600 rounded mr-3"></div>
-              <h3 className="text-xl font-bold">ABOUT US</h3>
+            <div className="flex items-center mb-4 md:mb-6">
+              <div className="w-6 h-6 md:w-8 md:h-8 bg-red-600 rounded mr-2 md:mr-3"></div>
+              <h3 className="text-lg md:text-xl font-bold">ABOUT US</h3>
             </div>
-            <ul className="space-y-3">
+            <ul className="space-y-2 md:space-y-3">
               {aboutLinks.map((link, index) => (
                 <li key={index}>
                   <Link 
                     to={link.link}
-                    className="text-gray-300 hover:text-white transition-colors"
+                    className="text-gray-300 hover:text-white transition-colors text-sm md:text-base"
                   >
                     {link.name}
                   </Link>
@@ -88,27 +88,27 @@ const Footer = () => {
 
           {/* Products */}
           <div>
-            <div className="flex items-center mb-6">
-              <div className="w-8 h-8 bg-red-600 rounded mr-3"></div>
-              <h3 className="text-xl font-bold">PRODUCTS</h3>
+            <div className="flex items-center mb-4 md:mb-6">
+              <div className="w-6 h-6 md:w-8 md:h-8 bg-red-600 rounded mr-2 md:mr-3"></div>
+              <h3 className="text-lg md:text-xl font-bold">PRODUCTS</h3>
             </div>
-            <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
               {productLinks.slice(0, 8).map((link, index) => (
                 <Link
                   key={index}
                   to={link.link}
-                  className="text-gray-300 hover:text-white transition-colors text-sm"
+                  className="text-gray-300 hover:text-white transition-colors text-xs md:text-sm"
                 >
                   {link.name}
                 </Link>
               ))}
             </div>
-            <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2">
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
               {productLinks.slice(8).map((link, index) => (
                 <Link
                   key={index}
                   to={link.link}
-                  className="text-gray-300 hover:text-white transition-colors text-sm"
+                  className="text-gray-300 hover:text-white transition-colors text-xs md:text-sm"
                 >
                   {link.name}
                 </Link>
@@ -118,31 +118,31 @@ const Footer = () => {
 
           {/* Contact Us */}
           <div>
-            <div className="flex items-center mb-6">
-              <div className="w-8 h-8 bg-red-600 rounded mr-3"></div>
-              <h3 className="text-xl font-bold">CONTACT US</h3>
+            <div className="flex items-center mb-4 md:mb-6">
+              <div className="w-6 h-6 md:w-8 md:h-8 bg-red-600 rounded mr-2 md:mr-3"></div>
+              <h3 className="text-lg md:text-xl font-bold">CONTACT US</h3>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-3 md:space-y-4">
               <div>
-                <h4 className="text-lg font-semibold text-red-400 mb-2">BILAL-PARTS CO.,LTD</h4>
-                <div className="space-y-2 text-gray-300">
-                                      <p>Email: admin@bilal-parts.com</p>
+                <h4 className="text-base md:text-lg font-semibold text-red-400 mb-2">BILAL-PARTS CO.,LTD</h4>
+                <div className="space-y-1 md:space-y-2 text-gray-300 text-sm md:text-base">
+                  <p>Email: admin@bilal-parts.com</p>
                   <p>Tel：0086-18520438258</p>
                   <p>Fax：0086-20-3999 3597</p>
                 </div>
               </div>
               
               <div>
-                <p className="text-sm text-gray-400 mb-2">
+                <p className="text-xs md:text-sm text-gray-400 mb-2">
                   Subsidiary company：GUANGZHOU PENGZE MACHINERY EQUIPMENT CO.,LTD
                 </p>
-                <p className="text-sm text-gray-300">
+                <p className="text-xs md:text-sm text-gray-300">
                   Address：No. 999,Asian Games Avenue,Shiqi Town,Panyu District,Guangzhou,China.
                 </p>
               </div>
 
               <Button 
-                className="bg-red-600 hover:bg-red-700 text-white mt-4"
+                className="bg-red-600 hover:bg-red-700 text-white mt-3 md:mt-4 text-sm md:text-base w-full sm:w-auto"
                 onClick={() => navigate('/contact')}
               >
                 more contact
