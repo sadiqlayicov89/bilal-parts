@@ -206,77 +206,72 @@ const AdminPage = () => {
 
   const fetchUsers = async () => {
     try {
-      // Load users from localStorage
+      console.log('Fetching users from Supabase...');
+      const supabaseUsers = await SupabaseService.getUsers();
+      console.log('Fetched users from Supabase:', supabaseUsers);
+      setUsers(supabaseUsers || []);
+    } catch (error) {
+      console.error("Failed to fetch users from Supabase:", error);
+      // Fallback to localStorage for now
       const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
       setUsers(registeredUsers);
-    } catch (error) {
-      console.error("Failed to fetch users:", error);
     }
   };
 
   const fetchOrders = async () => {
     try {
+      console.log('Fetching orders from Supabase...');
+      const supabaseOrders = await SupabaseService.getOrders();
+      console.log('Fetched orders from Supabase:', supabaseOrders);
+      setOrders(supabaseOrders || []);
+    } catch (error) {
+      console.error("Failed to fetch orders from Supabase:", error);
+      // Fallback to localStorage for now
       const allOrders = getAllOrders();
       setOrders(allOrders);
-    } catch (error) {
-      console.error("Failed to fetch orders:", error);
     }
   };
 
   const handleOrderStatusChange = async (orderId, newStatus) => {
     try {
-      // Update order status in localStorage
-      const adminOrders = JSON.parse(localStorage.getItem('adminOrders') || '[]');
-      const updatedOrders = adminOrders.map(order => 
-        order.id === orderId ? { ...order, status: newStatus, updatedAt: new Date().toISOString() } : order
-      );
-      localStorage.setItem('adminOrders', JSON.stringify(updatedOrders));
+      console.log('Updating order status in Supabase:', orderId, newStatus);
       
-      // Also update in user orders
-      const userOrders = JSON.parse(localStorage.getItem('userOrders') || '[]');
-      const updatedUserOrders = userOrders.map(order => 
-        order.id === orderId ? { ...order, status: newStatus, updatedAt: new Date().toISOString() } : order
-      );
-      localStorage.setItem('userOrders', JSON.stringify(updatedUserOrders));
+      // Update order status in Supabase
+      await SupabaseService.updateOrderStatus(orderId, newStatus);
       
-      // Update local state immediately
-      setOrders(updatedOrders);
+      // Refresh orders from Supabase
+      await fetchOrders();
       
       // Update selected order if it's currently open in modal
       if (selectedOrder && selectedOrder.id === orderId) {
         setSelectedOrder({...selectedOrder, status: newStatus});
       }
 
-      // Create customer notification
-      const order = updatedOrders.find(o => o.id === orderId);
+      // Create customer notification in Supabase
+      const order = orders.find(o => o.id === orderId);
       if (order) {
-        const customerNotification = {
-          id: `customer-notif-${Date.now()}`,
-          type: 'order_status_update',
-          orderId: orderId,
-          orderNumber: orderId,
+        const notificationData = {
+          user_id: order.user_id,
+          type: 'order',
           title: 'Sifariş Status Yeniləndi',
-          message: `Sizin #${orderId} nömrəli sifarişinizin statusu dəyişdi`,
-          newStatus: newStatus,
-          statusText: {
-            'pending': 'Gözləyir',
-            'confirmed': 'Təsdiqləndi',
-            'processing': 'Hazırlanır',
-            'shipped': 'Göndərildi', 
-            'delivered': 'Çatdırıldı',
-            'cancelled': 'Ləğv Edildi'
-          }[newStatus] || newStatus,
-          customerEmail: order.userEmail,
-          customerName: order.userName,
-          timestamp: new Date().toISOString(),
-          isRead: false,
-          priority: newStatus === 'delivered' ? 'high' : 'normal'
+          message: `Sizin #${order.order_number || orderId} nömrəli sifarişinizin statusu "${newStatus}" olaraq dəyişdi`,
+          data: {
+            order_id: orderId,
+            order_number: order.order_number || orderId,
+            new_status: newStatus,
+            status_text: {
+              'pending': 'Gözləyir',
+              'confirmed': 'Təsdiqləndi',
+              'processing': 'Hazırlanır',
+              'shipped': 'Göndərildi', 
+              'delivered': 'Çatdırıldı',
+              'cancelled': 'Ləğv Edildi'
+            }[newStatus] || newStatus
+          }
         };
 
-        // Save customer notification
-        const existingCustomerNotifications = JSON.parse(localStorage.getItem('customerNotifications') || '[]');
-        const updatedCustomerNotifications = [customerNotification, ...existingCustomerNotifications];
-        localStorage.setItem('customerNotifications', JSON.stringify(updatedCustomerNotifications));
+        // Create notification in Supabase
+        await SupabaseService.createNotification(notificationData);
 
         // Dispatch event for customer notification
         window.dispatchEvent(new CustomEvent('newCustomerNotification', { detail: customerNotification }));
@@ -385,34 +380,64 @@ const AdminPage = () => {
 
   const fetchNotifications = async () => {
     try {
-      const savedNotifications = JSON.parse(localStorage.getItem('adminNotifications') || '[]');
-      setNotifications(savedNotifications);
+      console.log('Fetching notifications from Supabase...');
+      const supabaseNotifications = await SupabaseService.getNotifications(); // Admin notifications (no user_id)
+      console.log('Fetched notifications from Supabase:', supabaseNotifications);
+      setNotifications(supabaseNotifications || []);
       
       // Count unread notifications
-      const unreadCount = savedNotifications.filter(n => !n.isRead).length;
+      const unreadCount = (supabaseNotifications || []).filter(n => !n.is_read).length;
       setUnreadNotifications(unreadCount);
     } catch (error) {
-      console.error("Failed to fetch notifications:", error);
+      console.error("Failed to fetch notifications from Supabase:", error);
+      // Fallback to localStorage for now
+      const savedNotifications = JSON.parse(localStorage.getItem('adminNotifications') || '[]');
+      setNotifications(savedNotifications);
+      const unreadCount = savedNotifications.filter(n => !n.isRead).length;
+      setUnreadNotifications(unreadCount);
     }
   };
 
-  const markNotificationAsRead = (notificationId) => {
-    const updatedNotifications = notifications.map(n => 
-      n.id === notificationId ? { ...n, isRead: true } : n
-    );
-    setNotifications(updatedNotifications);
-    localStorage.setItem('adminNotifications', JSON.stringify(updatedNotifications));
-    
-    // Update unread count
-    const unreadCount = updatedNotifications.filter(n => !n.isRead).length;
-    setUnreadNotifications(unreadCount);
+  const markNotificationAsRead = async (notificationId) => {
+    try {
+      console.log('Marking notification as read in Supabase:', notificationId);
+      
+      // Mark notification as read in Supabase
+      await SupabaseService.markNotificationAsRead(notificationId);
+      
+      // Refresh notifications from Supabase
+      await fetchNotifications();
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+      // Fallback to localStorage
+      const updatedNotifications = notifications.map(n => 
+        n.id === notificationId ? { ...n, isRead: true } : n
+      );
+      setNotifications(updatedNotifications);
+      localStorage.setItem('adminNotifications', JSON.stringify(updatedNotifications));
+      
+      const unreadCount = updatedNotifications.filter(n => !n.isRead).length;
+      setUnreadNotifications(unreadCount);
+    }
   };
 
-  const markAllNotificationsAsRead = () => {
-    const updatedNotifications = notifications.map(n => ({ ...n, isRead: true }));
-    setNotifications(updatedNotifications);
-    localStorage.setItem('adminNotifications', JSON.stringify(updatedNotifications));
-    setUnreadNotifications(0);
+  const markAllNotificationsAsRead = async () => {
+    try {
+      console.log('Marking all notifications as read in Supabase');
+      
+      // Mark all notifications as read in Supabase
+      await SupabaseService.markAllNotificationsAsRead(); // Admin notifications (no user_id)
+      
+      // Refresh notifications from Supabase
+      await fetchNotifications();
+    } catch (error) {
+      console.error('Error marking all notifications as read:', error);
+      // Fallback to localStorage
+      const updatedNotifications = notifications.map(n => ({ ...n, isRead: true }));
+      setNotifications(updatedNotifications);
+      localStorage.setItem('adminNotifications', JSON.stringify(updatedNotifications));
+      setUnreadNotifications(0);
+    }
   };
 
   const handleUserToggle = async (userId) => {
@@ -438,34 +463,27 @@ const AdminPage = () => {
 
   const handleUserDiscountUpdate = async (userId, newDiscount) => {
     try {
-      // Update local state
-      const userIndex = users.findIndex(u => u.id === userId);
-      if (userIndex !== -1) {
-        const updatedUsers = [...users];
-        updatedUsers[userIndex].discount = newDiscount;
-        setUsers(updatedUsers);
-        
-        // Also update localStorage
-        const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-        const registeredUserIndex = registeredUsers.findIndex(u => u.id === userId);
-        if (registeredUserIndex !== -1) {
-          registeredUsers[registeredUserIndex].discount = newDiscount;
-          localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
-        }
-        
-        // Show success toast after a short delay to avoid spam
-        clearTimeout(window.discountUpdateTimeout);
-        window.discountUpdateTimeout = setTimeout(() => {
-          toast({
-            title: "Success",
-            description: `Discount updated to ${newDiscount}%`,
-          });
-        }, 1000);
-      }
+      console.log('Updating user discount in Supabase:', userId, newDiscount);
+      
+      // Update user in Supabase
+      await SupabaseService.updateUser(userId, { discount: newDiscount });
+      
+      // Refresh users from Supabase
+      await fetchUsers();
+      
+      // Show success toast after a short delay to avoid spam
+      clearTimeout(window.discountUpdateTimeout);
+      window.discountUpdateTimeout = setTimeout(() => {
+        toast({
+          title: "Success",
+          description: `Discount updated to ${newDiscount}% in Supabase`,
+        });
+      }, 1000);
     } catch (error) {
+      console.error('Error updating user discount:', error);
       toast({
         title: "Error",
-        description: "Failed to update discount",
+        description: `Failed to update discount: ${error.message}`,
         variant: "destructive"
       });
     }
@@ -473,43 +491,39 @@ const AdminPage = () => {
 
   const handleUserApproval = async (userId, newStatus, discountValue = null) => {
     try {
-      const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-      const userIndex = registeredUsers.findIndex(u => u.id === userId);
+      console.log('Updating user status in Supabase:', userId, newStatus, discountValue);
       
-      if (userIndex !== -1) {
-        // Handle both boolean (old way) and string (new way) parameters
-        let status, isActive;
-        if (typeof newStatus === 'boolean') {
-          status = newStatus ? 'APPROVED' : 'REJECTED';
-          isActive = newStatus;
-        } else {
-          status = newStatus;
-          isActive = newStatus === 'APPROVED';
-        }
-        
-        registeredUsers[userIndex].status = status;
-        registeredUsers[userIndex].is_active = isActive;
-        
-        // Update discount if provided
-        if (discountValue !== null) {
-          registeredUsers[userIndex].discount = parseFloat(discountValue) || 0;
-        }
-        
-        // Update localStorage
-        localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
-        
-        // Update local state
-        setUsers(registeredUsers);
-        
-        toast({
-          title: "Success",
-          description: `User status updated to ${status}${discountValue !== null ? ` with ${discountValue}% discount` : ''}`,
-        });
+      // Handle both boolean (old way) and string (new way) parameters
+      let status, isActive;
+      if (typeof newStatus === 'boolean') {
+        status = newStatus ? 'active' : 'suspended';
+        isActive = newStatus;
+      } else {
+        status = newStatus.toLowerCase();
+        isActive = newStatus === 'active';
       }
+      
+      // Prepare update data
+      const updateData = { status, is_active: isActive };
+      if (discountValue !== null) {
+        updateData.discount = parseFloat(discountValue) || 0;
+      }
+      
+      // Update user in Supabase
+      await SupabaseService.updateUser(userId, updateData);
+      
+      // Refresh users from Supabase
+      await fetchUsers();
+      
+      toast({
+        title: "Success",
+        description: `User status updated to ${status}${discountValue !== null ? ` with ${discountValue}% discount` : ''} in Supabase`,
+      });
     } catch (error) {
+      console.error('Error updating user status:', error);
       toast({
         title: "Error",
-        description: "Failed to update user status",
+        description: `Failed to update user status: ${error.message}`,
         variant: "destructive"
       });
     }
