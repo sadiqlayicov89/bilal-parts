@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clear LocalStorage</title>
+</head>
+<body>
+    <h1>Clear LocalStorage</h1>
+    <button onclick="clearStorage()">Clear All Auth Data</button>
+    <button onclick="showStorage()">Show Current Data</button>
+    <div id="output"></div>
+
+    <script>
+        function clearStorage() {
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+            localStorage.removeItem('registeredUsers');
+            document.getElementById('output').innerHTML = '<p style="color: green;">All auth data cleared!</p>';
+        }
+
+        function showStorage() {
+            const user = localStorage.getItem('user');
+            const token = localStorage.getItem('token');
+            const registeredUsers = localStorage.getItem('registeredUsers');
+            
+            document.getElementById('output').innerHTML = `
+                <h3>Current LocalStorage Data:</h3>
+                <p><strong>User:</strong> ${user || 'null'}</p>
+                <p><strong>Token:</strong> ${token || 'null'}</p>
+                <p><strong>Registered Users:</strong> ${registeredUsers || 'null'}</p>
+            `;
+        }
+
+        // Show current data on load
+        showStorage();
+    </script>
+</body>
+</html>
+

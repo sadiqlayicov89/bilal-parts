@@ -1,0 +1,15 @@
+<svg width="200" height="60" viewBox="0 0 200 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background rectangle with rounded corners -->
+  <rect x="2" y="2" width="56" height="56" rx="8" fill="#dc2626" stroke="#b91c1c" stroke-width="2"/>
+  
+  <!-- BP Text in circle -->
+  <text x="30" y="38" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="white" text-anchor="middle">BP</text>
+  
+  <!-- Company name -->
+  <text x="70" y="25" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#1f2937">Bilal Parts</text>
+  <text x="70" y="42" font-family="Arial, sans-serif" font-size="12" fill="#6b7280">Автозапчасти и комплектующие</text>
+  
+  <!-- Decorative line -->
+  <line x1="70" y1="48" x2="190" y2="48" stroke="#dc2626" stroke-width="2"/>
+</svg>
+
