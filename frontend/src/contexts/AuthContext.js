@@ -104,31 +104,8 @@ export const AuthProvider = ({ children }) => {
         return { success: true };
       }
     } catch (supabaseError) {
-      console.log('Supabase login failed, trying backend API:', supabaseError);
-      
-      // Try backend API as fallback
-      try {
-        const response = await axios.post(`${API}/auth/login`, {
-          email,
-          password
-        });
-
-        const { token, user } = response.data;
-        
-        setUser(user);
-        setToken(token);
-        localStorage.setItem('token', token);
-        
-        toast({
-          title: 'Login Successful',
-          description: `Welcome back, ${user.first_name}!`,
-        });
-
-        return { success: true };
-      } catch (apiError) {
-        console.error('Backend API login failed:', apiError);
-        throw new Error('Login failed. Please check your credentials.');
-      }
+      console.error('Supabase login failed:', supabaseError);
+      throw new Error(`Login failed: ${supabaseError.message || 'Invalid credentials'}`);
     } finally {
       setLoading(false);
     }
@@ -216,6 +193,10 @@ export const AuthProvider = ({ children }) => {
 
   const isAuthenticated = !!user;
   const userDiscount = user?.user_metadata?.discount_percentage || 0;
+  
+  const isAdmin = () => {
+    return user?.role === 'admin' || user?.email === 'admin@bilal-parts.com';
+  };
 
   const value = {
     user,
@@ -223,6 +204,7 @@ export const AuthProvider = ({ children }) => {
     loading,
     isAuthenticated,
     userDiscount,
+    isAdmin,
     login,
     register,
     logout

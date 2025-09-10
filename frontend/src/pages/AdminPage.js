@@ -138,8 +138,8 @@ const AdminPage = () => {
     }
     fetchDashboardStats();
     // Only fetch notifications if user is admin
-    if (isAdmin && user?.email === 'admin@bilal-parts.com') {
-    fetchNotifications();
+    if (isAdmin() && user?.email === 'admin@bilal-parts.com') {
+      fetchNotifications();
     }
     
     // Listen for new notifications
