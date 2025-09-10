@@ -377,9 +377,9 @@ const MyOrdersPage = () => {
           </DialogHeader>
 
           {selectedOrder && (
-            <div className="bg-white p-6">
+            <div className="invoice-content bg-white p-6">
               {/* Order Info */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 <Card className="h-fit">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-base">Order Information</CardTitle>
@@ -417,12 +417,20 @@ const MyOrdersPage = () => {
               </div>
 
               {/* Order Items */}
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base">Order Items</CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <div className="space-y-2">
+              <div className="mt-6">
+                <h3 className="text-lg font-semibold mb-4">Order Items</h3>
+                <table className="w-full border-collapse border border-gray-300">
+                  <thead>
+                    <tr className="bg-gray-50">
+                      <th className="border border-gray-300 p-3 text-left">№</th>
+                      <th className="border border-gray-300 p-3 text-left">Product</th>
+                      <th className="border border-gray-300 p-3 text-left">Code</th>
+                      <th className="border border-gray-300 p-3 text-left">Qty</th>
+                      <th className="border border-gray-300 p-3 text-left">Price</th>
+                      <th className="border border-gray-300 p-3 text-left">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
                     {selectedOrder.items.map((item, index) => {
                       const originalPrice = item.price;
                       const orderDiscount = selectedOrder.discountPercentage || selectedOrder.userDiscount || userDiscount;
@@ -431,51 +439,41 @@ const MyOrdersPage = () => {
                       const itemTotal = discountedPrice * item.quantity;
                       
                       return (
-                        <div key={index} className="flex justify-between items-start py-2 border-b last:border-b-0">
-                          <div className="flex-1">
-                            <h4 className="font-medium text-sm">{item.name}</h4>
-                            <div className="text-xs text-gray-500 space-y-0.5">
-                              <p>Kataloq №: {item.catalogNumber || 'N/A'}</p>
-                              <p>Artikul: {item.sku || item.artikul || 'N/A'}</p>
-                              <p>Miqdar: {item.quantity}</p>
+                        <tr key={index}>
+                          <td className="border border-gray-300 p-3">{index + 1}</td>
+                          <td className="border border-gray-300 p-3">
+                            <div>
+                              <div className="font-medium">{item.name}</div>
+                              <div className="text-sm text-gray-500">
+                                {item.catalogNumber && `Cat: ${item.catalogNumber}`}
+                                {item.sku && ` | SKU: ${item.sku}`}
+                              </div>
                             </div>
-                            
-                            <div className="mt-1">
-                              {orderDiscount > 0 ? (
-                                <div className="space-y-1">
-                                  <div className="flex items-center space-x-2">
-                                    <span className="text-xs font-medium text-red-600">
-                                      {formatPrice(discountedPrice)} hər biri
-                                    </span>
-                                    <Badge variant="destructive" className="text-xs">
-                                      -{orderDiscount}%
-                                    </Badge>
-                                  </div>
-                                  <span className="text-xs text-gray-400 line-through">
-                                    {formatPrice(originalPrice)} hər biri
-                                  </span>
-                                </div>
-                              ) : (
-                                <span className="text-xs text-gray-500">
-                                  {formatPrice(originalPrice)} hər biri
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                          <span className="font-semibold text-sm">{formatPrice(itemTotal)}</span>
-                        </div>
+                          </td>
+                          <td className="border border-gray-300 p-3">{item.sku || item.catalogNumber || 'N/A'}</td>
+                          <td className="border border-gray-300 p-3">{item.quantity}</td>
+                          <td className="border border-gray-300 p-3">
+                            {orderDiscount > 0 ? (
+                              <div>
+                                <div className="text-red-600 font-medium">{formatPrice(discountedPrice)}</div>
+                                <div className="text-xs text-gray-400 line-through">{formatPrice(originalPrice)}</div>
+                              </div>
+                            ) : (
+                              formatPrice(originalPrice)
+                            )}
+                          </td>
+                          <td className="border border-gray-300 p-3 font-semibold">{formatPrice(itemTotal)}</td>
+                        </tr>
                       );
                     })}
-                  </div>
-                </CardContent>
-              </Card>
+                  </tbody>
+                </table>
+              </div>
 
               {/* Order Total */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Order Summary</CardTitle>
-                </CardHeader>
-                <CardContent>
+              <div className="mt-6">
+                <h3 className="text-lg font-semibold mb-4">Order Summary</h3>
+                <div className="bg-gray-50 p-4 rounded-lg">
                   {(() => {
                     const orderDiscount = selectedOrder.discountPercentage || selectedOrder.userDiscount || userDiscount;
                     const orderSubtotal = selectedOrder.subtotal || selectedOrder.total;
