@@ -2,4 +2,4 @@
 ALTER TABLE public.cart_items DISABLE ROW LEVEL SECURITY;
 
 -- Verify RLS status
-SELECT relname, relrowlevelsecurity FROM pg_class WHERE relname = 'cart_items';
+SELECT relname, relrowsecurity FROM pg_class WHERE relname = 'cart_items';

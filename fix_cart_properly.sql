@@ -41,6 +41,6 @@ CREATE POLICY "Users can delete own cart items" ON public.cart_items
 ALTER TABLE public.cart_items ENABLE ROW LEVEL SECURITY;
 
 -- Verify the setup
-SELECT relname, relrowlevelsecurity FROM pg_class WHERE relname = 'cart_items';
+SELECT relname, relrowsecurity FROM pg_class WHERE relname = 'cart_items';
 SELECT schemaname, tablename, policyname, permissive, roles, cmd, qual, with_check
 FROM pg_policies WHERE tablename = 'cart_items';

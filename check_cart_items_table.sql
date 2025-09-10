@@ -10,7 +10,7 @@ AND table_schema = 'public'
 ORDER BY ordinal_position;
 
 -- Check RLS status
-SELECT relname, relrowlevelsecurity 
+SELECT relname, relrowsecurity 
 FROM pg_class 
 WHERE relname = 'cart_items';
 
