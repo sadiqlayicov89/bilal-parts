@@ -32,8 +32,8 @@ const MyOrdersPage = () => {
       discountPercentage: userDiscount,
       total: userDiscount > 0 ? 275.00 - ((275.00 * userDiscount) / 100) : 275.00,
       items: [
-        { name: 'BATTERY CHARGER', quantity: 1, price: 180.00 },
-        { name: 'CLUTCH DISC', quantity: 1, price: 95.00 }
+        { name: 'BATTERY CHARGER', quantity: 1, price: 180.00, catalogNumber: 'BC-001', sku: 'BATTERY-CHARGER-001' },
+        { name: 'CLUTCH DISC', quantity: 1, price: 95.00, catalogNumber: 'CD-002', sku: 'CLUTCH-DISC-002' }
       ],
       shippingAddress: 'г. Москва, ул. Примерная, д. 123',
       paymentMethod: 'Bank Transfer'
@@ -48,8 +48,8 @@ const MyOrdersPage = () => {
       discountPercentage: userDiscount,
       total: userDiscount > 0 ? 450.00 - ((450.00 * userDiscount) / 100) : 450.00,
       items: [
-        { name: 'ENGINE FILTER', quantity: 2, price: 150.00 },
-        { name: 'HYDRAULIC PUMP', quantity: 1, price: 150.00 }
+        { name: 'ENGINE FILTER', quantity: 2, price: 150.00, catalogNumber: 'EF-003', sku: 'ENGINE-FILTER-003' },
+        { name: 'HYDRAULIC PUMP', quantity: 1, price: 150.00, catalogNumber: 'HP-004', sku: 'HYDRAULIC-PUMP-004' }
       ],
       shippingAddress: 'г. Москва, ул. Примерная, д. 123',
       paymentMethod: 'Bank Transfer'
@@ -64,7 +64,7 @@ const MyOrdersPage = () => {
       discountPercentage: userDiscount,
       total: userDiscount > 0 ? 320.00 - ((320.00 * userDiscount) / 100) : 320.00,
       items: [
-        { name: 'TRANSMISSION BELT', quantity: 1, price: 320.00 }
+        { name: 'TRANSMISSION BELT', quantity: 1, price: 320.00, catalogNumber: 'TB-005', sku: 'TRANSMISSION-BELT-005' }
       ],
       shippingAddress: 'г. Москва, ул. Примерная, д. 123',
       paymentMethod: 'Bank Transfer'
@@ -268,18 +268,9 @@ const MyOrdersPage = () => {
       <Dialog open={showOrderDetails} onOpenChange={setShowOrderDetails}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Package className="h-5 w-5 text-red-600" />
-                <span>Order Details - #{selectedOrder?.id}</span>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowOrderDetails(false)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
+            <DialogTitle className="flex items-center space-x-2">
+              <Package className="h-5 w-5 text-red-600" />
+              <span>Order Details - #{selectedOrder?.id}</span>
             </DialogTitle>
           </DialogHeader>
 
@@ -326,10 +317,10 @@ const MyOrdersPage = () => {
               {/* Order Items */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Order Items</CardTitle>
+                  <CardTitle className="text-base">Order Items</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     {selectedOrder.items.map((item, index) => {
                       const originalPrice = item.price;
                       const orderDiscount = selectedOrder.discountPercentage || selectedOrder.userDiscount || userDiscount;
@@ -338,34 +329,38 @@ const MyOrdersPage = () => {
                       const itemTotal = discountedPrice * item.quantity;
                       
                       return (
-                        <div key={index} className="flex justify-between items-start py-3 border-b">
+                        <div key={index} className="flex justify-between items-start py-2 border-b">
                           <div className="flex-1">
-                            <h4 className="font-medium">{item.name}</h4>
-                            <p className="text-sm text-gray-500">Quantity: {item.quantity}</p>
+                            <h4 className="font-medium text-sm">{item.name}</h4>
+                            <div className="text-xs text-gray-500 space-y-1">
+                              <p>Kataloq №: {item.catalogNumber || 'N/A'}</p>
+                              <p>Artikul: {item.sku || item.artikul || 'N/A'}</p>
+                              <p>Miqdar: {item.quantity}</p>
+                            </div>
                             
                             <div className="mt-1">
                               {orderDiscount > 0 ? (
                                 <div className="space-y-1">
                                   <div className="flex items-center space-x-2">
-                                    <span className="text-sm font-medium text-red-600">
-                                      {formatPrice(discountedPrice)} each
+                                    <span className="text-xs font-medium text-red-600">
+                                      {formatPrice(discountedPrice)} hər biri
                                     </span>
                                     <Badge variant="destructive" className="text-xs">
                                       -{orderDiscount}%
                                     </Badge>
                                   </div>
                                   <span className="text-xs text-gray-400 line-through">
-                                    {formatPrice(originalPrice)} each
+                                    {formatPrice(originalPrice)} hər biri
                                   </span>
                                 </div>
                               ) : (
-                                <span className="text-sm text-gray-500">
-                                  {formatPrice(originalPrice)} each
+                                <span className="text-xs text-gray-500">
+                                  {formatPrice(originalPrice)} hər biri
                                 </span>
                               )}
                             </div>
                           </div>
-                          <span className="font-semibold">{formatPrice(itemTotal)}</span>
+                          <span className="font-semibold text-sm">{formatPrice(itemTotal)}</span>
                         </div>
                       );
                     })}
