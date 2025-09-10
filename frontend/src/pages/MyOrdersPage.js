@@ -22,84 +22,141 @@ const MyOrdersPage = () => {
 
   const handlePrintOrder = () => {
     if (!selectedOrder) return;
-    
     const printWindow = window.open('', '_blank');
-    const printContent = `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>Order Details - #${selectedOrder.id}</title>
+    if (!printWindow) {
+      alert('Пожалуйста, разрешите всплывающие окна для печати');
+      return;
+    }
+
+    const vatRate = 20; // 20% VAT included in price
+    const totalAmountAll = Number(selectedOrder.total || 0);
+    const vatIncludedTotalAll = Number(((totalAmountAll * vatRate) / (100 + vatRate)).toFixed(2));
+    const totalWithoutVatAll = Number((totalAmountAll - vatIncludedTotalAll).toFixed(2));
+
+    const classicHTML = `<!DOCTYPE html><html><head><meta charset="utf-8" />
+      <title>Счет на оплату ${selectedOrder.id}</title>
           <style>
-            body { font-family: Arial, sans-serif; margin: 20px; }
-            .header { text-align: center; margin-bottom: 30px; }
-            .order-info { display: flex; justify-content: space-between; margin-bottom: 20px; }
-            .section { margin-bottom: 20px; }
-            .items-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-            .items-table th, .items-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-            .items-table th { background-color: #f2f2f2; }
-            .total-section { text-align: right; margin-top: 20px; }
-            .total-amount { font-size: 18px; font-weight: bold; color: #dc2626; }
-          </style>
-        </head>
-        <body>
-          <div class="header">
-            <h1>Bilal Parts - Order Details</h1>
-            <h2>Order #${selectedOrder.id}</h2>
+        @page { size: A4; margin: 1.5cm; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Times New Roman', serif; font-size: 12px; color: #000; }
+        .note { font-size: 10px; text-align: center; margin-bottom: 6px; }
+        .sample { font-size: 10px; text-align: center; margin-bottom: 6px; }
+        table { width: 100%; border-collapse: collapse; }
+        .bank td { border: 1px solid #000; padding: 4px 6px; }
+        .bank .left { width: 60%; }
+        .bank .right { width: 40%; }
+        .title { font-weight: bold; font-size: 16px; margin: 12px 0 8px 0; }
+        .bold { font-weight: bold; }
+        .items th, .items td { border: 1px solid #000; padding: 6px; }
+        .items th { background: #f0f0f0; text-align: center; }
+        .flex { display: flex; justify-content: space-between; }
+        .sign { display: flex; justify-content: space-between; margin-top: 24px; }
+        .line { display: inline-block; width: 220px; height: 14px; border-bottom: 1px solid #000; }
+        .footer { font-size: 10px; text-align: center; margin-top: 10px; }
+        img { max-height: 146px !important; max-width: 257px !important; width: auto !important; }
+      </style></head><body>
+        <div class="note">Внимание! Оплата данного счета означает согласие с условиями поставки товара. Уведомление об оплате обязательно, в противном случае не гарантируется наличие товара на складе. Товар отпускается по факту прихода денег на р/с Поставщика, самовывозом, при наличии доверенности и паспорта.</div>
+        <div class="sample">Образец заполнения платежного поручения</div>
+        <table class="bank">
+          <tr>
+            <td class="left">
+              <div class="bold" style="font-size:10px">Банк получателя</div>
+              <div>T-BANK</div>
+              <div style="font-size:10px">ИНН 7707083893 КПП 770701001</div>
+              <div style="font-size:10px">Получатель</div>
+              <div>ООО "Bilal-parts"</div>
+            </td>
+            <td class="right">
+              <div class="flex"><span style="font-size:10px">БИК</span><span>044525225</span></div>
+              <div class="flex"><span style="font-size:10px">Сч. №</span><span>30101810200000000225</span></div>
+              <div class="flex"><span style="font-size:10px">КПП</span><span>770701001</span></div>
+              <div class="flex"><span style="font-size:10px">Сч. №</span><span>40702810123456789012</span></div>
+            </td>
+          </tr>
+        </table>
+
+        <div class="title">Счет на оплату № ${selectedOrder.id} от ${new Date(selectedOrder.date).toLocaleDateString('ru-RU')}</div>
+        <div style="text-align: right; font-size: 10px;">
+          <div>Валюта: RUB</div>
+          <div style="margin-top: 4px;">
+            <img src="/Логотип основной-1.png" alt="Bilal Parts Logo" style="height: 98px; width: auto; max-width: 238px;" />
           </div>
-          
-          <div class="order-info">
-            <div>
-              <p><strong>Date:</strong> ${new Date(selectedOrder.date).toLocaleDateString()}</p>
-              <p><strong>Status:</strong> ${getStatusText(selectedOrder.status)}</p>
-            </div>
-            <div>
-              <p><strong>Payment Method:</strong> ${selectedOrder.paymentMethod}</p>
-              <p><strong>Customer:</strong> ${user?.first_name} ${user?.last_name}</p>
-            </div>
-          </div>
-          
-          <div class="section">
-            <h3>Order Items</h3>
-            <table class="items-table">
-              <thead>
-                <tr>
-                  <th>Product Name</th>
-                  <th>SKU</th>
-                  <th>Catalog No</th>
-                  <th>Quantity</th>
-                  <th>Price</th>
-                  <th>Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${selectedOrder.items.map(item => `
-                  <tr>
-                    <td>${item.name}</td>
-                    <td>${item.sku || '-'}</td>
-                    <td>${item.catalogNumber || '-'}</td>
-                    <td>${item.quantity}</td>
-                    <td>${formatPrice(item.price)}</td>
-                    <td>${formatPrice(item.price * item.quantity)}</td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
-          </div>
-          
-          <div class="total-section">
-            <p><strong>Subtotal:</strong> ${formatPrice(selectedOrder.subtotal)}</p>
-            ${selectedOrder.discountAmount > 0 ? `
-              <p><strong>Discount (${selectedOrder.discountPercentage}%):</strong> -${formatPrice(selectedOrder.discountAmount)}</p>
-            ` : ''}
-            <p class="total-amount"><strong>Total Amount:</strong> ${formatPrice(selectedOrder.total)}</p>
-          </div>
-        </body>
-      </html>
-    `;
-    
-    printWindow.document.write(printContent);
+        </div>
+
+        <table style="margin-bottom:8px;">
+          <tr>
+            <td style="width:110px" class="bold">Поставщик:</td>
+            <td>ИНН 7707083893, КПП 770701001, ООО "Bilal-parts", г. Москва, ул. Примерная, д. 123</td>
+          </tr>
+          <tr>
+            <td class="bold">Покупатель:</td>
+            <td>${user?.firstName || 'Admin'} ${user?.lastName || 'User'}, ${user?.company_name || ''}, ИНН ${user?.vat_number || 'N/A'}, ${selectedOrder.shippingAddress || 'N/A'}</td>
+          </tr>
+        </table>
+
+        <div style="font-size:10px">Действителен до ${(() => {
+          const d = new Date(selectedOrder.date);
+          d.setDate(d.getDate() + 5);
+          return d.toLocaleDateString('ru-RU');
+        })()}</div>
+
+        <table class="items" style="margin-top:8px;">
+          <thead>
+            <tr>
+              <th style="width:30px;">№</th>
+              <th>Товар</th>
+              <th style="width:90px;">Код</th>
+              <th style="width:60px;">Кол-во</th>
+              <th style="width:50px;">Ед.</th>
+              <th style="width:80px;">Цена</th>
+              <th style="width:90px;">в т.ч. НДС</th>
+              <th style="width:90px;">Всего</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${selectedOrder.items.map((item, idx) => {
+              const originalPrice = item.price;
+              const orderDiscount = selectedOrder.discountPercentage || selectedOrder.userDiscount || userDiscount;
+              const discountAmount = orderDiscount > 0 ? (originalPrice * orderDiscount) / 100 : 0;
+              const discountedPrice = originalPrice - discountAmount;
+              const itemTotal = discountedPrice * item.quantity;
+              const itemVat = Number(((itemTotal * vatRate) / (100 + vatRate)).toFixed(2));
+              return `<tr>
+                <td style="text-align:center;">${idx + 1}</td>
+                <td>${item.name}</td>
+                <td>${item.sku || item.catalogNumber || 'N/A'}</td>
+                <td style="text-align:center;">${item.quantity}</td>
+                <td style="text-align:center;">шт</td>
+                <td style="text-align:right;">${discountedPrice.toFixed(2)}</td>
+                <td style="text-align:right;">${itemVat.toFixed(2)}</td>
+                <td style="text-align:right;">${itemTotal.toFixed(2)}</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+
+        <div style="margin-top:8px; text-align:right;">
+          ${(selectedOrder.discountPercentage || selectedOrder.userDiscount || userDiscount) > 0 ? `
+            <div style="font-size:12px; color:#666;">Сумма без скидки: ${(selectedOrder.subtotal || selectedOrder.total).toFixed(2)} RUB</div>
+            <div style="font-size:12px; color:#dc2626;">Скидка (${selectedOrder.discountPercentage || selectedOrder.userDiscount || userDiscount}%): -${(selectedOrder.discountAmount || 0).toFixed(2)} RUB</div>
+            <div style="font-size:12px; margin-bottom:4px;">Сумма со скидкой: ${selectedOrder.total.toFixed(2)} RUB</div>
+          ` : ''}
+          <div>Итого НДС: <strong>${vatIncludedTotalAll.toFixed(2)}</strong></div>
+          <div>Итого без НДС: <strong>${totalWithoutVatAll.toFixed(2)}</strong></div>
+          <div style="font-size:14px; margin-top:6px;">Итого к оплате: <strong>${totalAmountAll.toFixed(2)} RUB</strong></div>
+        </div>
+
+        <div class="sign">
+          <div>Руководитель <span class="line"></span></div>
+          <div>Бухгалтер <span class="line"></span></div>
+        </div>
+
+        <div class="footer">Внимание! Товар в поврежденной, грязной упаковке или без упаковки возврату не подлежит!</div>
+      </body></html>`;
+
+    printWindow.document.write(classicHTML);
     printWindow.document.close();
-    printWindow.print();
+    printWindow.onload = () => { printWindow.print(); printWindow.close(); };
   };
 
   // Mock orders data - in real app, this would come from API
