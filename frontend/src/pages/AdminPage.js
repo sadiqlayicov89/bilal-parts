@@ -275,8 +275,8 @@ const AdminPage = () => {
 
   const fetchOrders = async () => {
     try {
-      console.log('Fetching orders from Supabase...');
-      const supabaseOrders = await SupabaseService.getOrders();
+      console.log('Fetching all orders for admin...');
+      const supabaseOrders = await SupabaseService.getAllOrders();
       console.log('Fetched orders from Supabase:', supabaseOrders);
       setOrders(supabaseOrders || []);
     } catch (error) {

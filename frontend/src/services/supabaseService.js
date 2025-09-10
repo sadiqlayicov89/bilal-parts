@@ -545,6 +545,31 @@ export class SupabaseService {
     }
   }
 
+  static async getAllOrders() {
+    try {
+      console.log('Fetching all orders for admin...');
+      
+      const { data, error } = await supabase
+        .from('orders')
+        .select(`
+          *,
+          order_items(*)
+        `)
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.error('Error fetching orders:', error);
+        throw error;
+      }
+      
+      console.log('Fetched orders:', data?.length || 0);
+      return data || [];
+    } catch (error) {
+      console.error('SupabaseService: Error fetching orders:', error);
+      throw error;
+    }
+  }
+
   static async updateOrderStatus(orderId, status) {
     try {
       const { data, error } = await supabase
