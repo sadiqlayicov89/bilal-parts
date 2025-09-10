@@ -18,7 +18,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Checkbox } from "../components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../components/ui/dialog";
 import { useToast } from "../hooks/use-toast";
-import { mockData } from "../data/mockData";
+// Removed mockData import - using only Supabase
 import { calculateCartTotals, formatPrice } from "../utils/priceUtils";
 import SupabaseService from "../services/supabaseService";
 import { supabase } from "../config/supabase";
