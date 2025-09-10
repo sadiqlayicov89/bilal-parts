@@ -182,22 +182,30 @@ export class SupabaseService {
   
   static async getCartItems(userId) {
     try {
+      console.log('Fetching cart items for user:', userId);
+      
       const { data, error } = await supabase
         .from('cart_items')
         .select(`
           *,
           products(
             id, name, sku, price, original_price, in_stock,
-            product_images(image_url, alt_text, is_primary)
+            stock_quantity, images, catalog_number, category,
+            description, specifications
           )
         `)
         .eq('user_id', userId)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      return data;
+      if (error) {
+        console.error('Error fetching cart items:', error);
+        throw error;
+      }
+      
+      console.log('Fetched cart items:', data?.length || 0);
+      return data || [];
     } catch (error) {
-      console.error('Error fetching cart items:', error);
+      console.error('SupabaseService: Error fetching cart items:', error);
       throw error;
     }
   }
@@ -439,64 +447,67 @@ export class SupabaseService {
   
   static async getUsers() {
     try {
-      // First try to get from profiles table
+      console.log('Fetching users from profiles table...');
+      
+      // Get users from profiles table (this is where user data is stored)
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('*')
         .order('created_at', { ascending: false });
       
       if (profilesError) {
-        console.warn('Error fetching from profiles table:', profilesError);
+        console.error('Error fetching from profiles table:', profilesError);
+        throw profilesError;
       }
       
-      // Also get from auth.users (admin only)
-      const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
+      console.log('Fetched profiles:', profiles?.length || 0);
       
-      if (authError) {
-        console.warn('Error fetching from auth.users:', authError);
-        // Fallback to profiles only
-        return profiles || [];
-      }
-      
-      // Combine and format users
-      const allUsers = [];
-      
-      // Add users from profiles table
-      if (profiles) {
-        allUsers.push(...profiles.map(profile => ({
-          ...profile,
-          source: 'profiles'
-        })));
-      }
-      
-      // Add users from auth.users that don't have profiles
-      if (authUsers && authUsers.users) {
-        authUsers.users.forEach(authUser => {
-          const hasProfile = profiles?.some(profile => profile.id === authUser.id);
-          if (!hasProfile) {
-            allUsers.push({
-              id: authUser.id,
-              email: authUser.email,
-              first_name: authUser.user_metadata?.first_name || '',
-              last_name: authUser.user_metadata?.last_name || '',
-              phone: authUser.user_metadata?.phone || '',
-              country: authUser.user_metadata?.country || '',
-              city: authUser.user_metadata?.city || '',
-              discount_percentage: 0,
-              role: 'user',
-              is_approved: true,
-              created_at: authUser.created_at,
-              updated_at: authUser.updated_at,
-              source: 'auth'
-            });
+      // If no profiles found, try to get from auth.users using a different approach
+      if (!profiles || profiles.length === 0) {
+        console.log('No profiles found, trying alternative approach...');
+        
+        // Try to get current user's profile as a test
+        const { data: { user: currentUser } } = await supabase.auth.getUser();
+        if (currentUser) {
+          console.log('Current user found:', currentUser.email);
+          
+          // Create a basic profile entry for current user if it doesn't exist
+          const { data: existingProfile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', currentUser.id)
+            .single();
+          
+          if (!existingProfile) {
+            console.log('Creating profile for current user...');
+            const { data: newProfile, error: createError } = await supabase
+              .from('profiles')
+              .insert({
+                id: currentUser.id,
+                email: currentUser.email,
+                first_name: currentUser.user_metadata?.first_name || '',
+                last_name: currentUser.user_metadata?.last_name || '',
+                phone: currentUser.user_metadata?.phone || '',
+                country: currentUser.user_metadata?.country || '',
+                city: currentUser.user_metadata?.city || '',
+                discount_percentage: 0,
+                role: 'user',
+                is_approved: true
+              })
+              .select()
+              .single();
+            
+            if (createError) {
+              console.error('Error creating profile:', createError);
+            } else {
+              console.log('Profile created:', newProfile);
+              return [newProfile];
+            }
           }
-        });
+        }
       }
       
-      // Sort by created_at
-      allUsers.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-      
-      return allUsers;
+      return profiles || [];
     } catch (error) {
       console.error('SupabaseService: Error fetching users:', error);
       throw error;
@@ -526,6 +537,8 @@ export class SupabaseService {
   
   static async getOrders() {
     try {
+      console.log('Fetching all orders for admin...');
+      
       const { data, error } = await supabase
         .from('orders')
         .select(`
@@ -535,8 +548,13 @@ export class SupabaseService {
         `)
         .order('created_at', { ascending: false });
       
-      if (error) throw error;
-      return data;
+      if (error) {
+        console.error('Error fetching orders:', error);
+        throw error;
+      }
+      
+      console.log('Fetched orders:', data?.length || 0);
+      return data || [];
     } catch (error) {
       console.error('SupabaseService: Error fetching orders:', error);
       throw error;
@@ -566,6 +584,8 @@ export class SupabaseService {
   
   static async getNotifications(userId = null) {
     try {
+      console.log('Fetching notifications for user:', userId);
+      
       let query = supabase
         .from('notifications')
         .select('*')
@@ -580,8 +600,13 @@ export class SupabaseService {
       
       const { data, error } = await query;
       
-      if (error) throw error;
-      return data;
+      if (error) {
+        console.error('Error fetching notifications:', error);
+        throw error;
+      }
+      
+      console.log('Fetched notifications:', data?.length || 0);
+      return data || [];
     } catch (error) {
       console.error('SupabaseService: Error fetching notifications:', error);
       throw error;
@@ -661,36 +686,6 @@ export class SupabaseService {
   // ====================================
   // CART OPERATIONS
   // ====================================
-  
-  static async getCartItems(userId) {
-    try {
-      const { data, error } = await supabase
-        .from('cart_items')
-        .select(`
-          *,
-          products (
-            id,
-            name,
-            price,
-            images,
-            in_stock,
-            stock_quantity,
-            catalog_number,
-            sku,
-            category,
-            description,
-            specifications
-          )
-        `)
-        .eq('user_id', userId);
-      
-      if (error) throw error;
-      return data || [];
-    } catch (error) {
-      console.error('SupabaseService: Error fetching cart items:', error);
-      throw error;
-    }
-  }
 
   static async addToCart(userId, productId, quantity = 1) {
     try {
