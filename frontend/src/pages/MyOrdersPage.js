@@ -348,36 +348,36 @@ const MyOrdersPage = () => {
 
       {/* Order Details Modal */}
       <Dialog open={showOrderDetails} onOpenChange={setShowOrderDetails}>
-        <DialogContent className="max-w-5xl max-h-[95vh] overflow-hidden p-0">
-          <DialogHeader className="p-6 pb-4 border-b bg-gray-50">
-            <div className="flex items-center justify-between">
-              <DialogTitle className="flex items-center space-x-2">
-                <Package className="h-5 w-5 text-red-600" />
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto [&>button]:!hidden">
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between">
+              <div className="flex items-center">
+                <div className="w-6 h-6 bg-red-600 rounded mr-2"></div>
                 <span>Order Details - #{selectedOrder?.id}</span>
-              </DialogTitle>
+              </div>
               <div className="flex items-center space-x-2">
                 <Button
-                  onClick={handlePrintOrder}
                   variant="outline"
                   size="sm"
-                  className="flex items-center space-x-2"
+                  onClick={handlePrintOrder}
+                  className="flex items-center"
                 >
-                  <Printer className="h-4 w-4" />
-                  <span>Print</span>
+                  <Printer className="w-4 h-4 mr-2" />
+                  Print
                 </Button>
                 <Button
-                  onClick={() => setShowOrderDetails(false)}
                   variant="ghost"
                   size="sm"
+                  onClick={() => setShowOrderDetails(false)}
                 >
-                  <X className="h-4 w-4" />
+                  <X className="w-4 h-4" />
                 </Button>
               </div>
-            </div>
+            </DialogTitle>
           </DialogHeader>
 
           {selectedOrder && (
-            <div className="p-6 overflow-y-auto max-h-[calc(95vh-120px)]">
+            <div className="bg-white p-6">
               {/* Order Info */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
                 <Card className="h-fit">
