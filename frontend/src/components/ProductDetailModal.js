@@ -80,25 +80,25 @@ const ProductDetailModal = ({ isOpen, onClose, product }) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
-        className="max-w-7xl max-h-[98vh] overflow-hidden p-0"
+        className="max-w-6xl max-h-[95vh] overflow-hidden p-0"
         onKeyDown={handleKeyDown}
       >
-        <DialogHeader className="p-6 pb-4 border-b">
-          <DialogTitle className="text-2xl font-bold text-gray-900">
+        <DialogHeader className="p-4 pb-2 border-b">
+          <DialogTitle className="text-xl font-bold text-gray-900">
             {currentProduct.name}
           </DialogTitle>
         </DialogHeader>
 
-        <div className="flex flex-col lg:flex-row h-full">
+        <div className="flex flex-col lg:flex-row h-full overflow-y-auto">
           {/* Left Column - Images */}
-          <div className="lg:w-1/2 p-6">
+          <div className="lg:w-1/2 p-4">
             <div className="space-y-4">
               {/* Main Image */}
               <div className="relative group">
                 <img
                   src={images.length > 0 ? images[selectedImageIndex] : 'https://images.unsplash.com/photo-1581093458791-9d42e30754c4?w=400&h=300&fit=crop'}
                   alt={currentProduct.name}
-                  className="w-full h-80 object-cover rounded-lg"
+                  className="w-full h-64 object-cover rounded-lg"
                 />
                 
                 {/* Stock Badge */}
@@ -174,7 +174,7 @@ const ProductDetailModal = ({ isOpen, onClose, product }) => {
                     <button
                       key={index}
                       onClick={() => setSelectedImageIndex(index)}
-                      className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${
+                      className={`flex-shrink-0 w-12 h-12 rounded-lg overflow-hidden border-2 transition-all ${
                         selectedImageIndex === index 
                           ? 'border-blue-500 ring-2 ring-blue-200' 
                           : 'border-gray-200 hover:border-gray-300'
@@ -194,10 +194,10 @@ const ProductDetailModal = ({ isOpen, onClose, product }) => {
 
           {/* Right Column - Product Info */}
           <div className="lg:w-1/2 p-4">
-            <div className="space-y-4">
+            <div className="space-y-3">
               {/* Product Information */}
               <div className="bg-gray-50 p-3 rounded-lg">
-                <h3 className="text-base font-semibold text-gray-900 mb-3">Məhsul Məlumatları</h3>
+                <h3 className="text-sm font-semibold text-gray-900 mb-2">Məhsul Məlumatları</h3>
                 <div className="space-y-2">
                   <div className="flex items-center space-x-2">
                     <Package className="h-4 w-4 text-gray-500" />
@@ -248,7 +248,7 @@ const ProductDetailModal = ({ isOpen, onClose, product }) => {
 
               {/* Price */}
               <div className="bg-gray-50 p-3 rounded-lg">
-                <h3 className="text-base font-semibold text-gray-900 mb-2">Qiymət</h3>
+                <h3 className="text-sm font-semibold text-gray-900 mb-2">Qiymət</h3>
                 <div className="space-y-2">
                   <div className="flex items-center space-x-3">
                     <span className="text-2xl font-bold text-red-600">
@@ -281,7 +281,7 @@ const ProductDetailModal = ({ isOpen, onClose, product }) => {
               {/* Description */}
               {currentProduct.description && (
                 <div className="bg-gray-50 p-3 rounded-lg">
-                  <h3 className="text-base font-semibold text-gray-900 mb-2">Təsvir</h3>
+                  <h3 className="text-sm font-semibold text-gray-900 mb-2">Təsvir</h3>
                   <p className="text-xs text-gray-700 leading-relaxed">
                     {currentProduct.description}
                   </p>
@@ -291,7 +291,7 @@ const ProductDetailModal = ({ isOpen, onClose, product }) => {
               {/* Specifications */}
               {currentProduct.specifications && (
                 <div className="bg-gray-50 p-3 rounded-lg">
-                  <h3 className="text-base font-semibold text-gray-900 mb-2">Texniki Xüsusiyyətlər</h3>
+                  <h3 className="text-sm font-semibold text-gray-900 mb-2">Texniki Xüsusiyyətlər</h3>
                   <div className="space-y-1">
                     {Object.entries(currentProduct.specifications).map(([key, value]) => (
                       <div key={key} className="flex justify-between py-1 border-b border-gray-200 last:border-b-0">
@@ -304,7 +304,7 @@ const ProductDetailModal = ({ isOpen, onClose, product }) => {
               )}
 
               {/* Action Buttons */}
-              <div className="pt-2 space-y-2">
+              <div className="pt-1 space-y-2">
                 {/* Add to Cart Button */}
                 {user ? (
                   <Button
@@ -361,22 +361,22 @@ const ProductDetailModal = ({ isOpen, onClose, product }) => {
 
               {/* Similar Products */}
               {similarProducts.length > 0 && (
-                <div className="bg-gray-50 p-4 md:p-6 rounded-lg -mx-4 md:-mx-6 -mb-4 md:-mb-6">
-                  <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-4 md:mb-6">Oxşar Məhsullar</h3>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
+                <div className="bg-gray-50 p-3 rounded-lg -mx-4 -mb-4">
+                  <h3 className="text-sm font-semibold text-gray-900 mb-3">Oxşar Məhsullar</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                     {similarProducts.map((product) => (
-                      <div key={product.id} className="bg-white p-2 md:p-4 rounded-lg border hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:-translate-y-1">
-                        <div className="aspect-square mb-2 md:mb-4">
+                      <div key={product.id} className="bg-white p-2 rounded-lg border hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:-translate-y-1">
+                        <div className="aspect-square mb-2">
                           <img
                             src={product.images && product.images.length > 0 ? product.images[0] : product.image}
                             alt={product.name}
                             className="w-full h-full object-cover rounded-lg"
                           />
                         </div>
-                        <h4 className="text-xs md:text-sm font-semibold text-gray-900 line-clamp-2 mb-1 md:mb-2 leading-tight">
+                        <h4 className="text-xs font-semibold text-gray-900 line-clamp-2 mb-1 leading-tight">
                           {product.name}
                         </h4>
-                        <p className="text-sm md:text-lg text-red-600 font-bold">
+                        <p className="text-xs text-red-600 font-bold">
                           {(getProductPriceInfo(product, userDiscount)?.displayPrice || product.price || 0).toFixed(2)} ₽
                         </p>
                       </div>
