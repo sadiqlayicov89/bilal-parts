@@ -137,7 +137,6 @@ export const CartProvider = ({ children }) => {
       });
 
       return { success: true };
-      }
     } catch (error) {
       const message = error.response?.data?.message || error.message || 'Failed to add item to cart';
       toast({
