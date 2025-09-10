@@ -162,7 +162,62 @@ const AdminPage = () => {
 
   const fetchDashboardStats = async () => {
     try {
-      // Mock data'dan dashboard istatistiklerini al
+      console.log('Fetching dashboard stats from Supabase...');
+      
+      // Fetch real data from Supabase
+      const [supabaseUsers, supabaseProducts, supabaseOrders] = await Promise.all([
+        SupabaseService.getUsers().catch(() => []),
+        SupabaseService.getProducts().catch(() => []),
+        SupabaseService.getOrders().catch(() => [])
+      ]);
+      
+      console.log('Dashboard stats data:', {
+        users: supabaseUsers.length,
+        products: supabaseProducts.length,
+        orders: supabaseOrders.length
+      });
+      
+      // Calculate stats from real data
+      const stats = {
+        users: {
+          total: supabaseUsers.length,
+          active: supabaseUsers.filter(u => u.is_approved !== false).length,
+          inactive: supabaseUsers.filter(u => u.is_approved === false).length,
+          pending: supabaseUsers.filter(u => u.is_approved === false).length
+        },
+        products: {
+          total: supabaseProducts.length,
+          in_stock: supabaseProducts.filter(p => p.in_stock).length,
+          out_of_stock: supabaseProducts.filter(p => !p.in_stock).length
+        },
+        orders: {
+          total: supabaseOrders.length,
+          pending: supabaseOrders.filter(o => o.status === 'pending').length,
+          completed: supabaseOrders.filter(o => o.status === 'delivered' || o.status === 'completed').length
+        },
+        revenue: {
+          monthly: supabaseOrders
+            .filter(o => o.status !== 'cancelled')
+            .reduce((sum, o) => sum + (o.total_amount || 0), 0),
+          average_order: supabaseOrders.length > 0 
+            ? supabaseOrders
+                .filter(o => o.status !== 'cancelled')
+                .reduce((sum, o) => sum + (o.total_amount || 0), 0) / supabaseOrders.length 
+            : 0
+        },
+        messages: {
+          unread: 0 // Will be updated when we implement contact messages
+        },
+        newsletter: {
+          subscribers: 0 // Will be updated when we implement newsletter
+        }
+      };
+      
+      setDashboardStats(stats);
+      setLoading(false);
+    } catch (error) {
+      console.error("Failed to load dashboard stats:", error);
+      // Fallback to mock data
       const stats = {
         users: {
           total: mockData.users.length,
@@ -197,9 +252,6 @@ const AdminPage = () => {
       };
       
       setDashboardStats(stats);
-      setLoading(false);
-    } catch (error) {
-      console.error("Failed to load dashboard stats:", error);
       setLoading(false);
     }
   };
