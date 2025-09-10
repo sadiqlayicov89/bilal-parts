@@ -380,8 +380,8 @@ const AdminPage = () => {
 
   const fetchNotifications = async () => {
     try {
-      console.log('Fetching notifications from Supabase...');
-      const supabaseNotifications = await SupabaseService.getNotifications(); // Admin notifications (no user_id)
+      console.log('Fetching admin notifications from Supabase...');
+      const supabaseNotifications = await SupabaseService.getNotifications(null); // Admin notifications (no user_id)
       console.log('Fetched notifications from Supabase:', supabaseNotifications);
       setNotifications(supabaseNotifications || []);
       

@@ -71,8 +71,17 @@ export const CartProvider = ({ children }) => {
     try {
       setLoading(true);
       
+      // Check if user is authenticated
+      if (!isAuthenticated || !user?.id) {
+        console.log('User not authenticated, clearing cart');
+        setCartItems([]);
+        setCartCount(0);
+        setCartTotal(0);
+        return;
+      }
+      
       // Load cart from Supabase
-      console.log('Loading cart from Supabase');
+      console.log('Loading cart from Supabase for user:', user.id);
       const cartItems = await SupabaseService.getCartItems(user.id);
       
       // Transform cart items to match expected format

@@ -439,13 +439,64 @@ export class SupabaseService {
   
   static async getUsers() {
     try {
-      const { data, error } = await supabase
+      // First try to get from profiles table
+      const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('*')
         .order('created_at', { ascending: false });
       
-      if (error) throw error;
-      return data;
+      if (profilesError) {
+        console.warn('Error fetching from profiles table:', profilesError);
+      }
+      
+      // Also get from auth.users (admin only)
+      const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
+      
+      if (authError) {
+        console.warn('Error fetching from auth.users:', authError);
+        // Fallback to profiles only
+        return profiles || [];
+      }
+      
+      // Combine and format users
+      const allUsers = [];
+      
+      // Add users from profiles table
+      if (profiles) {
+        allUsers.push(...profiles.map(profile => ({
+          ...profile,
+          source: 'profiles'
+        })));
+      }
+      
+      // Add users from auth.users that don't have profiles
+      if (authUsers && authUsers.users) {
+        authUsers.users.forEach(authUser => {
+          const hasProfile = profiles?.some(profile => profile.id === authUser.id);
+          if (!hasProfile) {
+            allUsers.push({
+              id: authUser.id,
+              email: authUser.email,
+              first_name: authUser.user_metadata?.first_name || '',
+              last_name: authUser.user_metadata?.last_name || '',
+              phone: authUser.user_metadata?.phone || '',
+              country: authUser.user_metadata?.country || '',
+              city: authUser.user_metadata?.city || '',
+              discount_percentage: 0,
+              role: 'user',
+              is_approved: true,
+              created_at: authUser.created_at,
+              updated_at: authUser.updated_at,
+              source: 'auth'
+            });
+          }
+        });
+      }
+      
+      // Sort by created_at
+      allUsers.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      
+      return allUsers;
     } catch (error) {
       console.error('SupabaseService: Error fetching users:', error);
       throw error;
