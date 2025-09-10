@@ -196,7 +196,7 @@ export class SupabaseService {
           *,
           products(
             id, name, sku, price, original_price, in_stock,
-            stock_quantity, images, catalog_number, category,
+            stock_quantity, catalog_number, category,
             description, specifications
           )
         `)
@@ -531,7 +531,7 @@ export class SupabaseService {
         .from('orders')
         .select(`
           *,
-          profiles!orders_user_id_fkey(email, first_name, last_name),
+          profiles(email, first_name, last_name),
           order_items(*)
         `)
         .order('created_at', { ascending: false });
