@@ -8,22 +8,22 @@ const NewsSection = () => {
   const news = [
     {
       date: "04-23",
-      title: "Folangsi Co., Ltd. participated in the 137th Canton Fair",
+      title: "Bilal-Parts Co., Ltd. participated in the 137th Canton Fair",
       excerpt: "On April 15, 2025, the 137th China Import and Export Fair (Canton Fair) opened grandly in Guangzhou. As an important window for China's opening up and a key platform for foreign trade, this Canton Fair attracted global attention with its innovative and vigorous momentum.",
       link: "/news/23096.html",
       category: "Company News"
     },
     {
       date: "03-22", 
-      title: "Charming Phuket,Encountering a Tropical Paradise--2025 Folangsi International Business Center Phuket Tour",
-      excerpt: "One person can walk fast,two people can walk leisurely,but a group of people can go further.With the concerted efforts of all departments, the Folangsi International Business Center exceeded the group's targets again.Therefore,the team traveled together to Phuket,Thailand to experience different customs and cultures and breathe the air of freedom.",
+      title: "Charming Phuket,Encountering a Tropical Paradise--2025 Bilal-Parts International Business Center Phuket Tour",
+      excerpt: "One person can walk fast,two people can walk leisurely,but a group of people can go further.With the concerted efforts of all departments, the Bilal-Parts International Business Center exceeded the group's targets again.Therefore,the team traveled together to Phuket,Thailand to experience different customs and cultures and breathe the air of freedom.",
       link: "/news/23095.html",
       category: "Company Trip"
     },
     {
       date: "01-14",
-      title: "Striving for the forefront and taking advantage of the momentum - Folangsi 2024 summary,commendation and 2025 New Years",
-      excerpt: "On January 11, 2025, the 2024 Summary and Commendation Meeting of Folangsi Co., Ltd. and the 2025 New Year Party with the theme of \"Striving for the Forefront and Taking Advantage of the Trend\" were successfully held in Hefei,Anhui Province.",
+      title: "Striving for the forefront and taking advantage of the momentum - Bilal-Parts 2024 summary,commendation and 2025 New Years",
+      excerpt: "On January 11, 2025, the 2024 Summary and Commendation Meeting of Bilal-Parts Co., Ltd. and the 2025 New Year Party with the theme of \"Striving for the Forefront and Taking Advantage of the Trend\" were successfully held in Hefei,Anhui Province.",
       link: "/news/23094.html",
       category: "Company Events"
     }

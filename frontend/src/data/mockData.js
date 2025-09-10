@@ -1,4 +1,4 @@
-// Mock data for the Folangsi forklift website
+// Mock data for the Bilal-Parts forklift website
 export const mockData = {
   // Company information
   company: {
@@ -836,7 +836,7 @@ export const mockData = {
     {
       id: 1,
       date: "04-23",
-      title: "Folangsi Co., Ltd. participated in the 137th Canton Fair",
+      title: "Bilal-Parts Co., Ltd. participated in the 137th Canton Fair",
       excerpt: "On April 15, 2025, the 137th China Import and Export Fair (Canton Fair) opened grandly in Guangzhou...",
       category: "Company News",
       image: "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=250&fit=crop"
@@ -844,7 +844,7 @@ export const mockData = {
     {
       id: 2,
       date: "03-22",
-      title: "Charming Phuket,Encountering a Tropical Paradise--2025 Folangsi International Business Center Phuket Tour",
+      title: "Charming Phuket,Encountering a Tropical Paradise--2025 Bilal-Parts International Business Center Phuket Tour",
       excerpt: "One person can walk fast,two people can walk leisurely,but a group of people can go further...",
       category: "Company Trip",
       image: "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=400&h=250&fit=crop"
@@ -852,8 +852,8 @@ export const mockData = {
     {
       id: 3,
       date: "01-14",
-      title: "Striving for the forefront and taking advantage of the momentum - Folangsi 2024 summary",
-      excerpt: "On January 11, 2025, the 2024 Summary and Commendation Meeting of Folangsi Co., Ltd...",
+      title: "Striving for the forefront and taking advantage of the momentum - Bilal-Parts 2024 summary",
+      excerpt: "On January 11, 2025, the 2024 Summary and Commendation Meeting of Bilal-Parts Co., Ltd...",
       category: "Company Events",
       image: "https://images.unsplash.com/photo-1533038590840-1cde6e668a91?w=400&h=250&fit=crop"
     }

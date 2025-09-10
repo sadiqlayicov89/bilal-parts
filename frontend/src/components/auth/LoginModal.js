@@ -50,7 +50,7 @@ const LoginModal = ({ children, onSuccess }) => {
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="text-center text-2xl font-bold text-red-600">
-            Login to Folangsi
+            Login to Bilal-Parts
           </DialogTitle>
           <DialogDescription className="text-center">
             Enter your credentials to access your account

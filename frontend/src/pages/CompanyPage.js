@@ -59,7 +59,7 @@ const CompanyPage = () => {
             <div>
               <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4 md:mb-6">Our Story</h2>
               <p className="text-sm md:text-base lg:text-lg text-gray-700 leading-relaxed mb-4 md:mb-6">
-                Headquartered in Guangzhou, China, Folangsi Co., Ltd. was established in 2007 and has grown to become an industry leader in forklift parts and logistics equipment solutions. We are an in-plant logistics equipment operation management company based on IoT innovation and digital driving.
+                Headquartered in Guangzhou, China, Bilal-Parts Co., Ltd. was established in 2007 and has grown to become an industry leader in forklift parts and logistics equipment solutions. We are an in-plant logistics equipment operation management company based on IoT innovation and digital driving.
               </p>
               <p className="text-sm md:text-base lg:text-lg text-gray-700 leading-relaxed mb-4 md:mb-6">
                 As a comprehensive service provider for forklift rentals, sales, repairs & parts, we specialize in forklift parts development and sales with a global one-stop service approach. Our commitment to quality and innovation has made us a trusted partner for businesses worldwide.
@@ -116,9 +116,9 @@ const CompanyPage = () => {
             <div className="bg-gray-50 p-8 rounded-lg">
               <div className="w-24 h-24 bg-gray-300 rounded-full mx-auto mb-6"></div>
               <blockquote className="text-lg italic text-gray-700 mb-6">
-                "At Folangsi, we believe in building lasting partnerships through quality products and exceptional service. Our 21 years of experience have taught us that success comes from understanding our customers' needs and delivering solutions that exceed expectations."
+                "At Bilal-Parts, we believe in building lasting partnerships through quality products and exceptional service. Our 21 years of experience have taught us that success comes from understanding our customers' needs and delivering solutions that exceed expectations."
               </blockquote>
-              <cite className="text-gray-600 font-medium">Chairman, Folangsi Co., Ltd.</cite>
+              <cite className="text-gray-600 font-medium">Chairman, Bilal-Parts Co., Ltd.</cite>
             </div>
           </div>
         </div>

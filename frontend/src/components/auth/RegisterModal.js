@@ -81,7 +81,7 @@ const RegisterModal = ({ children, onSuccess }) => {
             Create Account
           </DialogTitle>
           <DialogDescription className="text-center">
-            Join Folangsi to access exclusive forklift parts and services
+            Join Bilal-Parts to access exclusive forklift parts and services
           </DialogDescription>
         </DialogHeader>
         

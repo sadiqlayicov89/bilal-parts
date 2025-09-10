@@ -34,8 +34,8 @@ const WishlistPage = () => {
   const handleShare = () => {
     if (navigator.share) {
       navigator.share({
-        title: 'My Folangsi Wishlist',
-        text: 'Check out my wishlist on Folangsi',
+        title: 'My Bilal-Parts Wishlist',
+        text: 'Check out my wishlist on Bilal-Parts',
         url: window.location.href,
       });
     } else {

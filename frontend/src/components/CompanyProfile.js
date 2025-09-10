@@ -71,7 +71,7 @@ const CompanyProfile = () => {
               </p>
               
               <p className="text-lg text-gray-700 leading-relaxed mb-6">
-                Headquartered in Guangzhou, China, Folangsi Co., Ltd. is an in-plant logistics equipment operation management company based on IoT innovation and digital driving. sales, repairs & parts, as well as a global one-stop service provider specializing in forklift parts development and sales.
+                Headquartered in Guangzhou, China, Bilal-Parts Co., Ltd. is an in-plant logistics equipment operation management company based on IoT innovation and digital driving. sales, repairs & parts, as well as a global one-stop service provider specializing in forklift parts development and sales.
               </p>
             </div>
 
