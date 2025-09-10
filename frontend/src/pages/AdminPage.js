@@ -137,7 +137,10 @@ const AdminPage = () => {
       return;
     }
     fetchDashboardStats();
+    // Only fetch notifications if user is admin
+    if (isAdmin && user?.email === 'admin@bilal-parts.com') {
     fetchNotifications();
+    }
     
     // Listen for new notifications
     const handleNewNotification = (event) => {
@@ -312,12 +315,12 @@ const AdminPage = () => {
             order_number: order.order_number || orderId,
             new_status: newStatus,
             status_text: {
-              'pending': 'Gözləyir',
-              'confirmed': 'Təsdiqləndi',
-              'processing': 'Hazırlanır',
-              'shipped': 'Göndərildi', 
-              'delivered': 'Çatdırıldı',
-              'cancelled': 'Ləğv Edildi'
+            'pending': 'Gözləyir',
+            'confirmed': 'Təsdiqləndi',
+            'processing': 'Hazırlanır',
+            'shipped': 'Göndərildi', 
+            'delivered': 'Çatdırıldı',
+            'cancelled': 'Ləğv Edildi'
             }[newStatus] || newStatus
           }
         };
@@ -462,14 +465,14 @@ const AdminPage = () => {
     } catch (error) {
       console.error('Error marking notification as read:', error);
       // Fallback to localStorage
-      const updatedNotifications = notifications.map(n => 
-        n.id === notificationId ? { ...n, isRead: true } : n
-      );
-      setNotifications(updatedNotifications);
-      localStorage.setItem('adminNotifications', JSON.stringify(updatedNotifications));
-      
-      const unreadCount = updatedNotifications.filter(n => !n.isRead).length;
-      setUnreadNotifications(unreadCount);
+    const updatedNotifications = notifications.map(n => 
+      n.id === notificationId ? { ...n, isRead: true } : n
+    );
+    setNotifications(updatedNotifications);
+    localStorage.setItem('adminNotifications', JSON.stringify(updatedNotifications));
+    
+    const unreadCount = updatedNotifications.filter(n => !n.isRead).length;
+    setUnreadNotifications(unreadCount);
     }
   };
 
@@ -485,10 +488,10 @@ const AdminPage = () => {
     } catch (error) {
       console.error('Error marking all notifications as read:', error);
       // Fallback to localStorage
-      const updatedNotifications = notifications.map(n => ({ ...n, isRead: true }));
-      setNotifications(updatedNotifications);
-      localStorage.setItem('adminNotifications', JSON.stringify(updatedNotifications));
-      setUnreadNotifications(0);
+    const updatedNotifications = notifications.map(n => ({ ...n, isRead: true }));
+    setNotifications(updatedNotifications);
+    localStorage.setItem('adminNotifications', JSON.stringify(updatedNotifications));
+    setUnreadNotifications(0);
     }
   };
 
@@ -522,15 +525,15 @@ const AdminPage = () => {
       
       // Refresh users from Supabase
       await fetchUsers();
-      
-      // Show success toast after a short delay to avoid spam
-      clearTimeout(window.discountUpdateTimeout);
-      window.discountUpdateTimeout = setTimeout(() => {
-        toast({
-          title: "Success",
+        
+        // Show success toast after a short delay to avoid spam
+        clearTimeout(window.discountUpdateTimeout);
+        window.discountUpdateTimeout = setTimeout(() => {
+          toast({
+            title: "Success",
           description: `Discount updated to ${newDiscount}% in Supabase`,
-        });
-      }, 1000);
+          });
+        }, 1000);
     } catch (error) {
       console.error('Error updating user discount:', error);
       toast({
@@ -545,32 +548,32 @@ const AdminPage = () => {
     try {
       console.log('Updating user status in Supabase:', userId, newStatus, discountValue);
       
-      // Handle both boolean (old way) and string (new way) parameters
-      let status, isActive;
-      if (typeof newStatus === 'boolean') {
+        // Handle both boolean (old way) and string (new way) parameters
+        let status, isActive;
+        if (typeof newStatus === 'boolean') {
         status = newStatus ? 'active' : 'suspended';
-        isActive = newStatus;
-      } else {
+          isActive = newStatus;
+        } else {
         status = newStatus.toLowerCase();
         isActive = newStatus === 'active';
       }
       
       // Prepare update data
       const updateData = { status, is_active: isActive };
-      if (discountValue !== null) {
+        if (discountValue !== null) {
         updateData.discount = parseFloat(discountValue) || 0;
-      }
-      
+        }
+        
       // Update user in Supabase
       await SupabaseService.updateUser(userId, updateData);
-      
+        
       // Refresh users from Supabase
       await fetchUsers();
-      
-      toast({
-        title: "Success",
+        
+        toast({
+          title: "Success",
         description: `User status updated to ${status}${discountValue !== null ? ` with ${discountValue}% discount` : ''} in Supabase`,
-      });
+        });
     } catch (error) {
       console.error('Error updating user status:', error);
       toast({
@@ -739,10 +742,10 @@ const AdminPage = () => {
       
       // Refresh products list
       await fetchAllProducts();
-      setSelectedProducts([]);
-      
-      toast({
-        title: "Success",
+    setSelectedProducts([]);
+    
+    toast({
+      title: "Success",
         description: `${selectedProducts.length} products deleted successfully from Supabase`,
       });
     } catch (error) {
@@ -912,9 +915,9 @@ const AdminPage = () => {
           
           // Refresh products list
           await fetchAllProducts();
-          
-          toast({
-            title: "Success",
+        
+        toast({
+          title: "Success",
             description: "New product created successfully in Supabase",
           });
           
@@ -1698,9 +1701,9 @@ const AdminPage = () => {
       await fetchAllProducts();
       
       setSelectedCategories([]);
-      
-      toast({
-        title: "Success",
+    
+    toast({
+      title: "Success",
         description: `${selectedCategories.length} categories deleted successfully from Supabase`,
       });
     } catch (error) {
@@ -1734,9 +1737,9 @@ const AdminPage = () => {
       await fetchAllProducts();
       
       setSelectedCategories([]);
-      
-      toast({
-        title: "Success",
+    
+    toast({
+      title: "Success",
         description: "All categories deleted successfully from Supabase",
       });
     } catch (error) {
@@ -1875,14 +1878,14 @@ const AdminPage = () => {
       
       // Refresh categories and products
       await fetchAllProducts();
-      
-      toast({
-        title: "Success",
+        
+        toast({
+          title: "Success",
         description: "Category updated successfully in Supabase",
-      });
-      
-      setEditCategoryModal(false);
-      setEditingCategory(null);
+        });
+        
+        setEditCategoryModal(false);
+        setEditingCategory(null);
     } catch (error) {
       console.error('Error updating category:', error);
       toast({

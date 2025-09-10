@@ -168,9 +168,9 @@ const ProductDetailPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50" onKeyDown={handleKeyDown} tabIndex={0}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         {/* Back Button */}
-        <div className="mb-6">
+        <div className="mb-4">
           <Button
             variant="outline"
             onClick={() => navigate(-1)}
@@ -184,14 +184,14 @@ const ProductDetailPage = () => {
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           <div className="flex flex-col lg:flex-row">
             {/* Left Column - Images */}
-            <div className="lg:w-1/2 p-6">
+            <div className="lg:w-1/2 p-4">
               <div className="space-y-4">
                 {/* Main Image */}
                 <div className="relative group">
                   <img
                     src={images.length > 0 ? images[selectedImageIndex] : 'https://images.unsplash.com/photo-1581093458791-9d42e30754c4?w=400&h=300&fit=crop'}
                     alt={currentProduct.name}
-                    className="w-full h-96 object-cover rounded-lg"
+                    className="w-full h-64 object-cover rounded-lg"
                   />
                   
                   {/* Stock Badge */}

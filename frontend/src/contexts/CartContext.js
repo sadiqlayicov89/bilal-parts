@@ -41,21 +41,11 @@ export const CartProvider = ({ children }) => {
 
   // Load cart on page refresh/load
   useEffect(() => {
-    // Səhifə yükləndikdə localStorage-dan cart məlumatlarını yüklə
-    const savedCart = localStorage.getItem('mock-cart');
-    if (savedCart && isAuthenticated) {
-      try {
-        const parsedCart = JSON.parse(savedCart);
-        if (parsedCart.items && parsedCart.items.length > 0) {
-          setCartItems(parsedCart.items);
-          setCartCount(parsedCart.total_items || 0);
-          setCartTotal(parsedCart.total_amount || 0);
-        }
-      } catch (error) {
-        console.error('Failed to load cart from localStorage:', error);
-      }
+    // Only load cart if user is authenticated
+    if (isAuthenticated && user?.id) {
+      loadCart();
     }
-  }, []); // Empty dependency array - runs only once on mount
+  }, [isAuthenticated, user?.id]);
 
   // Calculate cart totals with user discount
   const calculateCartTotalWithDiscount = (items) => {

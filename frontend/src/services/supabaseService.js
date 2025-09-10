@@ -182,6 +182,12 @@ export class SupabaseService {
   
   static async getCartItems(userId) {
     try {
+      // Check if userId is valid
+      if (!userId || userId === 'is.null' || userId === 'null') {
+        console.log('Invalid userId provided to getCartItems:', userId);
+        return [];
+      }
+      
       console.log('Fetching cart items for user:', userId);
       
       const { data, error } = await supabase
@@ -212,6 +218,12 @@ export class SupabaseService {
 
   static async addToCart(userId, productId, quantity = 1) {
     try {
+      // Check if userId is valid
+      if (!userId || userId === 'is.null' || userId === 'null') {
+        console.log('Invalid userId provided to addToCart:', userId);
+        throw new Error('User not authenticated');
+      }
+      
       const { data, error } = await supabase
         .from('cart_items')
         .upsert({
@@ -232,10 +244,16 @@ export class SupabaseService {
 
   static async updateCartItem(userId, productId, quantity) {
     try {
+      // Check if userId is valid
+      if (!userId || userId === 'is.null' || userId === 'null') {
+        console.log('Invalid userId provided to updateCartItem:', userId);
+        throw new Error('User not authenticated');
+      }
+      
       if (quantity <= 0) {
         return await this.removeFromCart(userId, productId);
       }
-
+      
       const { data, error } = await supabase
         .from('cart_items')
         .update({ quantity })
@@ -254,6 +272,12 @@ export class SupabaseService {
 
   static async removeFromCart(userId, productId) {
     try {
+      // Check if userId is valid
+      if (!userId || userId === 'is.null' || userId === 'null') {
+        console.log('Invalid userId provided to removeFromCart:', userId);
+        throw new Error('User not authenticated');
+      }
+      
       const { error } = await supabase
         .from('cart_items')
         .delete()
@@ -270,6 +294,12 @@ export class SupabaseService {
 
   static async clearCart(userId) {
     try {
+      // Check if userId is valid
+      if (!userId || userId === 'is.null' || userId === 'null') {
+        console.log('Invalid userId provided to clearCart:', userId);
+        throw new Error('User not authenticated');
+      }
+      
       const { error } = await supabase
         .from('cart_items')
         .delete()
@@ -449,7 +479,7 @@ export class SupabaseService {
     try {
       console.log('Fetching users from profiles table...');
       
-      // Get users from profiles table (this is where user data is stored)
+      // Simple query to get all profiles
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('*')
@@ -457,59 +487,17 @@ export class SupabaseService {
       
       if (profilesError) {
         console.error('Error fetching from profiles table:', profilesError);
+        console.error('Error details:', profilesError.message, profilesError.details, profilesError.hint);
         throw profilesError;
       }
       
       console.log('Fetched profiles:', profiles?.length || 0);
-      
-      // If no profiles found, try to get from auth.users using a different approach
-      if (!profiles || profiles.length === 0) {
-        console.log('No profiles found, trying alternative approach...');
-        
-        // Try to get current user's profile as a test
-        const { data: { user: currentUser } } = await supabase.auth.getUser();
-        if (currentUser) {
-          console.log('Current user found:', currentUser.email);
-          
-          // Create a basic profile entry for current user if it doesn't exist
-          const { data: existingProfile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', currentUser.id)
-            .single();
-          
-          if (!existingProfile) {
-            console.log('Creating profile for current user...');
-            const { data: newProfile, error: createError } = await supabase
-              .from('profiles')
-              .insert({
-                id: currentUser.id,
-                email: currentUser.email,
-                first_name: currentUser.user_metadata?.first_name || '',
-                last_name: currentUser.user_metadata?.last_name || '',
-                phone: currentUser.user_metadata?.phone || '',
-                country: currentUser.user_metadata?.country || '',
-                city: currentUser.user_metadata?.city || '',
-                discount_percentage: 0,
-                role: 'user',
-                is_approved: true
-              })
-              .select()
-              .single();
-            
-            if (createError) {
-              console.error('Error creating profile:', createError);
-            } else {
-              console.log('Profile created:', newProfile);
-              return [newProfile];
-            }
-          }
-        }
-      }
+      console.log('Profiles data:', profiles);
       
       return profiles || [];
     } catch (error) {
       console.error('SupabaseService: Error fetching users:', error);
+      console.error('Error details:', error.message, error.details, error.hint);
       throw error;
     }
   }
