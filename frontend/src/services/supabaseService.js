@@ -225,6 +225,8 @@ export class SupabaseService {
           user_id: userId,
           product_id: productId,
           quantity: quantity
+        }, {
+          onConflict: 'user_id,product_id'
         })
         .select()
         .single();
