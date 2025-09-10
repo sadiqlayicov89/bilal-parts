@@ -346,14 +346,14 @@ const MyOrdersPage = () => {
         )}
       </div>
 
-      {/* Order Details Modal */}
+      {/* Order Details Modal - Invoice Format */}
       <Dialog open={showOrderDetails} onOpenChange={setShowOrderDetails}>
         <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto [&>button]:!hidden">
           <DialogHeader>
             <DialogTitle className="flex items-center justify-between">
               <div className="flex items-center">
                 <div className="w-6 h-6 bg-red-600 rounded mr-2"></div>
-                <span>Order Details - #{selectedOrder?.id}</span>
+                <span>Счет на оплату</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Button
@@ -363,7 +363,7 @@ const MyOrdersPage = () => {
                   className="flex items-center"
                 >
                   <Printer className="w-4 h-4 mr-2" />
-                  Print
+                  Печать
                 </Button>
                 <Button
                   variant="ghost"
@@ -378,134 +378,167 @@ const MyOrdersPage = () => {
 
           {selectedOrder && (
             <div className="invoice-content bg-white p-6">
-              {/* Order Info */}
-              <div className="mb-6">
-                <h3 className="text-lg font-semibold mb-4">Order Information</h3>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <div>
-                    <table className="w-full">
-                      <tbody>
-                        <tr>
-                          <td className="py-1 pr-4 font-medium">Order ID:</td>
-                          <td className="py-1">#{selectedOrder.id}</td>
-                        </tr>
-                        <tr>
-                          <td className="py-1 pr-4 font-medium">Date:</td>
-                          <td className="py-1">{new Date(selectedOrder.date).toLocaleDateString()}</td>
-                        </tr>
-                        <tr>
-                          <td className="py-1 pr-4 font-medium">Status:</td>
-                          <td className="py-1">
-                            <Badge className={getStatusColor(selectedOrder.status)}>
-                              {getStatusText(selectedOrder.status)}
-                            </Badge>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="py-1 pr-4 font-medium">Payment Method:</td>
-                          <td className="py-1">{selectedOrder.paymentMethod}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                  <div>
-                    <h4 className="font-medium mb-2">Shipping Address</h4>
-                    <p className="text-gray-700 text-sm">{selectedOrder.shippingAddress}</p>
+              <style dangerouslySetInnerHTML={{
+                __html: `
+                  @media print {
+                    .invoice-logo {
+                      height: 146px !important;
+                      max-width: 257px !important;
+                      width: auto !important;
+                    }
+                    img {
+                      max-height: 146px !important;
+                      max-width: 257px !important;
+                    }
+                  }
+                `
+              }} />
+              <div style={{ fontSize: 10, textAlign: 'center', marginBottom: 6 }}>
+                Внимание! Оплата данного счета означает согласие с условиями поставки товара. Уведомление об оплате обязательно, в противном случае не гарантируется наличие товара на складе. Товар отпускается по факту прихода денег на р/с Поставщика, самовывозом, при наличии доверенности и паспорта.
+              </div>
+              <div style={{ fontSize: 10, textAlign: 'center', marginBottom: 6 }}>Образец заполнения платежного поручения</div>
+
+              <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #000', marginBottom: 10 }}>
+                <tbody>
+                  <tr>
+                    <td style={{ border: '1px solid #000', padding: '4px 6px', width: '60%' }}>
+                      <div style={{ fontSize: 10 }}>Банк получателя</div>
+                      <div>T-BANK</div>
+                      <div style={{ fontSize: 10 }}>ИНН 7707083893 КПП 770701001</div>
+                      <div style={{ fontSize: 10 }}>Получатель</div>
+                      <div>ООО "Bilal-parts"</div>
+                    </td>
+                    <td style={{ border: '1px solid #000', padding: '4px 6px', width: '40%' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ fontSize: 10 }}>БИК</span><span>044525225</span></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ fontSize: 10 }}>Сч. №</span><span>30101810200000000225</span></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ fontSize: 10 }}>КПП</span><span>770701001</span></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ fontSize: 10 }}>Сч. №</span><span>40702810123456789012</span></div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '12px 0 8px 0' }}>
+                <div style={{ fontWeight: 700, fontSize: 16 }}>Счет на оплату № {selectedOrder.id} от {new Date(selectedOrder.date).toLocaleDateString('ru-RU')}</div>
+                <div style={{ fontSize: 10, textAlign: 'right' }}>
+                  <div>Валюта: RUB</div>
+                  <div style={{ marginTop: 4 }}>
+                    <img 
+                      src="/Логотип основной-1.png" 
+                      alt="Bilal Parts Logo" 
+                      className="invoice-logo"
+                      style={{ 
+                        height: '98px', 
+                        width: 'auto',
+                        maxWidth: '238px'
+                      }} 
+                    />
                   </div>
                 </div>
               </div>
 
-              {/* Order Items */}
-              <div className="mt-6">
-                <h3 className="text-lg font-semibold mb-4">Order Items</h3>
-                <table className="w-full border-collapse border border-gray-300">
-                  <thead>
-                    <tr className="bg-gray-50">
-                      <th className="border border-gray-300 p-3 text-left">№</th>
-                      <th className="border border-gray-300 p-3 text-left">Product</th>
-                      <th className="border border-gray-300 p-3 text-left">Code</th>
-                      <th className="border border-gray-300 p-3 text-left">Qty</th>
-                      <th className="border border-gray-300 p-3 text-left">Price</th>
-                      <th className="border border-gray-300 p-3 text-left">Total</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {selectedOrder.items.map((item, index) => {
-                      const originalPrice = item.price;
-                      const orderDiscount = selectedOrder.discountPercentage || selectedOrder.userDiscount || userDiscount;
-                      const discountAmount = orderDiscount > 0 ? (originalPrice * orderDiscount) / 100 : 0;
-                      const discountedPrice = originalPrice - discountAmount;
-                      const itemTotal = discountedPrice * item.quantity;
-                      
-                      return (
-                        <tr key={index}>
-                          <td className="border border-gray-300 p-3">{index + 1}</td>
-                          <td className="border border-gray-300 p-3">
-                            <div>
-                              <div className="font-medium">{item.name}</div>
-                              <div className="text-sm text-gray-500">
-                                {item.catalogNumber && `Cat: ${item.catalogNumber}`}
-                                {item.sku && ` | SKU: ${item.sku}`}
-                              </div>
-                            </div>
-                          </td>
-                          <td className="border border-gray-300 p-3">{item.sku || item.catalogNumber || 'N/A'}</td>
-                          <td className="border border-gray-300 p-3">{item.quantity}</td>
-                          <td className="border border-gray-300 p-3">
-                            {orderDiscount > 0 ? (
-                              <div>
-                                <div className="text-red-600 font-medium">{formatPrice(discountedPrice)}</div>
-                                <div className="text-xs text-gray-400 line-through">{formatPrice(originalPrice)}</div>
-                              </div>
-                            ) : (
-                              formatPrice(originalPrice)
-                            )}
-                          </td>
-                          <td className="border border-gray-300 p-3 font-semibold">{formatPrice(itemTotal)}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+              <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: 8 }}>
+                <tbody>
+                  <tr>
+                    <td style={{ width: 110, fontWeight: 700, padding: '2px 0' }}>Поставщик:</td>
+                    <td>ИНН 7707083893, КПП 770701001, ООО "Bilal-parts", г. Москва, ул. Примерная, д. 123</td>
+                  </tr>
+                  <tr>
+                    <td style={{ fontWeight: 700, padding: '2px 0' }}>Покупатель:</td>
+                    <td>{user?.firstName || 'Admin'} {user?.lastName || 'User'}, {user?.company_name || ''}, ИНН {user?.vat_number || 'N/A'}, {selectedOrder.shippingAddress || 'N/A'}</td>
+                  </tr>
+                </tbody>
+              </table>
 
-              {/* Order Total */}
-              <div className="mt-6">
-                <h3 className="text-lg font-semibold mb-4">Order Summary</h3>
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  {(() => {
+              <div style={{ fontSize: 10 }}>Действителен до {(() => {
+                const d = new Date(selectedOrder.date);
+                d.setDate(d.getDate() + 5);
+                return d.toLocaleDateString('ru-RU');
+              })()}</div>
+
+              <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 8 }}>
+                <thead>
+                  <tr>
+                    <th style={{ border: '1px solid #000', background: '#f0f0f0', padding: 6, width: 30 }}>№</th>
+                    <th style={{ border: '1px solid #000', background: '#f0f0f0', padding: 6 }}>Товар</th>
+                    <th style={{ border: '1px solid #000', background: '#f0f0f0', padding: 6, width: 90 }}>Код</th>
+                    <th style={{ border: '1px solid #000', background: '#f0f0f0', padding: 6, width: 60 }}>Кол-во</th>
+                    <th style={{ border: '1px solid #000', background: '#f0f0f0', padding: 6, width: 50 }}>Ед.</th>
+                    <th style={{ border: '1px solid #000', background: '#f0f0f0', padding: 6, width: 80 }}>Цена</th>
+                    <th style={{ border: '1px solid #000', background: '#f0f0f0', padding: 6, width: 90 }}>в т.ч. НДС</th>
+                    <th style={{ border: '1px solid #000', background: '#f0f0f0', padding: 6, width: 90 }}>Всего</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {selectedOrder.items.map((item, index) => {
+                    const originalPrice = item.price;
+                    const orderDiscount = selectedOrder.discountPercentage || selectedOrder.userDiscount || userDiscount;
+                    const discountAmount = orderDiscount > 0 ? (originalPrice * orderDiscount) / 100 : 0;
+                    const discountedPrice = originalPrice - discountAmount;
+                    const itemTotal = discountedPrice * item.quantity;
+                    const itemVat = Number(((itemTotal * 20) / (100 + 20)).toFixed(2));
+                    
+                    return (
+                      <tr key={index}>
+                        <td style={{ border: '1px solid #000', padding: 6, textAlign: 'center' }}>{index + 1}</td>
+                        <td style={{ border: '1px solid #000', padding: 6 }}>{item.name}</td>
+                        <td style={{ border: '1px solid #000', padding: 6, textAlign: 'center' }}>{item.sku || item.catalogNumber || 'N/A'}</td>
+                        <td style={{ border: '1px solid #000', padding: 6, textAlign: 'center' }}>{item.quantity}</td>
+                        <td style={{ border: '1px solid #000', padding: 6, textAlign: 'center' }}>ШТ</td>
+                        <td style={{ border: '1px solid #000', padding: 6, textAlign: 'right' }}>{discountedPrice.toFixed(2)}</td>
+                        <td style={{ border: '1px solid #000', padding: 6, textAlign: 'right' }}>{itemVat.toFixed(2)}</td>
+                        <td style={{ border: '1px solid #000', padding: 6, textAlign: 'right' }}>{itemTotal.toFixed(2)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+
+              <div style={{ marginTop: 8, textAlign: 'right' }}>
+                <div style={{ fontSize: 10, marginBottom: 4 }}>
+                  Итого НДС: <strong>{(() => {
                     const orderDiscount = selectedOrder.discountPercentage || selectedOrder.userDiscount || userDiscount;
                     const orderSubtotal = selectedOrder.subtotal || selectedOrder.total;
                     const orderDiscountAmount = selectedOrder.discountAmount || (orderDiscount > 0 ? (orderSubtotal * orderDiscount) / 100 : 0);
                     const orderFinalTotal = selectedOrder.total;
-                    
-                    return (
-                      <div className="space-y-3">
-                        <div className="flex justify-between">
-                          <span>Subtotal:</span>
-                          <span>{formatPrice(orderSubtotal)}</span>
-                        </div>
-                        
-                        {orderDiscount > 0 && (
-                          <div className="flex justify-between text-red-600">
-                            <div className="flex items-center space-x-2">
-                              <span>Applied Discount ({orderDiscount}%):</span>
-                              <Badge variant="destructive" className="text-xs">
-                                -{orderDiscount}%
-                              </Badge>
-                            </div>
-                            <span>-{formatPrice(orderDiscountAmount)}</span>
-                          </div>
-                        )}
-                        
-                        <div className="flex justify-between text-lg font-bold border-t pt-3">
-                          <span>Total Amount:</span>
-                          <span className="text-red-600">{formatPrice(orderFinalTotal)}</span>
-                        </div>
-                      </div>
-                    );
-                  })()}
+                    const totalVAT = Number(((orderFinalTotal * 20) / (100 + 20)).toFixed(2));
+                    return totalVAT.toFixed(2);
+                  })()}</strong>
                 </div>
+                <div style={{ fontSize: 10, marginBottom: 4 }}>
+                  Итого без НДС: <strong>{(() => {
+                    const orderDiscount = selectedOrder.discountPercentage || selectedOrder.userDiscount || userDiscount;
+                    const orderSubtotal = selectedOrder.subtotal || selectedOrder.total;
+                    const orderDiscountAmount = selectedOrder.discountAmount || (orderDiscount > 0 ? (orderSubtotal * orderDiscount) / 100 : 0);
+                    const orderFinalTotal = selectedOrder.total;
+                    const totalBasePrice = Number((orderFinalTotal / 1.20).toFixed(2));
+                    return totalBasePrice.toFixed(2);
+                  })()}</strong>
+                </div>
+                <div style={{ fontSize: 12, fontWeight: 700 }}>
+                  Итого к оплате: <strong>{(() => {
+                    const orderDiscount = selectedOrder.discountPercentage || selectedOrder.userDiscount || userDiscount;
+                    const orderSubtotal = selectedOrder.subtotal || selectedOrder.total;
+                    const orderDiscountAmount = selectedOrder.discountAmount || (orderDiscount > 0 ? (orderSubtotal * orderDiscount) / 100 : 0);
+                    const orderFinalTotal = selectedOrder.total;
+                    return orderFinalTotal.toFixed(2);
+                  })()} RUB</strong>
+                </div>
+              </div>
+
+              <div style={{ marginTop: 20, display: 'flex', justifyContent: 'space-between' }}>
+                <div>
+                  <div style={{ fontSize: 10, marginBottom: 20 }}>Руководитель</div>
+                  <div style={{ borderBottom: '1px solid #000', width: 150, height: 20 }}></div>
+                </div>
+                <div>
+                  <div style={{ fontSize: 10, marginBottom: 20 }}>Бухгалтер</div>
+                  <div style={{ borderBottom: '1px solid #000', width: 150, height: 20 }}></div>
+                </div>
+              </div>
+
+              <div style={{ fontSize: 8, textAlign: 'center', marginTop: 10 }}>
+                Взимание! Товар в поврежденной, грязной упаковке или без упаковки возврату не подлежит!
               </div>
             </div>
           )}
