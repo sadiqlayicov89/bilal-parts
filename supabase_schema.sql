@@ -375,6 +375,17 @@ DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
 CREATE POLICY "Users can update own profile" ON public.profiles
   FOR UPDATE USING (auth.uid() = id);
 
+-- Admin can view all profiles
+DROP POLICY IF EXISTS "Admin can view all profiles" ON public.profiles;
+CREATE POLICY "Admin can view all profiles" ON public.profiles
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles 
+      WHERE id = auth.uid() 
+      AND role = 'admin'
+    )
+  );
+
 DROP POLICY IF EXISTS "Users can view own addresses" ON public.addresses;
 CREATE POLICY "Users can view own addresses" ON public.addresses
   FOR ALL USING (auth.uid() = user_id);
@@ -382,6 +393,17 @@ CREATE POLICY "Users can view own addresses" ON public.addresses
 DROP POLICY IF EXISTS "Users can view own orders" ON public.orders;
 CREATE POLICY "Users can view own orders" ON public.orders
   FOR SELECT USING (auth.uid() = user_id);
+
+-- Admin can view all orders
+DROP POLICY IF EXISTS "Admin can view all orders" ON public.orders;
+CREATE POLICY "Admin can view all orders" ON public.orders
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles 
+      WHERE id = auth.uid() 
+      AND role = 'admin'
+    )
+  );
 
 DROP POLICY IF EXISTS "Users can view own cart items" ON public.cart_items;
 CREATE POLICY "Users can view own cart items" ON public.cart_items
