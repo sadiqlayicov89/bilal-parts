@@ -506,8 +506,8 @@ const MyOrdersPage = () => {
                       </div>
                     );
                   })()}
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </div>
           )}
         </DialogContent>
