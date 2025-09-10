@@ -197,7 +197,7 @@ export class SupabaseService {
           products(
             id, name, sku, price, original_price, in_stock,
             stock_quantity, catalog_number, category,
-            description, specifications
+            description
           )
         `)
         .eq('user_id', userId)
