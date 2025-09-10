@@ -379,41 +379,40 @@ const MyOrdersPage = () => {
           {selectedOrder && (
             <div className="invoice-content bg-white p-6">
               {/* Order Info */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                <Card className="h-fit">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-base">Order Information</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Order ID:</span>
-                      <span className="font-medium">#{selectedOrder.id}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Date:</span>
-                      <span className="font-medium">{new Date(selectedOrder.date).toLocaleDateString()}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Status:</span>
-                      <Badge className={getStatusColor(selectedOrder.status)}>
-                        {getStatusText(selectedOrder.status)}
-                      </Badge>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Payment Method:</span>
-                      <span className="font-medium">{selectedOrder.paymentMethod}</span>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="h-fit">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-base">Shipping Address</CardTitle>
-                  </CardHeader>
-                  <CardContent>
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold mb-4">Order Information</h3>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div>
+                    <table className="w-full">
+                      <tbody>
+                        <tr>
+                          <td className="py-1 pr-4 font-medium">Order ID:</td>
+                          <td className="py-1">#{selectedOrder.id}</td>
+                        </tr>
+                        <tr>
+                          <td className="py-1 pr-4 font-medium">Date:</td>
+                          <td className="py-1">{new Date(selectedOrder.date).toLocaleDateString()}</td>
+                        </tr>
+                        <tr>
+                          <td className="py-1 pr-4 font-medium">Status:</td>
+                          <td className="py-1">
+                            <Badge className={getStatusColor(selectedOrder.status)}>
+                              {getStatusText(selectedOrder.status)}
+                            </Badge>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="py-1 pr-4 font-medium">Payment Method:</td>
+                          <td className="py-1">{selectedOrder.paymentMethod}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div>
+                    <h4 className="font-medium mb-2">Shipping Address</h4>
                     <p className="text-gray-700 text-sm">{selectedOrder.shippingAddress}</p>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               </div>
 
               {/* Order Items */}
