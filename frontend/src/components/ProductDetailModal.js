@@ -5,16 +5,19 @@ import { Badge } from './ui/badge';
 import { Heart, Star, Package, Info, ChevronLeft, ChevronRight, ShoppingCart } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
+import { useWishlist } from '../contexts/WishlistContext';
 import { getProductPriceInfo } from '../utils/priceUtils';
 import LoginModal from './auth/LoginModal';
 import mockData from '../data/mockData';
 
 const ProductDetailModal = ({ isOpen, onClose, product }) => {
-  const { user, userDiscount } = useAuth();
+  const { user, userDiscount, isAuthenticated } = useAuth();
   const { addToCart } = useCart();
+  const { toggleWishlist, checkInWishlist } = useWishlist();
   const [currentProduct, setCurrentProduct] = useState(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [isInWishlist, setIsInWishlist] = useState(false);
 
   useEffect(() => {
     if (product && isOpen) {

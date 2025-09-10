@@ -352,9 +352,6 @@ const ProductsPage = () => {
                 return acc;
               }, {}) : {}
           }));
-          console.log('Formatted products:', formattedProducts);
-          console.log('Formatted products count:', formattedProducts.length);
-          console.log('First product sample:', formattedProducts[0]);
           setProducts(formattedProducts);
         } else {
           // Fallback to localStorage or mockData
@@ -523,22 +520,9 @@ const ProductsPage = () => {
   // Use useMemo to prevent unnecessary recalculations
   const filteredProducts = useMemo(() => {
          try {
-       console.log('=== FILTERING PRODUCTS ===');
-       console.log('Current filters:', {
-         searchQuery,
-         selectedCategory,
-         selectedSubcategory,
-         priceRange,
-         sortBy
-       });
-       console.log('Available categories:', categories.map(cat => cat.name));
-       console.log('Products to filter:', products.length);
-       console.log('Sample products:', products.slice(0, 3).map(p => ({ name: p.name, category: p.category })));
-       console.log('All product categories:', [...new Set(products.map(p => p.category))]);
       
       // Early return if no products
       if (!products || products.length === 0) {
-        console.log('No products to filter, returning empty array');
         return [];
       }
       
@@ -666,10 +650,6 @@ const ProductsPage = () => {
         }
       });
 
-       console.log('=== FILTERING COMPLETED ===');
-       console.log(`Final result: ${filtered.length} products`);
-       console.log('Final products:', filtered.map(p => ({ name: p.name, category: p.category, subcategory: p.subcategory })));
-       
        return filtered;
     } catch (error) {
       console.error('Error in getFilteredProducts:', error);

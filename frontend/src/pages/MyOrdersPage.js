@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
-import { ArrowLeft, Package, Calendar, MapPin, CreditCard, Eye, X } from 'lucide-react';
+import { ArrowLeft, Package, Calendar, MapPin, CreditCard, Eye, X, Printer } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
 import { getProductPriceInfo, formatPrice, calculateCartTotals } from '../utils/priceUtils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
@@ -19,6 +19,88 @@ const MyOrdersPage = () => {
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showOrderDetails, setShowOrderDetails] = useState(false);
+
+  const handlePrintOrder = () => {
+    if (!selectedOrder) return;
+    
+    const printWindow = window.open('', '_blank');
+    const printContent = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Order Details - #${selectedOrder.id}</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            .header { text-align: center; margin-bottom: 30px; }
+            .order-info { display: flex; justify-content: space-between; margin-bottom: 20px; }
+            .section { margin-bottom: 20px; }
+            .items-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+            .items-table th, .items-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            .items-table th { background-color: #f2f2f2; }
+            .total-section { text-align: right; margin-top: 20px; }
+            .total-amount { font-size: 18px; font-weight: bold; color: #dc2626; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>Bilal Parts - Order Details</h1>
+            <h2>Order #${selectedOrder.id}</h2>
+          </div>
+          
+          <div class="order-info">
+            <div>
+              <p><strong>Date:</strong> ${new Date(selectedOrder.date).toLocaleDateString()}</p>
+              <p><strong>Status:</strong> ${getStatusText(selectedOrder.status)}</p>
+            </div>
+            <div>
+              <p><strong>Payment Method:</strong> ${selectedOrder.paymentMethod}</p>
+              <p><strong>Customer:</strong> ${user?.first_name} ${user?.last_name}</p>
+            </div>
+          </div>
+          
+          <div class="section">
+            <h3>Order Items</h3>
+            <table class="items-table">
+              <thead>
+                <tr>
+                  <th>Product Name</th>
+                  <th>SKU</th>
+                  <th>Catalog No</th>
+                  <th>Quantity</th>
+                  <th>Price</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${selectedOrder.items.map(item => `
+                  <tr>
+                    <td>${item.name}</td>
+                    <td>${item.sku || '-'}</td>
+                    <td>${item.catalogNumber || '-'}</td>
+                    <td>${item.quantity}</td>
+                    <td>${formatPrice(item.price)}</td>
+                    <td>${formatPrice(item.price * item.quantity)}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+          
+          <div class="total-section">
+            <p><strong>Subtotal:</strong> ${formatPrice(selectedOrder.subtotal)}</p>
+            ${selectedOrder.discountAmount > 0 ? `
+              <p><strong>Discount (${selectedOrder.discountPercentage}%):</strong> -${formatPrice(selectedOrder.discountAmount)}</p>
+            ` : ''}
+            <p class="total-amount"><strong>Total Amount:</strong> ${formatPrice(selectedOrder.total)}</p>
+          </div>
+        </body>
+      </html>
+    `;
+    
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    printWindow.print();
+  };
 
   // Mock orders data - in real app, this would come from API
   const mockOrders = [
@@ -266,23 +348,43 @@ const MyOrdersPage = () => {
 
       {/* Order Details Modal */}
       <Dialog open={showOrderDetails} onOpenChange={setShowOrderDetails}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center space-x-2">
-              <Package className="h-5 w-5 text-red-600" />
-              <span>Order Details - #{selectedOrder?.id}</span>
-            </DialogTitle>
+        <DialogContent className="max-w-5xl max-h-[95vh] overflow-hidden p-0">
+          <DialogHeader className="p-6 pb-4 border-b bg-gray-50">
+            <div className="flex items-center justify-between">
+              <DialogTitle className="flex items-center space-x-2">
+                <Package className="h-5 w-5 text-red-600" />
+                <span>Order Details - #{selectedOrder?.id}</span>
+              </DialogTitle>
+              <div className="flex items-center space-x-2">
+                <Button
+                  onClick={handlePrintOrder}
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center space-x-2"
+                >
+                  <Printer className="h-4 w-4" />
+                  <span>Print</span>
+                </Button>
+                <Button
+                  onClick={() => setShowOrderDetails(false)}
+                  variant="ghost"
+                  size="sm"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
           </DialogHeader>
 
           {selectedOrder && (
-            <div className="space-y-6">
+            <div className="p-6 overflow-y-auto max-h-[calc(95vh-120px)]">
               {/* Order Info */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Order Information</CardTitle>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+                <Card className="h-fit">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base">Order Information</CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-3">
+                  <CardContent className="space-y-2">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Order ID:</span>
                       <span className="font-medium">#{selectedOrder.id}</span>
@@ -304,23 +406,23 @@ const MyOrdersPage = () => {
                   </CardContent>
                 </Card>
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Shipping Address</CardTitle>
+                <Card className="h-fit">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base">Shipping Address</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-gray-700">{selectedOrder.shippingAddress}</p>
+                    <p className="text-gray-700 text-sm">{selectedOrder.shippingAddress}</p>
                   </CardContent>
                 </Card>
               </div>
 
               {/* Order Items */}
               <Card>
-                <CardHeader>
+                <CardHeader className="pb-3">
                   <CardTitle className="text-base">Order Items</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
+                <CardContent className="pt-0">
+                  <div className="space-y-2">
                     {selectedOrder.items.map((item, index) => {
                       const originalPrice = item.price;
                       const orderDiscount = selectedOrder.discountPercentage || selectedOrder.userDiscount || userDiscount;
@@ -329,10 +431,10 @@ const MyOrdersPage = () => {
                       const itemTotal = discountedPrice * item.quantity;
                       
                       return (
-                        <div key={index} className="flex justify-between items-start py-2 border-b">
+                        <div key={index} className="flex justify-between items-start py-2 border-b last:border-b-0">
                           <div className="flex-1">
                             <h4 className="font-medium text-sm">{item.name}</h4>
-                            <div className="text-xs text-gray-500 space-y-1">
+                            <div className="text-xs text-gray-500 space-y-0.5">
                               <p>Kataloq №: {item.catalogNumber || 'N/A'}</p>
                               <p>Artikul: {item.sku || item.artikul || 'N/A'}</p>
                               <p>Miqdar: {item.quantity}</p>

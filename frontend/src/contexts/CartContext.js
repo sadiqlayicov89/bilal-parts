@@ -70,7 +70,6 @@ export const CartProvider = ({ children }) => {
       }
       
       // Load cart from Supabase
-      console.log('Loading cart from Supabase for user:', user.id);
       const cartItems = await SupabaseService.getCartItems(user.id);
       
       // Transform cart items to match expected format

@@ -555,7 +555,7 @@ const AdminPage = () => {
           isActive = newStatus;
         } else {
         status = newStatus.toLowerCase();
-        isActive = newStatus === 'active';
+        isActive = newStatus.toLowerCase() === 'approved' || newStatus.toLowerCase() === 'active';
       }
       
       // Prepare update data
@@ -2463,6 +2463,7 @@ const AdminPage = () => {
                                 />
                               </th>
                               <th className="border border-gray-200 p-3 text-left font-medium">İSTİFADƏÇİ</th>
+                              <th className="border border-gray-200 p-3 text-left font-medium">FIRMA</th>
                               <th className="border border-gray-200 p-3 text-left font-medium">VÖEN</th>
                               <th className="border border-gray-200 p-3 text-left font-medium">ƏLAQƏ</th>
                               <th className="border border-gray-200 p-3 text-left font-medium">ÖLKƏ</th>
@@ -2497,6 +2498,9 @@ const AdminPage = () => {
                                 </td>
                                 <td className="border border-gray-200 p-3 text-sm">
                                   {user.vat_number || '-'}
+                                </td>
+                                <td className="border border-gray-200 p-3 text-sm">
+                                  {user.company_name || '-'}
                                 </td>
                                 <td className="border border-gray-200 p-3 text-sm">
                                   {user.phone || '-'}
@@ -2539,8 +2543,8 @@ const AdminPage = () => {
                                     className="px-2 py-1 text-xs border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                                   >
                                     <option value="pending">Pending</option>
-                                    <option value="APPROVED">Approved</option>
-                                    <option value="REJECTED">Rejected</option>
+                                    <option value="approved">Approved</option>
+                                    <option value="rejected">Rejected</option>
                                   </select>
                                 </td>
                                 <td className="border border-gray-200 p-3">

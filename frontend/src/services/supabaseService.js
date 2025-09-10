@@ -8,9 +8,6 @@ export class SupabaseService {
   
   static async getProducts(filters = {}) {
     try {
-      console.log('SupabaseService: Starting to fetch products...');
-      console.log('Supabase URL:', process.env.REACT_APP_SUPABASE_URL);
-      console.log('Supabase Key exists:', !!process.env.REACT_APP_SUPABASE_ANON_KEY);
       
       // Test with simplest possible query
       let query = supabase
@@ -188,7 +185,6 @@ export class SupabaseService {
         return [];
       }
       
-      console.log('Fetching cart items for user:', userId);
       
       const { data, error } = await supabase
         .from('cart_items')
@@ -208,7 +204,6 @@ export class SupabaseService {
         throw error;
       }
       
-      console.log('Fetched cart items:', data?.length || 0);
       return data || [];
     } catch (error) {
       console.error('SupabaseService: Error fetching cart items:', error);
