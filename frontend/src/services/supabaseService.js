@@ -531,7 +531,6 @@ export class SupabaseService {
         .from('orders')
         .select(`
           *,
-          profiles(email, first_name, last_name),
           order_items(*)
         `)
         .order('created_at', { ascending: false });
