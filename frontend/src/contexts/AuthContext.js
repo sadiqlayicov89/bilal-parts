@@ -87,7 +87,7 @@ export const AuthProvider = ({ children }) => {
 
       if (error) {
         console.log('Supabase login failed:', error);
-        throw new Error(error.message || 'Login failed');
+        throw new Error(`Login failed: ${error.message || 'Invalid credentials'}`);
       }
 
       if (data.user) {

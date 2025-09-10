@@ -82,17 +82,48 @@ const HotProducts = () => {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % (products.length - 5));
+      const maxIndex = Math.max(0, products.length - getVisibleItems());
+      setCurrentIndex((prev) => (prev + 1) % (maxIndex + 1));
     }, 4000);
     return () => clearInterval(timer);
   }, [products.length]);
 
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      const maxIndex = Math.max(0, products.length - getVisibleItems());
+      if (currentIndex > maxIndex) {
+        setCurrentIndex(maxIndex);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [currentIndex, products.length]);
+
   const nextSlide = () => {
-    setCurrentIndex((prev) => (prev + 1) % (products.length - 5));
+    const maxIndex = Math.max(0, products.length - getVisibleItems());
+    setCurrentIndex((prev) => (prev + 1) % (maxIndex + 1));
   };
 
   const prevSlide = () => {
-    setCurrentIndex((prev) => (prev - 1 + (products.length - 5)) % (products.length - 5));
+    const maxIndex = Math.max(0, products.length - getVisibleItems());
+    setCurrentIndex((prev) => (prev - 1 + (maxIndex + 1)) % (maxIndex + 1));
+  };
+
+  const getVisibleItems = () => {
+    // Return number of visible items based on screen size
+    if (window.innerWidth < 640) return 1; // mobile: 1 item
+    if (window.innerWidth < 768) return 2; // sm: 2 items
+    if (window.innerWidth < 1024) return 3; // md: 3 items
+    if (window.innerWidth < 1280) return 4; // lg: 4 items
+    return 5; // xl: 5 items
+  };
+
+  const getTransformValue = () => {
+    const visibleItems = getVisibleItems();
+    const itemWidth = 100 / visibleItems;
+    return `translateX(-${currentIndex * itemWidth}%)`;
   };
 
   if (loading) {
@@ -126,7 +157,7 @@ const HotProducts = () => {
           <div className="overflow-hidden">
             <div 
               className="flex transition-transform duration-500 ease-in-out"
-              style={{ transform: `translateX(-${currentIndex * 20}%)` }}
+              style={{ transform: getTransformValue() }}
             >
               {products.map((product, index) => (
                 <div key={index} className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 flex-shrink-0 px-2">
@@ -202,23 +233,23 @@ const HotProducts = () => {
             variant="ghost"
             size="lg"
             onClick={prevSlide}
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white shadow-lg hover:shadow-xl text-red-600 hover:text-red-700"
+            className="absolute left-2 sm:left-4 top-1/2 transform -translate-y-1/2 bg-white shadow-lg hover:shadow-xl text-red-600 hover:text-red-700 z-10 w-10 h-10 sm:w-12 sm:h-12"
           >
-            <ChevronLeft className="w-6 h-6" />
+            <ChevronLeft className="w-4 h-4 sm:w-6 sm:h-6" />
           </Button>
           
           <Button
             variant="ghost"
             size="lg"
             onClick={nextSlide}
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white shadow-lg hover:shadow-xl text-red-600 hover:text-red-700"
+            className="absolute right-2 sm:right-4 top-1/2 transform -translate-y-1/2 bg-white shadow-lg hover:shadow-xl text-red-600 hover:text-red-700 z-10 w-10 h-10 sm:w-12 sm:h-12"
           >
-            <ChevronRight className="w-6 h-6" />
+            <ChevronRight className="w-4 h-4 sm:w-6 sm:h-6" />
           </Button>
 
           {/* Slide Indicators */}
           <div className="flex justify-center mt-6 space-x-2">
-            {Array.from({ length: products.length - 5 }).map((_, index) => (
+            {Array.from({ length: Math.max(1, products.length - getVisibleItems() + 1) }).map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentIndex(index)}
