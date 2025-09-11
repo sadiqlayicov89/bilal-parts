@@ -6,6 +6,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { calculateCartTotals, formatPrice } from '../utils/priceUtils';
 import { useToast } from '../hooks/use-toast';
+import SupabaseService from '../services/supabaseService';
 
 const InvoiceModal = ({ isOpen, onClose, orderData, cartItems, invoiceNumber: propInvoiceNumber }) => {
   const invoiceRef = useRef(null);
@@ -51,80 +52,131 @@ const InvoiceModal = ({ isOpen, onClose, orderData, cartItems, invoiceNumber: pr
   })();
 
   const handleConfirmOrder = async () => {
-    // Save order to both user orders and admin orders
-    const newOrder = {
-      id: invoiceNumber,
-      userId: user?.id,
-      userEmail: user?.email,
-      userName: `${user?.first_name} ${user?.last_name}`,
-      userDiscount: userDiscount,
-      date: new Date().toISOString().split('T')[0],
-      status: 'pending',
-      items: cartItems.map(item => ({
-        name: item.product ? item.product.name : item.name,
+    try {
+      // Create order data for Supabase
+      const orderDataForSupabase = {
+        id: invoiceNumber,
+        user_id: user?.id,
+        user_email: user?.email,
+        user_name: `${user?.first_name} ${user?.last_name}`,
+        company: orderData?.company || '',
+        inn: orderData?.inn || '',
+        date: new Date().toISOString().split('T')[0],
+        status: 'pending',
+        subtotal: invoiceTotals.subtotal,
+        discount_amount: invoiceTotals.discountAmount,
+        discount_percentage: invoiceTotals.discountPercentage,
+        total: invoiceTotals.total,
+        shipping_address: orderData?.address || 'г. Москва, ул. Примерная, д. 123',
+        payment_method: 'Bank Transfer',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      // Create order items data for Supabase
+      const orderItemsData = cartItems.map(item => ({
+        order_id: invoiceNumber,
+        product_id: item.product?.id || null,
         quantity: item.quantity,
         price: item.product ? item.product.price : item.price,
+        name: item.product ? item.product.name : item.name,
         sku: item.product ? item.product.sku : '',
-        catalogNumber: item.product ? item.product.catalogNumber : ''
-      })),
-      subtotal: invoiceTotals.subtotal,
-      discountAmount: invoiceTotals.discountAmount,
-      discountPercentage: invoiceTotals.discountPercentage,
-      total: invoiceTotals.total,
-      shippingAddress: orderData?.address || 'г. Москва, ул. Примерная, д. 123',
-      paymentMethod: 'Bank Transfer',
-      company: orderData?.company || '',
-      inn: orderData?.inn || '',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
+        catalog_number: item.product ? item.product.catalogNumber : ''
+      }));
 
-    // Save to user orders
-    const existingUserOrders = JSON.parse(localStorage.getItem('userOrders') || '[]');
-    const updatedUserOrders = [newOrder, ...existingUserOrders.filter(o => o.id !== invoiceNumber)];
-    localStorage.setItem('userOrders', JSON.stringify(updatedUserOrders));
+      console.log('Creating order in Supabase:', orderDataForSupabase);
+      console.log('Creating order items in Supabase:', orderItemsData);
 
-    // Save to admin orders
-    const existingAdminOrders = JSON.parse(localStorage.getItem('adminOrders') || '[]');
-    const updatedAdminOrders = [newOrder, ...existingAdminOrders.filter(o => o.id !== invoiceNumber)];
-    localStorage.setItem('adminOrders', JSON.stringify(updatedAdminOrders));
+      // Save order to Supabase
+      const createdOrder = await SupabaseService.createOrder(orderDataForSupabase, orderItemsData);
+      console.log('Order created in Supabase:', createdOrder);
 
-    // Create admin notification
-    const notification = {
-      id: `notif-${Date.now()}`,
-      type: 'new_order',
-      title: 'Yeni Sifariş Təsdiqləndi',
-      message: `${user?.first_name} ${user?.last_name} tərəfindən sifariş təsdiqləndi`,
-      orderNumber: invoiceNumber,
-      customerName: `${user?.first_name} ${user?.last_name}`,
-      orderTotal: formatPrice(invoiceTotals.total),
-      discount: invoiceTotals.discountPercentage > 0 ? `${invoiceTotals.discountPercentage}%` : null,
-      timestamp: new Date().toISOString(),
-      isRead: false,
-      priority: 'high'
-    };
+      // Create notification in Supabase
+      const notificationData = {
+        type: 'new_order',
+        title: 'Yeni Sifariş Təsdiqləndi',
+        message: `${user?.first_name} ${user?.last_name} tərəfindən sifariş təsdiqləndi`,
+        order_number: invoiceNumber,
+        customer_name: `${user?.first_name} ${user?.last_name}`,
+        order_total: invoiceTotals.total,
+        discount: invoiceTotals.discountPercentage > 0 ? `${invoiceTotals.discountPercentage}%` : null,
+        is_read: false,
+        priority: 'high'
+      };
 
-    // Save notification
-    const existingNotifications = JSON.parse(localStorage.getItem('adminNotifications') || '[]');
-    const updatedNotifications = [notification, ...existingNotifications];
-    localStorage.setItem('adminNotifications', JSON.stringify(updatedNotifications));
+      console.log('Creating notification in Supabase:', notificationData);
+      await SupabaseService.createNotification(notificationData);
 
-    // Dispatch events
-    window.dispatchEvent(new CustomEvent('newAdminNotification', { detail: notification }));
-    window.dispatchEvent(new CustomEvent('orderConfirmed', { detail: newOrder }));
+      // Dispatch events for real-time updates
+      window.dispatchEvent(new CustomEvent('newAdminNotification', { detail: notificationData }));
+      window.dispatchEvent(new CustomEvent('orderConfirmed', { detail: createdOrder }));
 
-    // Clear cart after order confirmation
-    await clearCart();
+      // Clear cart after order confirmation
+      await clearCart();
 
-    // Show success message
-    toast({
-      title: 'Sifariş Təsdiqləndi',
-      description: `Sifariş #${invoiceNumber} uğurla təsdiqləndi. Səbət təmizləndi.`,
-      variant: 'default'
-    });
+      // Show success message
+      toast({
+        title: 'Sifariş Təsdiqləndi',
+        description: `Sifariş #${invoiceNumber} uğurla təsdiqləndi və Supabase-ə yazıldı. Səbət təmizləndi.`,
+        variant: 'default'
+      });
 
-    // Close modal
-    onClose();
+      // Close modal
+      onClose();
+
+    } catch (error) {
+      console.error('Error creating order in Supabase:', error);
+      
+      // Fallback to localStorage if Supabase fails
+      const newOrder = {
+        id: invoiceNumber,
+        userId: user?.id,
+        userEmail: user?.email,
+        userName: `${user?.first_name} ${user?.last_name}`,
+        userDiscount: userDiscount,
+        date: new Date().toISOString().split('T')[0],
+        status: 'pending',
+        items: cartItems.map(item => ({
+          name: item.product ? item.product.name : item.name,
+          quantity: item.quantity,
+          price: item.product ? item.product.price : item.price,
+          sku: item.product ? item.product.sku : '',
+          catalogNumber: item.product ? item.product.catalogNumber : ''
+        })),
+        subtotal: invoiceTotals.subtotal,
+        discountAmount: invoiceTotals.discountAmount,
+        discountPercentage: invoiceTotals.discountPercentage,
+        total: invoiceTotals.total,
+        shippingAddress: orderData?.address || 'г. Москва, ул. Примерная, д. 123',
+        paymentMethod: 'Bank Transfer',
+        company: orderData?.company || '',
+        inn: orderData?.inn || '',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+
+      // Save to localStorage as fallback
+      const existingUserOrders = JSON.parse(localStorage.getItem('userOrders') || '[]');
+      const updatedUserOrders = [newOrder, ...existingUserOrders.filter(o => o.id !== invoiceNumber)];
+      localStorage.setItem('userOrders', JSON.stringify(updatedUserOrders));
+
+      const existingAdminOrders = JSON.parse(localStorage.getItem('adminOrders') || '[]');
+      const updatedAdminOrders = [newOrder, ...existingAdminOrders.filter(o => o.id !== invoiceNumber)];
+      localStorage.setItem('adminOrders', JSON.stringify(updatedAdminOrders));
+
+      // Clear cart after order confirmation
+      await clearCart();
+
+      // Show success message with fallback info
+      toast({
+        title: 'Sifariş Təsdiqləndi',
+        description: `Sifariş #${invoiceNumber} uğurla təsdiqləndi (localStorage fallback). Səbət təmizləndi.`,
+        variant: 'default'
+      });
+
+      // Close modal
+      onClose();
+    }
   };
 
   const handlePrint = () => {

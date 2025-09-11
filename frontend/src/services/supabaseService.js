@@ -562,8 +562,18 @@ export class SupabaseService {
         throw error;
       }
       
-      console.log('Fetched orders:', data?.length || 0);
-      return data || [];
+      // Transform the data to match expected format
+      const transformedData = (data || []).map(order => {
+        console.log('Processing order:', order.id, 'order_items:', order.order_items);
+        return {
+          ...order,
+          items: order.order_items || []
+        };
+      });
+      
+      console.log('Fetched orders:', transformedData?.length || 0);
+      console.log('Transformed orders sample:', transformedData[0]);
+      return transformedData;
     } catch (error) {
       console.error('SupabaseService: Error fetching orders:', error);
       throw error;
@@ -790,6 +800,131 @@ export class SupabaseService {
       return { success: true };
     } catch (error) {
       console.error('SupabaseService: Error clearing cart:', error);
+      throw error;
+    }
+  }
+
+  // ====================================
+  // ORDERS
+  // ====================================
+
+  static async createOrder(orderData, orderItemsData) {
+    try {
+      console.log('Creating order in Supabase:', orderData);
+      
+      // First, create the order
+      const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .insert([orderData])
+        .select()
+        .single();
+      
+      if (orderError) {
+        console.error('Error creating order:', orderError);
+        throw orderError;
+      }
+
+      console.log('Order created:', order);
+
+      // Then, create the order items
+      if (orderItemsData && orderItemsData.length > 0) {
+        const { data: orderItems, error: itemsError } = await supabase
+          .from('order_items')
+          .insert(orderItemsData)
+          .select();
+        
+        if (itemsError) {
+          console.error('Error creating order items:', itemsError);
+          throw itemsError;
+        }
+
+        console.log('Order items created:', orderItems);
+        
+        // Return order with items
+        return {
+          ...order,
+          items: orderItems
+        };
+      }
+
+      return order;
+    } catch (error) {
+      console.error('SupabaseService: Error creating order:', error);
+      throw error;
+    }
+  }
+
+  static async getUserOrders(userId) {
+    try {
+      console.log('Fetching user orders for user:', userId);
+      
+      const { data, error } = await supabase
+        .from('orders')
+        .select(`
+          *,
+          order_items(*)
+        `)
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.error('Error fetching user orders:', error);
+        throw error;
+      }
+      
+      console.log('Fetched user orders:', data?.length || 0);
+      return data || [];
+    } catch (error) {
+      console.error('SupabaseService: Error fetching user orders:', error);
+      throw error;
+    }
+  }
+
+  // ====================================
+  // NOTIFICATIONS
+  // ====================================
+
+  static async createNotification(notificationData) {
+    try {
+      console.log('Creating notification in Supabase:', notificationData);
+      
+      const { data, error } = await supabase
+        .from('notifications')
+        .insert([notificationData])
+        .select()
+        .single();
+      
+      if (error) {
+        console.error('Error creating notification:', error);
+        throw error;
+      }
+
+      console.log('Notification created:', data);
+      return data;
+    } catch (error) {
+      console.error('SupabaseService: Error creating notification:', error);
+      throw error;
+    }
+  }
+
+  static async getNotifications() {
+    try {
+      console.log('Fetching notifications from Supabase...');
+      
+      const { data, error } = await supabase
+        .from('notifications')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.error('Error fetching notifications:', error);
+        throw error;
+      }
+      
+      console.log('Fetched notifications:', data?.length || 0);
+      return data || [];
+    } catch (error) {
+      console.error('SupabaseService: Error fetching notifications:', error);
       throw error;
     }
   }

@@ -9,6 +9,7 @@ import { ArrowLeft, Package, Calendar, MapPin, CreditCard, Eye, X, Printer } fro
 import { useToast } from '../hooks/use-toast';
 import { getProductPriceInfo, formatPrice, calculateCartTotals } from '../utils/priceUtils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
+import SupabaseService from '../services/supabaseService';
 
 const MyOrdersPage = () => {
   const { user, userDiscount } = useAuth();
@@ -211,24 +212,58 @@ const MyOrdersPage = () => {
   ];
 
   useEffect(() => {
-    // Load user's orders from localStorage first
-    const savedOrders = JSON.parse(localStorage.getItem('userOrders') || '[]');
-    const userOrders = getUserOrders();
-    
-    // Combine saved orders with context orders and mock orders
-    const allOrders = [...savedOrders, ...userOrders, ...mockOrders];
-    
-    // Remove duplicates by ID
-    const uniqueOrders = allOrders.filter((order, index, self) => 
-      index === self.findIndex(o => o.id === order.id)
-    );
-    
-    // Sort by date (newest first)
-    uniqueOrders.sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt));
-    
-    setOrders(uniqueOrders);
-    setLoading(false);
-  }, [getUserOrders]);
+    const fetchUserOrders = async () => {
+      if (!user?.id) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        console.log('Fetching user orders from Supabase for user:', user.id);
+        const userOrders = await SupabaseService.getUserOrders(user.id);
+        console.log('Fetched user orders from Supabase:', userOrders);
+        
+        // Transform Supabase orders to match expected format
+        const transformedOrders = userOrders.map(order => ({
+          id: order.id,
+          date: order.date || order.created_at?.split('T')[0],
+          status: order.status,
+          userDiscount: order.discount_percentage || 0,
+          subtotal: order.subtotal,
+          discountAmount: order.discount_amount || 0,
+          discountPercentage: order.discount_percentage || 0,
+          total: order.total,
+          items: order.items || [],
+          shippingAddress: order.shipping_address,
+          paymentMethod: order.payment_method,
+          userEmail: order.user_email,
+          userName: order.user_name,
+          company: order.company,
+          inn: order.inn
+        }));
+
+        // Sort by date (newest first)
+        transformedOrders.sort((a, b) => new Date(b.date) - new Date(a.date));
+        
+        setOrders(transformedOrders);
+      } catch (error) {
+        console.error('Error fetching user orders:', error);
+        // Fallback to localStorage
+        const savedOrders = JSON.parse(localStorage.getItem('userOrders') || '[]');
+        const userOrders = getUserOrders();
+        const allOrders = [...savedOrders, ...userOrders, ...mockOrders];
+        const uniqueOrders = allOrders.filter((order, index, self) => 
+          index === self.findIndex(o => o.id === order.id)
+        );
+        uniqueOrders.sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt));
+        setOrders(uniqueOrders);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserOrders();
+  }, [user?.id, getUserOrders]);
 
   const getStatusColor = (status) => {
     switch (status) {

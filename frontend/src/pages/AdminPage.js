@@ -278,6 +278,8 @@ const AdminPage = () => {
       console.log('Fetching all orders for admin...');
       const supabaseOrders = await SupabaseService.getAllOrders();
       console.log('Fetched orders from Supabase:', supabaseOrders);
+      console.log('First order sample:', supabaseOrders?.[0]);
+      console.log('First order items:', supabaseOrders?.[0]?.items);
       setOrders(supabaseOrders || []);
     } catch (error) {
       console.error("Failed to fetch orders from Supabase:", error);
@@ -439,7 +441,7 @@ const AdminPage = () => {
             </tr>
           </thead>
           <tbody>
-            ${selectedOrder.items.map((item, idx) => {
+            ${(selectedOrder.items || []).map((item, idx) => {
               const originalPrice = item.price;
               const orderDiscount = selectedOrder.discountPercentage || selectedOrder.userDiscount || 0;
               const discountAmount = orderDiscount > 0 ? (originalPrice * orderDiscount) / 100 : 0;
@@ -3060,7 +3062,9 @@ const AdminPage = () => {
                               const matchesStatus = orderStatusFilter === "all" || order.status === orderStatusFilter;
                               return matchesSearch && matchesStatus;
                             })
-                            .map((order) => (
+                            .map((order) => {
+                              console.log('Rendering order:', order.id, 'items:', order.items);
+                              return (
                               <Card 
                                 key={order.id} 
                                 className="hover:shadow-lg transition-shadow cursor-pointer"
@@ -3131,7 +3135,7 @@ const AdminPage = () => {
                                           </div>
                                         )}
                                         <div className="text-xs text-gray-500">
-                                          {order.items.length} məhsul
+                                          {order.items?.length || 0} məhsul
                                         </div>
                                       </div>
                                       
@@ -3167,7 +3171,8 @@ const AdminPage = () => {
                                   </div>
                                 </CardContent>
                               </Card>
-                            ))
+                              );
+                            })
                         )}
                       </div>
                     </CardContent>
@@ -4660,7 +4665,7 @@ const AdminPage = () => {
                      </tr>
                    </thead>
                    <tbody>
-                     {selectedOrder.items.map((item, index) => {
+                     {(selectedOrder.items || []).map((item, index) => {
                        const originalPrice = item.price;
                        const orderDiscount = selectedOrder.discountPercentage || selectedOrder.userDiscount || 0;
                        const discountAmount = orderDiscount > 0 ? (originalPrice * orderDiscount) / 100 : 0;
