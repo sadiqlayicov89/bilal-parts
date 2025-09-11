@@ -226,6 +226,7 @@ const MyOrdersPage = () => {
         // Transform Supabase orders to match expected format
         const transformedOrders = userOrders.map(order => ({
           id: order.id,
+          order_number: order.order_number,
           date: order.date || order.created_at?.split('T')[0],
           status: order.status,
           userDiscount: order.discount_percentage || 0,
