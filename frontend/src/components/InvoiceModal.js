@@ -101,6 +101,7 @@ const InvoiceModal = ({ isOpen, onClose, orderData, cartItems, invoiceNumber: pr
         data: {
           order_number: invoiceNumber,
           order_total: invoiceTotals.total,
+          customer_name: `${user?.first_name || ''} ${user?.last_name || ''}`.trim() || user?.email || 'N/A',
           discount: invoiceTotals.discountPercentage > 0 ? `${invoiceTotals.discountPercentage}%` : null
         }
       };
@@ -216,7 +217,7 @@ const InvoiceModal = ({ isOpen, onClose, orderData, cartItems, invoiceNumber: pr
                  </tr>
           <tr>
             <td class="bold">Покупатель:</td>
-            <td>${orderData?.contactName || 'Admin User'}, ${orderData?.company || ''}, ИНН ${orderData?.inn || 'N/A'}, ${orderData?.address || 'N/A'}</td>
+            <td>${user?.first_name || ''} ${user?.last_name || ''} ${user?.email || ''}, ${orderData?.company || ''}, ИНН ${orderData?.inn || 'N/A'}, ${orderData?.address || 'N/A'}</td>
                  </tr>
              </table>
 
@@ -428,7 +429,7 @@ const InvoiceModal = ({ isOpen, onClose, orderData, cartItems, invoiceNumber: pr
               </tr>
               <tr>
                 <td style={{ fontWeight: 700, padding: '2px 0' }}>Покупатель:</td>
-                <td>{orderData?.contactName || 'Admin User'}, {orderData?.company || ''}, ИНН {orderData?.inn || 'N/A'}, {orderData?.address || 'N/A'}</td>
+                <td>{user?.first_name || ''} {user?.last_name || ''} {user?.email || ''}, {orderData?.company || ''}, ИНН {orderData?.inn || 'N/A'}, {orderData?.address || 'N/A'}</td>
               </tr>
             </tbody>
           </table>

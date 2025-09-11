@@ -3670,24 +3670,24 @@ const AdminPage = () => {
                                     {notification.message}
                                   </p>
                                   
-                                  {notification.type === 'new_order' && (
+                                  {notification.type === 'new_order' && notification.data && (
                                     <div className="bg-white rounded p-3 space-y-1 text-sm">
                                       <div className="flex justify-between">
                                         <span className="text-gray-600">Sifariş №:</span>
-                                        <span className="font-medium">{notification.orderNumber}</span>
+                                        <span className="font-medium">{notification.data.order_number || 'N/A'}</span>
                                       </div>
                                       <div className="flex justify-between">
                                         <span className="text-gray-600">Müştəri:</span>
-                                        <span className="font-medium">{notification.customerName}</span>
+                                        <span className="font-medium">{notification.data.customer_name || 'N/A'}</span>
                                       </div>
                                       <div className="flex justify-between">
                                         <span className="text-gray-600">Məbləğ:</span>
-                                        <span className="font-medium text-red-600">{notification.orderTotal}</span>
+                                        <span className="font-medium text-red-600">{notification.data.order_total || 'N/A'}</span>
                                       </div>
-                                      {notification.discount && (
+                                      {notification.data.discount && (
                                         <div className="flex justify-between">
                                           <span className="text-gray-600">Endirim:</span>
-                                          <span className="font-medium text-red-600">{notification.discount}</span>
+                                          <span className="font-medium text-red-600">{notification.data.discount}</span>
                                         </div>
                                       )}
                                     </div>

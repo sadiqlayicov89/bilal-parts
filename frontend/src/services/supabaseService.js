@@ -911,6 +911,8 @@ export class SupabaseService {
       })) || [];
       
       console.log('Fetched user orders:', transformedOrders?.length || 0);
+      console.log('Raw orders data:', data);
+      console.log('Transformed orders:', transformedOrders);
       return transformedOrders;
     } catch (error) {
       console.error('SupabaseService: Error fetching user orders:', error);
