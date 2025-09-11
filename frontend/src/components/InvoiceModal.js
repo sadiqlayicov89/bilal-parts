@@ -55,12 +55,12 @@ const InvoiceModal = ({ isOpen, onClose, orderData, cartItems, invoiceNumber: pr
     try {
       // Create order data for Supabase
       const orderDataForSupabase = {
-        id: invoiceNumber,
+        order_number: invoiceNumber, // Use order_number instead of id
         user_id: user?.id,
         user_email: user?.email,
-        user_name: `${user?.first_name} ${user?.last_name}`,
-        company: orderData?.company || '',
-        inn: orderData?.inn || '',
+        user_name: `${user?.first_name || ''} ${user?.last_name || ''}`.trim() || 'Admin User',
+        company: orderData?.company || 'N/A',
+        inn: orderData?.inn || 'N/A',
         date: new Date().toISOString().split('T')[0],
         status: 'pending',
         subtotal: invoiceTotals.subtotal,

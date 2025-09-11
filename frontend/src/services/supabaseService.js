@@ -193,7 +193,7 @@ export class SupabaseService {
           products(
             id, name, sku, price, original_price, in_stock,
             stock_quantity, catalog_number, category,
-            description, specifications
+            description, specifications, product_images
           )
         `)
         .eq('user_id', userId)
@@ -840,9 +840,15 @@ export class SupabaseService {
 
       // Then, create the order items
       if (orderItemsData && orderItemsData.length > 0) {
+        // Update order_id in orderItemsData to use the created order's id
+        const updatedOrderItemsData = orderItemsData.map(item => ({
+          ...item,
+          order_id: order.id // Use the actual order ID from the created order
+        }));
+        
         const { data: orderItems, error: itemsError } = await supabase
           .from('order_items')
-          .insert(orderItemsData)
+          .insert(updatedOrderItemsData)
           .select();
         
         if (itemsError) {
