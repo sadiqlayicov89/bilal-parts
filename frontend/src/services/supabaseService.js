@@ -880,7 +880,12 @@ export class SupabaseService {
         .from('orders')
         .select(`
           *,
-          order_items(*)
+          order_items(
+            *,
+            products(
+              id, name, sku, catalog_number, price, category
+            )
+          )
         `)
         .eq('user_id', userId)
         .order('created_at', { ascending: false });
@@ -890,8 +895,23 @@ export class SupabaseService {
         throw error;
       }
       
-      console.log('Fetched user orders:', data?.length || 0);
-      return data || [];
+      // Transform order_items to items for consistency
+      const transformedOrders = data?.map(order => ({
+        ...order,
+        items: order.order_items?.map(item => ({
+          id: item.id,
+          name: item.products?.name || 'Unknown Product',
+          quantity: item.quantity,
+          price: item.price,
+          catalogNumber: item.products?.catalog_number || 'N/A',
+          sku: item.products?.sku || 'N/A',
+          category: item.products?.category || 'N/A',
+          total: item.total
+        })) || []
+      })) || [];
+      
+      console.log('Fetched user orders:', transformedOrders?.length || 0);
+      return transformedOrders;
     } catch (error) {
       console.error('SupabaseService: Error fetching user orders:', error);
       throw error;
