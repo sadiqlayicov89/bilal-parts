@@ -80,9 +80,8 @@ const InvoiceModal = ({ isOpen, onClose, orderData, cartItems, invoiceNumber: pr
         product_id: item.product?.id || null,
         quantity: item.quantity,
         price: item.product ? item.product.price : item.price,
-        name: item.product ? item.product.name : item.name,
-        sku: item.product ? item.product.sku : '',
-        catalog_number: item.product ? item.product.catalogNumber : ''
+        total: (item.product ? item.product.price : item.price) * item.quantity
+        // Removed: name, sku, catalog_number - these columns don't exist in order_items table
       }));
 
       console.log('Creating order in Supabase:', orderDataForSupabase);
