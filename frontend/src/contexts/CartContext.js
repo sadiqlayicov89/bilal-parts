@@ -79,7 +79,7 @@ export const CartProvider = ({ children }) => {
           id: item.products.id,
           name: item.products.name,
           price: item.products.price,
-          images: item.products.product_images || [],
+          images: [], // No images column in products table
           in_stock: item.products.in_stock,
           stock_quantity: item.products.stock_quantity,
           catalogNumber: item.products.catalog_number,
