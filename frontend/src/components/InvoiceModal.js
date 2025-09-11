@@ -127,55 +127,12 @@ const InvoiceModal = ({ isOpen, onClose, orderData, cartItems, invoiceNumber: pr
     } catch (error) {
       console.error('Error creating order in Supabase:', error);
       
-      // Fallback to localStorage if Supabase fails
-      const newOrder = {
-        id: invoiceNumber,
-        userId: user?.id,
-        userEmail: user?.email,
-        userName: `${user?.first_name} ${user?.last_name}`,
-        userDiscount: userDiscount,
-        date: new Date().toISOString().split('T')[0],
-        status: 'pending',
-        items: cartItems.map(item => ({
-          name: item.product ? item.product.name : item.name,
-          quantity: item.quantity,
-          price: item.product ? item.product.price : item.price,
-          sku: item.product ? item.product.sku : '',
-          catalogNumber: item.product ? item.product.catalogNumber : ''
-        })),
-        subtotal: invoiceTotals.subtotal,
-        discountAmount: invoiceTotals.discountAmount,
-        discountPercentage: invoiceTotals.discountPercentage,
-        total: invoiceTotals.total,
-        shippingAddress: orderData?.address || 'г. Москва, ул. Примерная, д. 123',
-        paymentMethod: 'Bank Transfer',
-        company: orderData?.company || '',
-        inn: orderData?.inn || '',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-
-      // Save to localStorage as fallback
-      const existingUserOrders = JSON.parse(localStorage.getItem('userOrders') || '[]');
-      const updatedUserOrders = [newOrder, ...existingUserOrders.filter(o => o.id !== invoiceNumber)];
-      localStorage.setItem('userOrders', JSON.stringify(updatedUserOrders));
-
-      const existingAdminOrders = JSON.parse(localStorage.getItem('adminOrders') || '[]');
-      const updatedAdminOrders = [newOrder, ...existingAdminOrders.filter(o => o.id !== invoiceNumber)];
-      localStorage.setItem('adminOrders', JSON.stringify(updatedAdminOrders));
-
-      // Clear cart after order confirmation
-      await clearCart();
-
-      // Show success message with fallback info
+      // Show error message instead of fallback
       toast({
-        title: 'Sifariş Təsdiqləndi',
-        description: `Sifariş #${invoiceNumber} uğurla təsdiqləndi (localStorage fallback). Səbət təmizləndi.`,
-        variant: 'default'
+        title: 'Sifariş Xətası',
+        description: `Sifariş yaradıla bilmədi: ${error.message}`,
+        variant: 'destructive'
       });
-
-      // Close modal
-      onClose();
     }
   };
 
