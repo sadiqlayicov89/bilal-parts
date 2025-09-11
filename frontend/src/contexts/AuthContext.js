@@ -198,6 +198,34 @@ export const AuthProvider = ({ children }) => {
     return user?.role === 'admin' || user?.email === 'admin@bilal-parts.com';
   };
 
+  const updateProfile = async (profileData) => {
+    try {
+      if (!user?.id) {
+        throw new Error('User not authenticated');
+      }
+
+      // Update user metadata in Supabase
+      const { data, error } = await supabase.auth.updateUser({
+        data: profileData
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      // Update local user state
+      setUser(prev => ({
+        ...prev,
+        ...profileData
+      }));
+
+      return { success: true };
+    } catch (error) {
+      console.error('Profile update error:', error);
+      throw error;
+    }
+  };
+
   const value = {
     user,
     token,
@@ -207,7 +235,8 @@ export const AuthProvider = ({ children }) => {
     isAdmin,
     login,
     register,
-    logout
+    logout,
+    updateProfile
   };
 
   return (
