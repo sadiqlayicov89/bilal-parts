@@ -6,9 +6,6 @@ SELECT 'Existing orders:' as info, id, order_number, status FROM orders ORDER BY
 INSERT INTO order_items (
   order_id,
   product_id,
-  product_name,
-  product_sku,
-  product_article,
   quantity,
   unit_price,
   total_price,
@@ -18,9 +15,6 @@ INSERT INTO order_items (
 (
   '7255530d-fb47-4aad-a6ca-8790985a9c9d',
   (SELECT id FROM products LIMIT 1), -- Get first product
-  'Test Product 1',
-  'SKU001',
-  'ART001',
   2,
   50.00,
   100.00,
@@ -30,9 +24,6 @@ INSERT INTO order_items (
 (
   '7255530d-fb47-4aad-a6ca-8790985a9c9d',
   (SELECT id FROM products OFFSET 1 LIMIT 1), -- Get second product
-  'Test Product 2',
-  'SKU002',
-  'ART002',
   1,
   75.00,
   75.00,
@@ -44,9 +35,6 @@ INSERT INTO order_items (
 INSERT INTO order_items (
   order_id,
   product_id,
-  product_name,
-  product_sku,
-  product_article,
   quantity,
   unit_price,
   total_price,
@@ -56,9 +44,6 @@ INSERT INTO order_items (
 (
   'f57ddee4-5bef-4449-a960-9b7d35444107',
   (SELECT id FROM products OFFSET 2 LIMIT 1), -- Get third product
-  'Test Product 3',
-  'SKU003',
-  'ART003',
   3,
   25.00,
   75.00,
@@ -68,9 +53,6 @@ INSERT INTO order_items (
 (
   'f57ddee4-5bef-4449-a960-9b7d35444107',
   (SELECT id FROM products OFFSET 3 LIMIT 1), -- Get fourth product
-  'Test Product 4',
-  'SKU004',
-  'ART004',
   1,
   100.00,
   100.00,

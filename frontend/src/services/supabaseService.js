@@ -553,7 +553,10 @@ export class SupabaseService {
         .from('orders')
         .select(`
           *,
-          order_items(*)
+          order_items(
+            *,
+            product:products(*)
+          )
         `)
         .order('created_at', { ascending: false });
       
@@ -567,7 +570,13 @@ export class SupabaseService {
         console.log('Processing order:', order.id, 'order_items:', order.order_items);
         return {
           ...order,
-          items: order.order_items || []
+          items: (order.order_items || []).map(item => ({
+            ...item,
+            name: item.product?.name || 'Unknown Product',
+            sku: item.product?.sku || 'N/A',
+            article: item.product?.article || 'N/A',
+            image: item.product?.images?.[0] || item.product?.image || '/placeholder-product.jpg'
+          }))
         };
       });
       
