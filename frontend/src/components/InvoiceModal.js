@@ -67,6 +67,7 @@ const InvoiceModal = ({ isOpen, onClose, orderData, cartItems, invoiceNumber: pr
         discount_amount: invoiceTotals.discountAmount,
         discount_percentage: invoiceTotals.discountPercentage,
         total: invoiceTotals.total,
+        total_amount: invoiceTotals.total, // Add total_amount field
         shipping_address: orderData?.address || 'г. Москва, ул. Примерная, д. 123',
         payment_method: 'Bank Transfer',
         created_at: new Date().toISOString(),
