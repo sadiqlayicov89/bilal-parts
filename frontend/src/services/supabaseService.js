@@ -575,7 +575,10 @@ export class SupabaseService {
             name: item.product?.name || 'Unknown Product',
             sku: item.product?.sku || 'N/A',
             article: item.product?.article || 'N/A',
-            image: item.product?.images?.[0] || item.product?.image || '/placeholder-product.jpg'
+            image: item.product?.images?.[0] || item.product?.image || '/placeholder-product.jpg',
+            // Map correct column names
+            unit_price: item.price || item.unit_price || 0,
+            total_price: item.total || item.total_price || 0
           }))
         };
       });
