@@ -93,15 +93,16 @@ const InvoiceModal = ({ isOpen, onClose, orderData, cartItems, invoiceNumber: pr
 
       // Create notification in Supabase
       const notificationData = {
+        user_id: user?.id,
         type: 'new_order',
         title: 'Yeni Sifariş Təsdiqləndi',
-        message: `${user?.first_name} ${user?.last_name} tərəfindən sifariş təsdiqləndi`,
-        order_number: invoiceNumber,
-        customer_name: `${user?.first_name} ${user?.last_name}`,
-        order_total: invoiceTotals.total,
-        discount: invoiceTotals.discountPercentage > 0 ? `${invoiceTotals.discountPercentage}%` : null,
+        message: `${user?.first_name || 'Admin'} ${user?.last_name || 'User'} tərəfindən sifariş təsdiqləndi`,
         is_read: false,
-        priority: 'high'
+        data: {
+          order_number: invoiceNumber,
+          order_total: invoiceTotals.total,
+          discount: invoiceTotals.discountPercentage > 0 ? `${invoiceTotals.discountPercentage}%` : null
+        }
       };
 
       console.log('Creating notification in Supabase:', notificationData);
