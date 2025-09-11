@@ -402,7 +402,7 @@ const AdminPage = () => {
           </tr>
         </table>
 
-        <div class="title">Счет на оплату № ${selectedOrder.id} от ${new Date(selectedOrder.date).toLocaleDateString('ru-RU')}</div>
+        <div class="title">Счет на оплату № ${selectedOrder.id} от ${new Date(selectedOrder.created_at).toLocaleDateString('ru-RU')}</div>
         <div style="text-align: right; font-size: 10px;">
           <div>Валюта: RUB</div>
           <div style="margin-top: 4px;">
@@ -422,7 +422,7 @@ const AdminPage = () => {
         </table>
 
         <div style="font-size:10px">Действителен до ${(() => {
-          const d = new Date(selectedOrder.date);
+          const d = new Date(selectedOrder.created_at);
           d.setDate(d.getDate() + 5);
           return d.toLocaleDateString('ru-RU');
         })()}</div>
@@ -3082,7 +3082,7 @@ const AdminPage = () => {
                                         <div>
                                           <h3 className="font-semibold text-gray-900">#{order.id}</h3>
                                           <p className="text-sm text-gray-500">
-                                            {new Date(order.date).toLocaleDateString('az-AZ', {
+                                            {new Date(order.created_at).toLocaleDateString('az-AZ', {
                                               year: 'numeric',
                                               month: 'short',
                                               day: 'numeric'
@@ -4614,7 +4614,7 @@ const AdminPage = () => {
                  </table>
 
                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '12px 0 8px 0' }}>
-                   <div style={{ fontWeight: 700, fontSize: 16 }}>Счет на оплату № {selectedOrder.id} от {new Date(selectedOrder.date).toLocaleDateString('ru-RU')}</div>
+                   <div style={{ fontWeight: 700, fontSize: 16 }}>Счет на оплату № {selectedOrder.id} от {new Date(selectedOrder.created_at).toLocaleDateString('ru-RU')}</div>
                    <div style={{ fontSize: 10, textAlign: 'right' }}>
                      <div>Валюта: RUB</div>
                      <div style={{ marginTop: 4 }}>
@@ -4646,7 +4646,7 @@ const AdminPage = () => {
                  </table>
 
                  <div style={{ fontSize: 10 }}>Действителен до {(() => {
-                   const d = new Date(selectedOrder.date);
+                   const d = new Date(selectedOrder.created_at);
                    d.setDate(d.getDate() + 5);
                    return d.toLocaleDateString('ru-RU');
                  })()}</div>
