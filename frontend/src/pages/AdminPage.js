@@ -39,6 +39,16 @@ const AdminPage = () => {
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("dashboard");
+  // Order edit modal state
+  const [editOrderModal, setEditOrderModal] = useState(false);
+  const [orderEditing, setOrderEditing] = useState(null);
+  const [orderEditForm, setOrderEditForm] = useState({
+    user_name: '',
+    company: '',
+    inn: '',
+    shipping_address: '',
+    status: 'pending'
+  });
   
   // User management states
   const [selectedUsers, setSelectedUsers] = useState([]);
@@ -3152,7 +3162,7 @@ const AdminPage = () => {
                                         </div>
                                       </div>
                                       
-                                      {/* Quick status change */}
+                                      {/* Quick status change + edit/delete */}
                                       <div className="flex flex-col space-y-1">
                                         {order.status === 'pending' && (
                                           <Button
@@ -3167,6 +3177,43 @@ const AdminPage = () => {
                                             Təsdiq Et
                                           </Button>
                                         )}
+                                        <div className="flex space-x-2">
+                                          <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              setOrderEditing(order);
+                                              setOrderEditForm({
+                                                user_name: order.user_name || order.userName || '',
+                                                company: order.company || '',
+                                                inn: order.inn || '',
+                                                shipping_address: order.shipping_address || order.shippingAddress || '',
+                                                status: order.status || 'pending'
+                                              });
+                                              setEditOrderModal(true);
+                                            }}
+                                          >
+                                            Dəyiş
+                                          </Button>
+                                          <Button
+                                            variant="destructive"
+                                            size="sm"
+                                            onClick={async (e) => {
+                                              e.stopPropagation();
+                                              try {
+                                                await SupabaseService.deleteOrder(order.id);
+                                                toast({ title: 'Silindi', description: `Sifariş #${order.order_number || order.id} silindi` });
+                                                await fetchOrders();
+                                              } catch (err) {
+                                                console.error(err);
+                                                toast({ title: 'Xəta', description: 'Silmək mümkün olmadı', variant: 'destructive' });
+                                              }
+                                            }}
+                                          >
+                                            Sil
+                                          </Button>
+                                        </div>
                                         <Button
                                           variant="outline"
                                           size="sm"
@@ -4128,6 +4175,51 @@ const AdminPage = () => {
                 >
                   Ləğv Et
                 </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Edit Order Modal */}
+        <Dialog open={editOrderModal} onOpenChange={setEditOrderModal}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle>Sifarişi Dəyiş</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-3">
+              <div>
+                <Label>Ad Soyad</Label>
+                <Input value={orderEditForm.user_name} onChange={(e) => setOrderEditForm({ ...orderEditForm, user_name: e.target.value })} />
+              </div>
+              <div>
+                <Label>Firma</Label>
+                <Input value={orderEditForm.company} onChange={(e) => setOrderEditForm({ ...orderEditForm, company: e.target.value })} />
+              </div>
+              <div>
+                <Label>VÖEN (INN)</Label>
+                <Input value={orderEditForm.inn} onChange={(e) => setOrderEditForm({ ...orderEditForm, inn: e.target.value })} />
+              </div>
+              <div>
+                <Label>Ünvan</Label>
+                <Input value={orderEditForm.shipping_address} onChange={(e) => setOrderEditForm({ ...orderEditForm, shipping_address: e.target.value })} />
+              </div>
+              <div>
+                <Label>Status</Label>
+                <Select value={orderEditForm.status} onValueChange={(v) => setOrderEditForm({ ...orderEditForm, status: v })}>
+                  <SelectTrigger><SelectValue placeholder="Status" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pending">Gözləyir</SelectItem>
+                    <SelectItem value="confirmed">Təsdiqləndi</SelectItem>
+                    <SelectItem value="processing">İşlənir</SelectItem>
+                    <SelectItem value="shipped">Göndərildi</SelectItem>
+                    <SelectItem value="delivered">Çatdırıldı</SelectItem>
+                    <SelectItem value="cancelled">Ləğv edildi</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex justify-end space-x-2 pt-2">
+                <Button variant="ghost" onClick={() => setEditOrderModal(false)}>Bağla</Button>
+                <Button onClick={async () => { try { if (!orderEditing) return; await SupabaseService.updateOrder(orderEditing.id, orderEditForm); toast({ title: 'Uğurlu', description: 'Sifariş yeniləndi' }); setEditOrderModal(false); await fetchOrders(); } catch (err) { console.error(err); toast({ title: 'Xəta', description: 'Sifariş yenilənmədi', variant: 'destructive' }); } }}>Yadda saxla</Button>
               </div>
             </div>
           </DialogContent>

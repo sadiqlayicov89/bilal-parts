@@ -557,7 +557,7 @@ export class SupabaseService {
             *,
             product:products(*)
           ),
-          user:profiles!orders_user_id_fkey(
+          user:profiles(
             id, first_name, last_name, email, phone, company_name, country, city
           )
         `)
@@ -584,7 +584,7 @@ export class SupabaseService {
             name: item.product?.name || 'Unknown Product',
             sku: item.product?.sku || 'N/A',
             article: item.product?.article || 'N/A',
-            image: item.product?.images?.[0] || item.product?.image || '/placeholder-product.jpg',
+            image: item.product?.images?.[0] || item.product?.image || null,
             // Map correct column names
             unit_price: item.price || item.unit_price || 0,
             total_price: item.total || item.total_price || 0
@@ -614,6 +614,46 @@ export class SupabaseService {
       return data;
     } catch (error) {
       console.error('SupabaseService: Error updating order status:', error);
+      throw error;
+    }
+  }
+
+  static async updateOrder(orderId, updates) {
+    try {
+      const payload = { ...updates, updated_at: new Date().toISOString() };
+      const { data, error } = await supabase
+        .from('orders')
+        .update(payload)
+        .eq('id', orderId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('SupabaseService: Error updating order:', error);
+      throw error;
+    }
+  }
+
+  static async deleteOrder(orderId) {
+    try {
+      // First delete related order_items to satisfy FK constraints
+      const { error: itemsError } = await supabase
+        .from('order_items')
+        .delete()
+        .eq('order_id', orderId);
+      if (itemsError) throw itemsError;
+
+      const { error } = await supabase
+        .from('orders')
+        .delete()
+        .eq('id', orderId);
+
+      if (error) throw error;
+      return { success: true };
+    } catch (error) {
+      console.error('SupabaseService: Error deleting order:', error);
       throw error;
     }
   }
@@ -729,6 +769,8 @@ export class SupabaseService {
 
   static async addToCart(userId, productId, quantity = 1) {
     try {
+      console.log('SupabaseService: Adding to cart - userId:', userId, 'productId:', productId, 'quantity:', quantity);
+      
       // Check if item already exists in cart
       const { data: existingItem, error: checkError } = await supabase
         .from('cart_items')
@@ -736,6 +778,8 @@ export class SupabaseService {
         .eq('user_id', userId)
         .eq('product_id', productId)
         .single();
+      
+      console.log('SupabaseService: Check existing item result:', { existingItem, checkError });
 
       if (checkError && checkError.code !== 'PGRST116') {
         throw checkError;
