@@ -217,7 +217,7 @@ const InvoiceModal = ({ isOpen, onClose, orderData, cartItems, invoiceNumber: pr
                  </tr>
           <tr>
             <td class="bold">Покупатель:</td>
-            <td>${user?.first_name || ''} ${user?.last_name || ''} ${user?.email || ''}, ${orderData?.company || ''}, ИНН ${orderData?.inn || 'N/A'}, ${orderData?.address || 'N/A'}</td>
+            <td>${user?.first_name || ''} ${user?.last_name || ''}, ${orderData?.company || ''}, ИНН ${orderData?.inn || 'N/A'}, ${orderData?.address || 'N/A'}</td>
                  </tr>
              </table>
 
@@ -429,7 +429,7 @@ const InvoiceModal = ({ isOpen, onClose, orderData, cartItems, invoiceNumber: pr
               </tr>
               <tr>
                 <td style={{ fontWeight: 700, padding: '2px 0' }}>Покупатель:</td>
-                <td>{user?.first_name || ''} {user?.last_name || ''} {user?.email || ''}, {orderData?.company || ''}, ИНН {orderData?.inn || 'N/A'}, {orderData?.address || 'N/A'}</td>
+                <td>{user?.first_name || ''} {user?.last_name || ''}, {orderData?.company || ''}, ИНН {orderData?.inn || 'N/A'}, {orderData?.address || 'N/A'}</td>
               </tr>
             </tbody>
           </table>

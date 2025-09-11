@@ -556,6 +556,9 @@ export class SupabaseService {
           order_items(
             *,
             product:products(*)
+          ),
+          user:profiles!orders_user_id_fkey(
+            id, first_name, last_name, email, phone, company_name, country, city
           )
         `)
         .order('created_at', { ascending: false });
@@ -567,9 +570,15 @@ export class SupabaseService {
       
       // Transform the data to match expected format
       const transformedData = (data || []).map(order => {
-        console.log('Processing order:', order.id, 'order_items:', order.order_items);
+        console.log('Processing order:', order.id, 'order_items:', order.order_items, 'user:', order.user);
         return {
           ...order,
+          // Add user information
+          userName: order.user ? `${order.user.first_name || ''} ${order.user.last_name || ''}`.trim() : order.user_name || 'N/A',
+          userEmail: order.user?.email || order.user_email || 'N/A',
+          company: order.user?.company_name || order.company || 'N/A',
+          country: order.user?.country || 'N/A',
+          city: order.user?.city || 'N/A',
           items: (order.order_items || []).map(item => ({
             ...item,
             name: item.product?.name || 'Unknown Product',
@@ -750,7 +759,8 @@ export class SupabaseService {
           .insert({
             user_id: userId,
             product_id: productId,
-            quantity: quantity
+            quantity: quantity,
+            updated_at: new Date().toISOString()
           });
         
         if (insertError) throw insertError;
@@ -912,7 +922,10 @@ export class SupabaseService {
       
       console.log('Fetched user orders:', transformedOrders?.length || 0);
       console.log('Raw orders data:', data);
+      console.log('First raw order:', data?.[0]);
+      console.log('First order order_items:', data?.[0]?.order_items);
       console.log('Transformed orders:', transformedOrders);
+      console.log('First transformed order:', transformedOrders?.[0]);
       return transformedOrders;
     } catch (error) {
       console.error('SupabaseService: Error fetching user orders:', error);

@@ -3080,7 +3080,7 @@ const AdminPage = () => {
                                       <div className="flex items-center space-x-3">
                                         <ShoppingCart className="w-5 h-5 text-gray-500" />
                                         <div>
-                                          <h3 className="font-semibold text-gray-900">#{order.id}</h3>
+                                          <h3 className="font-semibold text-gray-900">#{order.order_number || order.id}</h3>
                                           <p className="text-sm text-gray-500">
                                             {new Date(order.created_at).toLocaleDateString('az-AZ', {
                                               year: 'numeric',
@@ -3091,13 +3091,26 @@ const AdminPage = () => {
                                         </div>
                                       </div>
                                       
-                                      {/* Company info */}
+                                      {/* Customer info */}
                                       <div>
                                         <div className="font-medium text-gray-900">
-                                          {order.company || order.userName}
+                                          {order.user_name || order.userName || 'N/A'}
                                         </div>
                                         <div className="text-sm text-gray-500">
-                                          {order.userEmail}
+                                          {order.company || 'N/A'}
+                                        </div>
+                                        <div className="text-sm text-gray-500">
+                                          {order.userEmail || 'N/A'}
+                                        </div>
+                                      </div>
+                                      
+                                      {/* Location info */}
+                                      <div>
+                                        <div className="text-sm text-gray-500">
+                                          {order.country || 'N/A'}
+                                        </div>
+                                        <div className="text-sm text-gray-500">
+                                          {order.city || 'N/A'}
                                         </div>
                                       </div>
                                       
@@ -4614,7 +4627,7 @@ const AdminPage = () => {
                  </table>
 
                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '12px 0 8px 0' }}>
-                   <div style={{ fontWeight: 700, fontSize: 16 }}>Счет на оплату № {selectedOrder.id} от {new Date(selectedOrder.created_at).toLocaleDateString('ru-RU')}</div>
+                   <div style={{ fontWeight: 700, fontSize: 16 }}>Счет на оплату № {selectedOrder.order_number || selectedOrder.id} от {new Date(selectedOrder.created_at).toLocaleDateString('ru-RU')}</div>
                    <div style={{ fontSize: 10, textAlign: 'right' }}>
                      <div>Валюта: RUB</div>
                      <div style={{ marginTop: 4 }}>
@@ -4640,7 +4653,7 @@ const AdminPage = () => {
                      </tr>
                      <tr>
                        <td style={{ fontWeight: 700, padding: '2px 0' }}>Покупатель:</td>
-                       <td>{selectedOrder.userName}, {selectedOrder.company || ''}, ИНН {selectedOrder.inn || 'N/A'}, {selectedOrder.shippingAddress || 'N/A'}</td>
+                       <td>{selectedOrder.userName || selectedOrder.user_name || 'N/A'}, {selectedOrder.company || 'N/A'}, ИНН {selectedOrder.inn || 'N/A'}, {selectedOrder.shippingAddress || selectedOrder.shipping_address || 'N/A'}</td>
                      </tr>
                    </tbody>
                  </table>
