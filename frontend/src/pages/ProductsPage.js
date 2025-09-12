@@ -302,7 +302,7 @@ const ProductsPage = () => {
           
           // Convert admin categories format to products page format
           const convertedCategories = adminCategories.map(cat => {
-            const existingCategory = defaultCategories.find(c => c.name === cat.name);
+            const existingCategory = contextCategories.find(c => c.name === cat.name);
             return {
               name: cat.name,
               image: existingCategory?.image || "https://images.unsplash.com/photo-1581093458791-9d42e30754c4?w=400&h=300&fit=crop",
@@ -311,8 +311,8 @@ const ProductsPage = () => {
             };
           });
           
-          // Merge with default categories to ensure all are available
-          const mergedCategories = [...defaultCategories];
+          // Merge with context categories to ensure all are available
+          const mergedCategories = [...contextCategories];
           
           // Add admin categories that don't exist in defaults
           adminCategories.forEach(adminCat => {
@@ -330,13 +330,13 @@ const ProductsPage = () => {
           // console.log('Categories loaded:', mergedCategories); // Commented out to reduce console spam
           setCategories(mergedCategories);
         } else {
-          // console.log('No admin categories found in localStorage, using defaults'); // Commented out to reduce console spam
-          setCategories(defaultCategories);
+          // console.log('No admin categories found in localStorage, using context categories'); // Commented out to reduce console spam
+          setCategories(contextCategories);
         }
       } catch (error) {
         console.error('Failed to load categories from localStorage:', error);
-        // console.log('Falling back to default categories'); // Commented out to reduce console spam
-        setCategories(defaultCategories);
+        // console.log('Falling back to context categories'); // Commented out to reduce console spam
+        setCategories(contextCategories);
       }
     };
 
