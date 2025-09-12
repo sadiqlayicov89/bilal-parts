@@ -549,37 +549,56 @@ export class SupabaseService {
     try {
       console.log('Fetching all orders for admin...');
       
+      // First try to get orders with basic info
       const { data, error } = await supabase
         .from('orders')
-        .select(`
-          *,
-          order_items(
-            *,
-            product:products(*)
-          ),
-          user:profiles(
-            id, first_name, last_name, email, phone, company_name, country, city
-          )
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
       
       if (error) {
-        console.error('Error fetching orders:', error);
+        console.error('SupabaseService: Error fetching orders:', error);
         throw error;
       }
       
+      console.log('SupabaseService: Fetched orders:', data?.length || 0);
+      
+      // Then get order items separately to avoid complex joins
+      const ordersWithItems = await Promise.all((data || []).map(async (order) => {
+        try {
+          const { data: orderItems, error: itemsError } = await supabase
+            .from('order_items')
+            .select(`
+              *,
+              product:products(*)
+            `)
+            .eq('order_id', order.id);
+          
+          if (itemsError) {
+            console.error('Error fetching order items for order', order.id, ':', itemsError);
+            return { ...order, items: [] };
+          }
+          
+          return { ...order, items: orderItems || [] };
+        } catch (itemError) {
+          console.error('Error processing order items for order', order.id, ':', itemError);
+          return { ...order, items: [] };
+        }
+      }));
+      
+      console.log('SupabaseService: Processed orders with items:', ordersWithItems.length);
+      
       // Transform the data to match expected format
-      const transformedData = (data || []).map(order => {
-        console.log('Processing order:', order.id, 'order_items:', order.order_items, 'user:', order.user);
+      const transformedData = ordersWithItems.map(order => {
+        console.log('Processing order:', order.id, 'items:', order.items?.length || 0);
         return {
           ...order,
           // Add user information
-          userName: order.user ? `${order.user.first_name || ''} ${order.user.last_name || ''}`.trim() : order.user_name || 'N/A',
-          userEmail: order.user?.email || order.user_email || 'N/A',
-          company: order.user?.company_name || order.company || 'N/A',
-          country: order.user?.country || 'N/A',
-          city: order.user?.city || 'N/A',
-          items: (order.order_items || []).map(item => ({
+          userName: order.user_name || 'N/A',
+          userEmail: order.user_email || 'N/A',
+          company: order.company || 'N/A',
+          country: order.country || 'N/A',
+          city: order.city || 'N/A',
+          items: (order.items || []).map(item => ({
             ...item,
             name: item.product?.name || 'Unknown Product',
             sku: item.product?.sku || 'N/A',
