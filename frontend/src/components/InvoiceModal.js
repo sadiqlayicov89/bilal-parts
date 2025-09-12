@@ -15,6 +15,9 @@ const InvoiceModal = ({ isOpen, onClose, orderData, cartItems, invoiceNumber: pr
   const { userDiscount, user } = useAuth();
   const { clearCart } = useCart();
   const { toast } = useToast();
+  
+  // Get user metadata
+  const userMeta = user?.user_metadata || {};
 
   // Calculate totals with user discount
   const getInvoiceTotals = () => {
