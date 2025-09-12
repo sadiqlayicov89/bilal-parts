@@ -1,0 +1,17 @@
+warning: in the working copy of 'frontend/src/components/InvoiceModal.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/components/cart/CartModal.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/pages/CartPage.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/pages/MyOrdersPage.js', LF will be replaced by CRLF the next time Git touches it
+frontend/public/products_template.csv
+frontend/public/products_template_clean.csv
+frontend/public/products_template_excel.csv
+frontend/public/products_template_excel.xlsx
+frontend/public/products_template_fixed.csv
+frontend/public/products_template_sadiq_fixed.csv
+frontend/public/products_template_tab.txt
+frontend/public/products_test.csv
+frontend/public/set-discount.html
+frontend/src/components/InvoiceModal.js
+frontend/src/components/cart/CartModal.js
+frontend/src/pages/CartPage.js
+frontend/src/pages/MyOrdersPage.js

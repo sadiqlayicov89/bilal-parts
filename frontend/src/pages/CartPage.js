@@ -117,7 +117,7 @@ const CartPage = () => {
                     <div className="flex space-x-4">
                       <div className="flex-shrink-0">
                         <img
-                          src={item.product.images?.[0] || '/placeholder-product.jpg'}
+                          src={item.product.images?.[0] || 'https://via.placeholder.com/96x96?text=No+Image'}
                           alt={item.product.name}
                           className="w-24 h-24 object-cover rounded-lg"
                         />

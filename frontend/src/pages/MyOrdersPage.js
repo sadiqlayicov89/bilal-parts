@@ -13,6 +13,7 @@ import SupabaseService from '../services/supabaseService';
 
 const MyOrdersPage = () => {
   const { user, userDiscount } = useAuth();
+  const userMeta = (user && user.user_metadata) || {};
   const { getUserOrders } = useOrders();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -91,7 +92,7 @@ const MyOrdersPage = () => {
           </tr>
           <tr>
             <td class="bold">Покупатель:</td>
-            <td>${user?.firstName || 'Admin'} ${user?.lastName || 'User'}, ${user?.company_name || ''}, ИНН ${user?.vat_number || 'N/A'}, ${selectedOrder.shippingAddress || 'N/A'}</td>
+            <td>${userMeta.first_name || user?.first_name || 'N/A'} ${userMeta.last_name || user?.last_name || ''}, ${userMeta.company_name || 'N/A'}, ИНН ${userMeta.vat_number || 'N/A'}, ${selectedOrder.shippingAddress || userMeta.address || 'N/A'}</td>
           </tr>
         </table>
 
@@ -546,7 +547,7 @@ const MyOrdersPage = () => {
                   </tr>
                   <tr>
                     <td style={{ fontWeight: 700, padding: '2px 0' }}>Покупатель:</td>
-                    <td>{user?.firstName || 'Admin'} {user?.lastName || 'User'}, {user?.company_name || ''}, ИНН {user?.vat_number || 'N/A'}, {selectedOrder.shippingAddress || 'N/A'}</td>
+                    <td>{userMeta.first_name || user?.first_name || 'N/A'} {userMeta.last_name || user?.last_name || ''}, {userMeta.company_name || 'N/A'}, ИНН {userMeta.vat_number || 'N/A'}, {selectedOrder.shippingAddress || userMeta.address || 'N/A'}</td>
                   </tr>
                 </tbody>
               </table>

@@ -178,11 +178,11 @@ const CartModal = ({ children }) => {
                       <div key={item.id} className="flex space-x-3 p-2 border rounded-lg">
                       <div className="flex-shrink-0">
                         <img
-                          src={item.product.images?.[0] || '/placeholder-product.jpg'}
+                          src={item.product.images?.[0] || 'https://via.placeholder.com/64x64?text=No+Image'}
                           alt={item.product.name}
                           className="w-16 h-16 object-cover rounded-md"
                           onError={(e) => {
-                            e.target.src = '/placeholder-product.jpg';
+                            e.target.src = 'https://via.placeholder.com/64x64?text=No+Image';
                           }}
                         />
                       </div>
