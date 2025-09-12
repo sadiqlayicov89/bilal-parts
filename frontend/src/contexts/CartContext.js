@@ -121,6 +121,9 @@ export const CartProvider = ({ children }) => {
     try {
       setLoading(true);
       
+      // Fetch product details first
+      const product = await SupabaseService.getProductById(productId);
+      
       // Add to Supabase cart
       console.log('Adding product to Supabase cart');
       const result = await SupabaseService.addToCart(user.id, productId, quantity);
