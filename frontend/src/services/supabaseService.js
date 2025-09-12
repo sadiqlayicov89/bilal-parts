@@ -1075,6 +1075,33 @@ export class SupabaseService {
       throw error;
     }
   }
+
+  static async updatePaymentStatus(orderId, paymentStatus) {
+    try {
+      console.log('SupabaseService: Updating payment status for order:', orderId, 'to:', paymentStatus);
+      
+      const { data, error } = await supabase
+        .from('orders')
+        .update({ 
+          payment_status: paymentStatus,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', orderId)
+        .select()
+        .maybeSingle();
+      
+      if (error) {
+        console.error('SupabaseService: Error updating payment status:', error);
+        throw error;
+      }
+      
+      console.log('SupabaseService: Payment status updated:', data);
+      return data;
+    } catch (error) {
+      console.error('SupabaseService: Error updating payment status:', error);
+      throw error;
+    }
+  }
 }
 
 export default SupabaseService;
