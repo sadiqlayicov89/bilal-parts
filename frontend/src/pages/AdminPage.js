@@ -349,6 +349,25 @@ const AdminPage = () => {
         await SupabaseService.createNotification(notificationData);
 
         // Dispatch event for customer notification
+        const customerNotification = {
+          id: Date.now(),
+          type: 'order',
+          title: 'Sifariş Status Yeniləndi',
+          message: `Sizin #${order.order_number || orderId} nömrəli sifarişinizin statusu "${newStatus}" olaraq dəyişdi`,
+          data: {
+            order_id: orderId,
+            order_number: order.order_number || orderId,
+            new_status: newStatus,
+            status_text: {
+              'pending': 'Gözləyir',
+              'confirmed': 'Təsdiqləndi',
+              'processing': 'Hazırlanır',
+              'shipped': 'Göndərildi', 
+              'delivered': 'Çatdırıldı',
+              'cancelled': 'Ləğv Edildi'
+            }[newStatus] || newStatus
+          }
+        };
         window.dispatchEvent(new CustomEvent('newCustomerNotification', { detail: customerNotification }));
       }
       
