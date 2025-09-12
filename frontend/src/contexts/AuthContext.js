@@ -214,10 +214,25 @@ export const AuthProvider = ({ children }) => {
       }
 
       // Update local user state
-      setUser(prev => ({
-        ...prev,
+      const updatedUser = {
+        ...user,
         ...profileData
-      }));
+      };
+      setUser(updatedUser);
+
+      // Also update localStorage to persist changes
+      const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+      const userIndex = registeredUsers.findIndex(u => u.id === user.id);
+      if (userIndex !== -1) {
+        registeredUsers[userIndex] = {
+          ...registeredUsers[userIndex],
+          ...profileData
+        };
+        localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
+      }
+
+      // Update current user in localStorage
+      localStorage.setItem('currentUser', JSON.stringify(updatedUser));
 
       return { success: true };
     } catch (error) {

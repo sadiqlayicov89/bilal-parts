@@ -30,17 +30,19 @@ const ProfileSettingsPage = () => {
 
   useEffect(() => {
     if (user) {
+      // Get user metadata from Supabase auth
+      const userMeta = user.user_metadata || {};
       setFormData({
-        first_name: user.first_name || '',
-        last_name: user.last_name || '',
+        first_name: user.first_name || userMeta.first_name || '',
+        last_name: user.last_name || userMeta.last_name || '',
         email: user.email || '',
-        phone: user.phone || '',
-        company: user.company || '',
-        inn: user.inn || '',
-        address: user.address || '',
-        city: user.city || '',
-        country: user.country || '',
-        postal_code: user.postal_code || ''
+        phone: user.phone || userMeta.phone || '',
+        company: user.company || userMeta.company_name || '',
+        inn: user.inn || userMeta.vat_number || '',
+        address: user.address || userMeta.address || '',
+        city: user.city || userMeta.city || '',
+        country: user.country || userMeta.country || '',
+        postal_code: user.postal_code || userMeta.postal_code || ''
       });
     }
   }, [user]);
