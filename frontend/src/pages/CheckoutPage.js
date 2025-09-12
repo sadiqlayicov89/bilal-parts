@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -9,7 +9,7 @@ import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Textarea } from '../components/ui/textarea';
 import InvoiceModal from '../components/InvoiceModal';
-import { ArrowLeft, CreditCard, Truck } from 'lucide-react';
+import { ArrowLeft, CreditCard, Truck, Building2, CreditCard as CardIcon } from 'lucide-react';
 import { getProductPriceInfo, formatPrice } from '../utils/priceUtils';
 import { Badge } from '../components/ui/badge';
 
@@ -20,6 +20,42 @@ const CheckoutPage = () => {
   const { createOrder } = useOrders();
   const [showInvoice, setShowInvoice] = useState(false);
   const [invoiceNumber, setInvoiceNumber] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('bank_transfer');
+  
+  // Form state
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    address: '',
+    company: '',
+    inn: ''
+  });
+
+  // Auto-fill form data from user profile
+  useEffect(() => {
+    if (user) {
+      const userMeta = user.user_metadata || {};
+      setFormData({
+        firstName: user.first_name || userMeta.first_name || '',
+        lastName: user.last_name || userMeta.last_name || '',
+        email: user.email || '',
+        phone: user.phone || userMeta.phone || '',
+        address: user.address || userMeta.address || '',
+        company: user.company || userMeta.company_name || '',
+        inn: user.inn || userMeta.vat_number || ''
+      });
+    }
+  }, [user]);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
   const handleCheckout = async () => {
     const timestamp = Date.now();
@@ -36,10 +72,13 @@ const CheckoutPage = () => {
         price: item.product.price
       })),
       total: cartTotal,
-      shippingAddress: user?.address || 'N/A',
-      paymentMethod: 'Bank Transfer',
-      company: user?.company || '',
-      inn: user?.inn || ''
+      shippingAddress: formData.address || 'N/A',
+      paymentMethod: paymentMethod === 'bank_transfer' ? 'Bank Transfer' : 'P2P Card to Card',
+      company: formData.company || '',
+      inn: formData.inn || '',
+      user_name: `${formData.firstName} ${formData.lastName}`.trim(),
+      user_email: formData.email,
+      phone: formData.phone
     };
 
     const result = await createOrder(orderData);
@@ -198,12 +237,41 @@ const CheckoutPage = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
+                  {/* Payment Method Selection */}
+                  <div>
+                    <Label className="text-base font-semibold">Ödəniş Metodu</Label>
+                    <div className="grid grid-cols-2 gap-4 mt-2">
+                      <Button
+                        type="button"
+                        variant={paymentMethod === 'bank_transfer' ? 'default' : 'outline'}
+                        onClick={() => setPaymentMethod('bank_transfer')}
+                        className="h-auto p-4 flex flex-col items-center space-y-2"
+                      >
+                        <Building2 className="w-6 h-6" />
+                        <span>Bank Transfer</span>
+                        <span className="text-xs text-gray-500">Hesabdan ödəniş</span>
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={paymentMethod === 'p2p' ? 'default' : 'outline'}
+                        onClick={() => setPaymentMethod('p2p')}
+                        className="h-auto p-4 flex flex-col items-center space-y-2"
+                      >
+                        <CardIcon className="w-6 h-6" />
+                        <span>P2P Card to Card</span>
+                        <span className="text-xs text-gray-500">Kartdan karta</span>
+                      </Button>
+                    </div>
+                  </div>
+
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="firstName">First Name</Label>
                       <Input
                         id="firstName"
-                        defaultValue={user?.first_name || ''}
+                        name="firstName"
+                        value={formData.firstName}
+                        onChange={handleInputChange}
                         placeholder="Enter first name"
                       />
                     </div>
@@ -211,7 +279,9 @@ const CheckoutPage = () => {
                       <Label htmlFor="lastName">Last Name</Label>
                       <Input
                         id="lastName"
-                        defaultValue={user?.last_name || ''}
+                        name="lastName"
+                        value={formData.lastName}
+                        onChange={handleInputChange}
                         placeholder="Enter last name"
                       />
                     </div>
@@ -221,8 +291,10 @@ const CheckoutPage = () => {
                     <Label htmlFor="email">Email</Label>
                     <Input
                       id="email"
+                      name="email"
                       type="email"
-                      defaultValue={user?.email || ''}
+                      value={formData.email}
+                      onChange={handleInputChange}
                       placeholder="Enter email"
                     />
                   </div>
@@ -231,7 +303,9 @@ const CheckoutPage = () => {
                     <Label htmlFor="phone">Phone</Label>
                     <Input
                       id="phone"
-                      defaultValue={user?.phone || ''}
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleInputChange}
                       placeholder="Enter phone number"
                     />
                   </div>
@@ -240,7 +314,9 @@ const CheckoutPage = () => {
                     <Label htmlFor="address">Address</Label>
                     <Textarea
                       id="address"
-                      defaultValue={user?.address || ''}
+                      name="address"
+                      value={formData.address}
+                      onChange={handleInputChange}
                       placeholder="Enter full address"
                       rows={3}
                     />
@@ -250,7 +326,9 @@ const CheckoutPage = () => {
                     <Label htmlFor="company">Company (Optional)</Label>
                     <Input
                       id="company"
-                      defaultValue={user?.company || ''}
+                      name="company"
+                      value={formData.company}
+                      onChange={handleInputChange}
                       placeholder="Enter company name"
                     />
                   </div>
@@ -259,7 +337,9 @@ const CheckoutPage = () => {
                     <Label htmlFor="inn">INN (Tax ID)</Label>
                     <Input
                       id="inn"
-                      defaultValue={user?.inn || ''}
+                      name="inn"
+                      value={formData.inn}
+                      onChange={handleInputChange}
                       placeholder="Enter INN number"
                       maxLength="12"
                     />

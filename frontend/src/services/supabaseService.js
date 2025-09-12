@@ -622,14 +622,21 @@ export class SupabaseService {
 
   static async updateOrderStatus(orderId, status) {
     try {
+      console.log('SupabaseService: Updating order status - orderId:', orderId, 'status:', status);
+      
       const { data, error } = await supabase
         .from('orders')
         .update({ status, updated_at: new Date().toISOString() })
         .eq('id', orderId)
         .select()
-        .single();
+        .maybeSingle();
       
-      if (error) throw error;
+      if (error) {
+        console.error('SupabaseService: Error updating order status:', error);
+        throw error;
+      }
+      
+      console.log('SupabaseService: Order status updated successfully:', data);
       return data;
     } catch (error) {
       console.error('SupabaseService: Error updating order status:', error);

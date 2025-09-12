@@ -305,22 +305,29 @@ const AdminPage = () => {
       console.log('Updating order status in Supabase:', orderId, newStatus);
       
       // Update order status in Supabase
-      await SupabaseService.updateOrderStatus(orderId, newStatus);
+      const result = await SupabaseService.updateOrderStatus(orderId, newStatus);
       
-      // Refresh orders from Supabase
-      await fetchOrders();
-      
-      // Update selected order if it's currently open in modal
-      if (selectedOrder && selectedOrder.id === orderId) {
-        setSelectedOrder({...selectedOrder, status: newStatus});
-      }
+      if (result) {
+        // Refresh orders from Supabase
+        await fetchOrders();
+        
+        // Update selected order if it's currently open in modal
+        if (selectedOrder && selectedOrder.id === orderId) {
+          setSelectedOrder({...selectedOrder, status: newStatus});
+        }
 
-      // Create customer notification in Supabase
-      const order = orders.find(o => o.id === orderId);
-      if (order) {
-        const notificationData = {
-          user_id: order.user_id,
-          type: 'order',
+        // Show success message
+        toast({
+          title: "Status Updated",
+          description: `Order status updated to ${newStatus}`,
+        });
+
+        // Create customer notification in Supabase
+        const order = orders.find(o => o.id === orderId);
+        if (order) {
+          const notificationData = {
+            user_id: order.user_id,
+            type: 'order',
           title: 'Sifariş Status Yeniləndi',
           message: `Sizin #${order.order_number || orderId} nömrəli sifarişinizin statusu "${newStatus}" olaraq dəyişdi`,
           data: {
@@ -350,9 +357,10 @@ const AdminPage = () => {
         description: `Sifariş statusu "${newStatus}" olaraq dəyişdirildi`,
       });
     } catch (error) {
+      console.error('Error updating order status:', error);
       toast({
         title: "Xəta",
-        description: "Status dəyişdirilə bilmədi",
+        description: `Status dəyişdirilə bilmədi: ${error.message || 'Naməlum xəta'}`,
         variant: "destructive"
       });
     }
@@ -3067,176 +3075,118 @@ const AdminPage = () => {
                             Heç bir sifariş yoxdur
                           </div>
                         ) : (
-                          orders
-                            .filter(order => {
-                              const matchesSearch = orderSearchTerm === "" || 
-                                order.id.toLowerCase().includes(orderSearchTerm.toLowerCase()) ||
-                                order.userName.toLowerCase().includes(orderSearchTerm.toLowerCase()) ||
-                                (order.company && order.company.toLowerCase().includes(orderSearchTerm.toLowerCase()));
-                              const matchesStatus = orderStatusFilter === "all" || order.status === orderStatusFilter;
-                              return matchesSearch && matchesStatus;
-                            })
-                            .map((order) => {
-                              console.log('Rendering order:', order.id, 'items:', order.items);
-                              return (
-                              <Card 
-                                key={order.id} 
-                                className="hover:shadow-lg transition-shadow cursor-pointer"
-                                onClick={() => {
-                                  setSelectedOrder(order);
-                                  setShowOrderModal(true);
-                                }}
-                              >
-                                <CardContent className="p-6">
-                                  <div className="flex justify-between items-center">
-                                    {/* Left side - Order info */}
-                                    <div className="flex items-center space-x-6">
-                                      <div className="flex items-center space-x-3">
-                                        <ShoppingCart className="w-5 h-5 text-gray-500" />
-                                        <div>
-                                          <h3 className="font-semibold text-gray-900">#{order.order_number || order.id}</h3>
-                                          <p className="text-sm text-gray-500">
-                                            {new Date(order.created_at).toLocaleDateString('az-AZ', {
-                                              year: 'numeric',
-                                              month: 'short',
-                                              day: 'numeric'
-                                            })}
-                                          </p>
-                                        </div>
-                                      </div>
-                                      
-                                      {/* Customer info */}
-                                      <div>
-                                        <div className="font-medium text-gray-900">
-                                          {order.user_name || order.userName || 'N/A'}
-                                        </div>
-                                        <div className="text-sm text-gray-500">
-                                          {order.company || 'N/A'}
-                                        </div>
-                                        <div className="text-sm text-gray-500">
-                                          {order.userEmail || 'N/A'}
-                                        </div>
-                                      </div>
-                                      
-                                      {/* Location info */}
-                                      <div>
-                                        <div className="text-sm text-gray-500">
-                                          {order.country || 'N/A'}
-                                        </div>
-                                        <div className="text-sm text-gray-500">
-                                          {order.city || 'N/A'}
-                                        </div>
-                                      </div>
-                                      
-                                      {/* Status */}
-                                      <Badge className={
-                                        order.status === 'delivered' ? 'bg-green-100 text-green-800' :
-                                        order.status === 'confirmed' ? 'bg-blue-100 text-blue-800' :
-                                        order.status === 'processing' ? 'bg-yellow-100 text-yellow-800' :
-                                        order.status === 'shipped' ? 'bg-purple-100 text-purple-800' :
-                                        order.status === 'cancelled' ? 'bg-red-100 text-red-800' :
-                                        'bg-gray-100 text-gray-800'
-                                      }>
-                                        {
-                                          order.status === 'pending' ? 'Gözləyir' :
-                                          order.status === 'confirmed' ? 'Təsdiqləndi' :
-                                          order.status === 'processing' ? 'İşlənir' :
-                                          order.status === 'shipped' ? 'Göndərildi' :
-                                          order.status === 'delivered' ? 'Çatdırıldı' :
-                                          order.status === 'cancelled' ? 'Ləğv edildi' :
-                                          'Bilinmir'
-                                        }
-                                      </Badge>
-                                    </div>
-                                    
-                                    {/* Right side - Total and actions */}
-                                    <div className="flex items-center space-x-4">
-                                      {/* Total amount */}
-                                      <div className="text-right">
-                                        <div className="text-lg font-bold text-gray-900">
-                                          {formatPrice(order.total)}
-                                        </div>
-                                        {order.discountPercentage > 0 && (
-                                          <div className="text-xs text-red-600">
-                                            -{order.discountPercentage}% endirim
+                          <div className="overflow-x-auto">
+                            <table className="w-full border-collapse border border-gray-300">
+                              <thead>
+                                <tr className="bg-gray-50">
+                                  <th className="border border-gray-300 px-4 py-2 text-left">Sifariş №</th>
+                                  <th className="border border-gray-300 px-4 py-2 text-left">Ad, Soyad</th>
+                                  <th className="border border-gray-300 px-4 py-2 text-left">Firma</th>
+                                  <th className="border border-gray-300 px-4 py-2 text-left">İNN</th>
+                                  <th className="border border-gray-300 px-4 py-2 text-left">Tarix</th>
+                                  <th className="border border-gray-300 px-4 py-2 text-left">Məbləğ</th>
+                                  <th className="border border-gray-300 px-4 py-2 text-left">Status</th>
+                                  <th className="border border-gray-300 px-4 py-2 text-left">Əməliyyatlar</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {orders
+                                  .filter(order => {
+                                    const matchesSearch = orderSearchTerm === "" || 
+                                      order.id.toLowerCase().includes(orderSearchTerm.toLowerCase()) ||
+                                      order.userName.toLowerCase().includes(orderSearchTerm.toLowerCase()) ||
+                                      (order.company && order.company.toLowerCase().includes(orderSearchTerm.toLowerCase()));
+                                    const matchesStatus = orderStatusFilter === "all" || order.status === orderStatusFilter;
+                                    return matchesSearch && matchesStatus;
+                                  })
+                                  .map((order) => {
+                                    console.log('Rendering order:', order.id, 'items:', order.items);
+                                    return (
+                                      <tr 
+                                        key={order.id} 
+                                        className="hover:bg-gray-50 cursor-pointer"
+                                        onClick={() => {
+                                          setSelectedOrder(order);
+                                          setShowOrderModal(true);
+                                        }}
+                                      >
+                                        <td className="border border-gray-300 px-4 py-2">
+                                          <div className="flex items-center space-x-2">
+                                            <ShoppingCart className="w-4 h-4 text-gray-500" />
+                                            <span className="font-medium">#{order.order_number || order.id}</span>
                                           </div>
-                                        )}
-                                        <div className="text-xs text-gray-500">
-                                          {order.items?.length || 0} məhsul
-                                        </div>
-                                      </div>
-                                      
-                                      {/* Quick status change + edit/delete */}
-                                      <div className="flex flex-col space-y-1">
-                                        {order.status === 'pending' && (
-                                          <Button
-                                            size="sm"
-                                            onClick={(e) => {
-                                              e.stopPropagation();
-                                              handleOrderStatusChange(order.id, 'confirmed');
-                                            }}
-                                            className="bg-green-600 hover:bg-green-700 text-white"
-                                          >
-                                            <CheckCircle className="w-4 h-4 mr-1" />
-                                            Təsdiq Et
-                                          </Button>
-                                        )}
-                                        <div className="flex space-x-2">
-                                          <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={(e) => {
-                                              e.stopPropagation();
-                                              setOrderEditing(order);
-                                              setOrderEditForm({
-                                                user_name: order.user_name || order.userName || '',
-                                                company: order.company || '',
-                                                inn: order.inn || '',
-                                                shipping_address: order.shipping_address || order.shippingAddress || '',
-                                                status: order.status || 'pending'
-                                              });
-                                              setEditOrderModal(true);
-                                            }}
-                                          >
-                                            Dəyiş
-                                          </Button>
-                                          <Button
-                                            variant="destructive"
-                                            size="sm"
-                                            onClick={async (e) => {
-                                              e.stopPropagation();
-                                              try {
-                                                await SupabaseService.deleteOrder(order.id);
-                                                toast({ title: 'Silindi', description: `Sifariş #${order.order_number || order.id} silindi` });
-                                                await fetchOrders();
-                                              } catch (err) {
-                                                console.error(err);
-                                                toast({ title: 'Xəta', description: 'Silmək mümkün olmadı', variant: 'destructive' });
-                                              }
-                                            }}
-                                          >
-                                            Sil
-                                          </Button>
-                                        </div>
-                                        <Button
-                                          variant="outline"
-                                          size="sm"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            setSelectedOrder(order);
-                                            setShowOrderModal(true);
-                                          }}
-                                        >
-                                          <Eye className="w-4 h-4 mr-1" />
-                                          Detallar
-                                        </Button>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </CardContent>
-                              </Card>
-                              );
-                            })
+                                        </td>
+                                        <td className="border border-gray-300 px-4 py-2">
+                                          <div className="font-medium">{order.user_name || order.userName || 'N/A'}</div>
+                                          <div className="text-sm text-gray-500">{order.userEmail || 'N/A'}</div>
+                                        </td>
+                                        <td className="border border-gray-300 px-4 py-2">{order.company || 'N/A'}</td>
+                                        <td className="border border-gray-300 px-4 py-2">{order.inn || 'N/A'}</td>
+                                        <td className="border border-gray-300 px-4 py-2">
+                                          {new Date(order.created_at).toLocaleDateString('az-AZ', {
+                                            year: 'numeric',
+                                            month: 'short',
+                                            day: 'numeric'
+                                          })}
+                                        </td>
+                                        <td className="border border-gray-300 px-4 py-2 font-medium">
+                                          {order.total ? `${order.total} ₼` : 'N/A'}
+                                        </td>
+                                        <td className="border border-gray-300 px-4 py-2">
+                                          {getStatusBadge(order.status)}
+                                        </td>
+                                        <td className="border border-gray-300 px-4 py-2">
+                                          <div className="flex space-x-2" onClick={(e) => e.stopPropagation()}>
+                                            {order.status === 'pending' && (
+                                              <Button
+                                                size="sm"
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  handleOrderStatusChange(order.id, 'confirmed');
+                                                }}
+                                                className="bg-green-600 hover:bg-green-700 text-white"
+                                              >
+                                                <CheckCircle className="w-4 h-4 mr-1" />
+                                                Təsdiq Et
+                                              </Button>
+                                            )}
+                                            <Button
+                                              variant="outline"
+                                              size="sm"
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                setOrderEditing(order);
+                                                setOrderEditForm({
+                                                  user_name: order.user_name || order.userName || '',
+                                                  company: order.company || '',
+                                                  inn: order.inn || '',
+                                                  shipping_address: order.shipping_address || order.shippingAddress || '',
+                                                  status: order.status || 'pending'
+                                                });
+                                                setEditOrderModal(true);
+                                              }}
+                                            >
+                                              Dəyiş
+                                            </Button>
+                                            <Button
+                                              variant="outline"
+                                              size="sm"
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                setSelectedOrder(order);
+                                                setShowOrderModal(true);
+                                              }}
+                                            >
+                                              Detallar
+                                            </Button>
+                                          </div>
+                                        </td>
+                                      </tr>
+                                    );
+                                  })}
+                              </tbody>
+                            </table>
+                          </div>
                         )}
                       </div>
                     </CardContent>
