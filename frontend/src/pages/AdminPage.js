@@ -34,15 +34,6 @@ const AdminPage = () => {
   const [editingCategory, setEditingCategory] = useState(null);
   const [showCategoryForm, setShowCategoryForm] = useState(false);
 
-  // Payment form state
-  const [paymentFormData, setPaymentFormData] = useState({
-    order_id: '',
-    amount: '',
-    payment_method: '',
-    status: 'pending'
-  });
-  const [showPaymentForm, setShowPaymentForm] = useState(false);
-
   useEffect(() => {
     if (user) {
       loadCategories();
