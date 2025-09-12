@@ -341,7 +341,7 @@ const AdminPage = () => {
             'shipped': 'Göndərildi', 
             'delivered': 'Çatdırıldı',
             'cancelled': 'Ləğv Edildi'
-            }[newStatus] || newStatus
+          }[newStatus] || newStatus
           }
         };
 
