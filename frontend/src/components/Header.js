@@ -35,7 +35,7 @@ const Header = () => {
   const { user, isAuthenticated, logout, isAdmin } = useAuth();
   const { cartCount, getCartCount } = useCart();
   const { wishlistCount, getWishlistCount } = useWishlist();
-  const { categories } = useCategories();
+  const { categories: contextCategories } = useCategories();
 
   // Update counts when user logs in
   useEffect(() => {
@@ -81,16 +81,6 @@ const Header = () => {
     };
   }, [isAuthenticated, user]);
 
-  // Convert categories from context to header format
-  useEffect(() => {
-    if (categories && categories.length > 0) {
-      const convertedCategories = categories.map(cat => ({
-        name: cat.name,
-        subcategories: cat.subcategories ? cat.subcategories.map(sub => sub.name) : []
-      }));
-      setProductCategories(convertedCategories);
-    }
-  }, [categories]);
 
   // Close search bar when clicking outside
   useEffect(() => {
@@ -107,7 +97,6 @@ const Header = () => {
     };
   }, [isSearchOpen]);
 
-  const { categories: contextCategories } = useCategories();
   const [productCategories, setProductCategories] = useState([]);
 
   // Update productCategories when contextCategories change
