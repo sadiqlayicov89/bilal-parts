@@ -1001,6 +1001,7 @@ export class SupabaseService {
       // Transform order_items to items for consistency
       const transformedOrders = data?.map(order => ({
         ...order,
+        shippingAddress: order.shipping_address, // Map shipping_address to shippingAddress
         items: order.order_items?.map(item => ({
           id: item.id,
           name: item.products?.name || 'Unknown Product',

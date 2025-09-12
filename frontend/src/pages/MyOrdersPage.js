@@ -92,7 +92,7 @@ const MyOrdersPage = () => {
           </tr>
           <tr>
             <td class="bold">Покупатель:</td>
-            <td>${userMeta.first_name || user?.first_name || 'N/A'} ${userMeta.last_name || user?.last_name || ''}, ${userMeta.company_name || 'N/A'}, ИНН ${userMeta.vat_number || 'N/A'}, ${selectedOrder.shippingAddress || userMeta.address || userMeta.city || 'г. Москва, ул. Примерная, д. 123'}</td>
+            <td>${userMeta.first_name || user?.first_name || 'N/A'} ${userMeta.last_name || user?.last_name || ''}, ${userMeta.company_name || 'N/A'}, ИНН ${userMeta.vat_number || 'N/A'}, ${selectedOrder.shippingAddress || selectedOrder.shipping_address || userMeta.address || userMeta.city || 'г. Москва, ул. Примерная, д. 123'}</td>
           </tr>
         </table>
 
@@ -547,7 +547,7 @@ const MyOrdersPage = () => {
                   </tr>
                   <tr>
                     <td style={{ fontWeight: 700, padding: '2px 0' }}>Покупатель:</td>
-                    <td>{userMeta.first_name || user?.first_name || 'N/A'} {userMeta.last_name || user?.last_name || ''}, {userMeta.company_name || 'N/A'}, ИНН {userMeta.vat_number || 'N/A'}, {selectedOrder.shippingAddress || userMeta.address || userMeta.city || 'г. Москва, ул. Примерная, д. 123'}</td>
+                    <td>{userMeta.first_name || user?.first_name || 'N/A'} {userMeta.last_name || user?.last_name || ''}, {userMeta.company_name || 'N/A'}, ИНН {userMeta.vat_number || 'N/A'}, {selectedOrder.shippingAddress || selectedOrder.shipping_address || userMeta.address || userMeta.city || 'г. Москва, ул. Примерная, д. 123'}</td>
                   </tr>
                 </tbody>
               </table>
