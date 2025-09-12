@@ -854,9 +854,10 @@ export class SupabaseService {
         }
         
         console.log('SupabaseService: Added new cart item:', newItem);
+        return { success: true, cartItemId: newItem?.id };
       }
 
-      return { success: true };
+      return { success: true, cartItemId: updatedItem?.id };
     } catch (error) {
       console.error('SupabaseService: Error adding to cart:', error);
       return { success: false, error: error.message || 'Failed to add item to cart' };

@@ -127,18 +127,35 @@ export const CartProvider = ({ children }) => {
       
       if (result.success) {
         // Optimistically update the cart without full reload
-        // Just increment the cart count for better UX
         setCartCount(prev => prev + quantity);
+        
+        // Add item to local cart state immediately for instant UI update
+        const newCartItem = {
+          id: result.cartItemId || Date.now(),
+          user_id: user.id,
+          product_id: productId,
+          quantity: quantity,
+          product: product,
+          created_at: new Date().toISOString()
+        };
+        
+        setCartItems(prev => {
+          const existingItem = prev.find(item => item.product_id === productId);
+          if (existingItem) {
+            return prev.map(item => 
+              item.product_id === productId 
+                ? { ...item, quantity: item.quantity + quantity }
+                : item
+            );
+          } else {
+            return [...prev, newCartItem];
+          }
+        });
         
         toast({
           title: 'Added to Cart',
           description: 'Item has been added to your cart.',
         });
-
-        // Load cart in background without blocking UI
-        setTimeout(() => {
-          loadCart();
-        }, 100);
 
         return { success: true };
       } else {

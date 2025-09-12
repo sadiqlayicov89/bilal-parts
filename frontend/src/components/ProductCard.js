@@ -56,7 +56,7 @@ const ProductCard = ({ product, className = "" }) => {
       // Add a small delay to prevent rapid clicking
       setTimeout(() => {
         setIsAddingToCart(false);
-      }, 1000);
+      }, 300);
     }
   };
 

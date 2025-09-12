@@ -15,7 +15,7 @@ import { Plus, Edit, Trash2, Eye, Bell, CreditCard } from 'lucide-react';
 
 const AdminPage = () => {
   const { user } = useAuth();
-  const { categories, fetchCategories } = useCategories();
+  const { categories, loadCategories } = useCategories();
   const { toast } = useToast();
   
   const [activeTab, setActiveTab] = useState('categories');
@@ -45,7 +45,7 @@ const AdminPage = () => {
 
   useEffect(() => {
     if (user) {
-      fetchCategories();
+      loadCategories();
       fetchOrders();
       fetchNotifications();
     }
@@ -93,7 +93,7 @@ const AdminPage = () => {
         });
         setCategoryFormData({ name: '', description: '', image: '', parent_id: null });
         setShowCategoryForm(false);
-        fetchCategories();
+        loadCategories();
       }
     } catch (error) {
       console.error('Error adding category:', error);
@@ -127,7 +127,7 @@ const AdminPage = () => {
         setCategoryFormData({ name: '', description: '', image: '', parent_id: null });
         setEditingCategory(null);
         setShowCategoryForm(false);
-        fetchCategories();
+        loadCategories();
       }
     } catch (error) {
       console.error('Error updating category:', error);
@@ -150,7 +150,7 @@ const AdminPage = () => {
             title: "Uğurla Silindi",
             description: "Kateqoriya uğurla silindi.",
           });
-          fetchCategories();
+          loadCategories();
         }
       } catch (error) {
         console.error('Error deleting category:', error);
