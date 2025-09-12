@@ -137,7 +137,8 @@ const AdminPage = () => {
     name: '',
     description: '',
     parent_id: null,
-    is_active: true
+    is_active: true,
+    image: ''
   });
 
   // Check if user is admin
@@ -1920,7 +1921,8 @@ const AdminPage = () => {
       name: category.name,
       description: category.description || '',
       parent_id: category.parent_id,
-      is_active: category.is_active
+      is_active: category.is_active,
+      image: category.image || category.image_url || ''
     });
     setEditCategoryModal(true);
   };
@@ -1954,7 +1956,7 @@ const AdminPage = () => {
         slug: categoryFormData.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
         parent_id: parentId,
         is_active: categoryFormData.is_active,
-        image: 'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=400&h=300&fit=crop'
+        image: categoryFormData.image || 'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=400&h=300&fit=crop'
       };
       
       console.log('Category data for Supabase:', categoryData);
@@ -1986,7 +1988,8 @@ const AdminPage = () => {
         name: '',
         description: '',
         parent_id: "main",
-        is_active: true
+        is_active: true,
+        image: ''
       });
     } catch (error) {
       console.error('Error creating category:', error);
@@ -2007,7 +2010,8 @@ const AdminPage = () => {
         name: categoryFormData.name,
         description: categoryFormData.description || '',
         slug: categoryFormData.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
-        is_active: categoryFormData.is_active
+        is_active: categoryFormData.is_active,
+        image: categoryFormData.image || 'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=400&h=300&fit=crop'
       };
       
       console.log('Update data for Supabase:', updateData);
@@ -4536,6 +4540,30 @@ const AdminPage = () => {
                  />
                </div>
                
+               <div className="space-y-2">
+                 <Label htmlFor="add_category_image">Kateqoriya Şəkli (URL)</Label>
+                 <Input
+                   id="add_category_image"
+                   name="image"
+                   value={categoryFormData.image}
+                   onChange={handleCategoryInputChange}
+                   className="focus:ring-blue-500 focus:border-blue-500"
+                   placeholder="Şəkil URL-i daxil edin (məsələn: https://example.com/image.jpg)"
+                 />
+                 {categoryFormData.image && (
+                   <div className="mt-2">
+                     <img 
+                       src={categoryFormData.image} 
+                       alt="Preview" 
+                       className="w-32 h-24 object-cover rounded border"
+                       onError={(e) => {
+                         e.target.style.display = 'none';
+                       }}
+                     />
+                   </div>
+                 )}
+               </div>
+               
                                 <div className="space-y-2">
                    <Label htmlFor="add_category_parent">Ana Kateqoriya</Label>
                    <Select 
@@ -4615,6 +4643,30 @@ const AdminPage = () => {
                    rows={3}
                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                  />
+               </div>
+               
+               <div className="space-y-2">
+                 <Label htmlFor="edit_category_image">Kateqoriya Şəkli (URL)</Label>
+                 <Input
+                   id="edit_category_image"
+                   name="image"
+                   value={categoryFormData.image}
+                   onChange={handleCategoryInputChange}
+                   className="focus:ring-blue-500 focus:border-blue-500"
+                   placeholder="Şəkil URL-i daxil edin (məsələn: https://example.com/image.jpg)"
+                 />
+                 {categoryFormData.image && (
+                   <div className="mt-2">
+                     <img 
+                       src={categoryFormData.image} 
+                       alt="Preview" 
+                       className="w-32 h-24 object-cover rounded border"
+                       onError={(e) => {
+                         e.target.style.display = 'none';
+                       }}
+                     />
+                   </div>
+                 )}
                </div>
                
                <div className="flex items-center space-x-2">

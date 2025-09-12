@@ -1,0 +1,5 @@
+[33m462e355[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m Fix checkout 403 loops; use Supabase user_metadata for buyer fields on invoice/orders; replace broken asset URLs; update placeholders in cart views
+[33m83d4cda[m Admin Orders: add edit/delete functionality + service methods (updateOrder/deleteOrder); add Edit Order modal; improve list actions
+[33m809bdb9[m Fix admin panel order details and customer information display
+[33mee97ead[m Fix remaining critical issues: cart updated_at, My Orders data, customer info, notifications
+[33m06ca87c[m Fix My Orders page and cart foreign key issues

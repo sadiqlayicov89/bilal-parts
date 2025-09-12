@@ -123,18 +123,29 @@ export const CartProvider = ({ children }) => {
       
       // Add to Supabase cart
       console.log('Adding product to Supabase cart');
-      await SupabaseService.addToCart(user.id, productId, quantity);
+      const result = await SupabaseService.addToCart(user.id, productId, quantity);
       
-      // Reload cart to get updated data
-      await loadCart();
+      if (result.success) {
+        // Optimistically update the cart without full reload
+        // Just increment the cart count for better UX
+        setCartCount(prev => prev + quantity);
         
-      toast({
-        title: 'Added to Cart',
-        description: 'Item has been added to your cart.',
-      });
+        toast({
+          title: 'Added to Cart',
+          description: 'Item has been added to your cart.',
+        });
 
-      return { success: true };
+        // Load cart in background without blocking UI
+        setTimeout(() => {
+          loadCart();
+        }, 100);
+
+        return { success: true };
+      } else {
+        throw new Error(result.error || 'Failed to add item to cart');
+      }
     } catch (error) {
+      console.error('Add to cart error:', error);
       const message = error.response?.data?.message || error.message || 'Failed to add item to cart';
       toast({
         title: 'Error',

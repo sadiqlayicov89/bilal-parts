@@ -13,6 +13,7 @@ import { getProductPriceInfo, formatPrice } from '../utils/priceUtils';
 const ProductCard = ({ product, className = "" }) => {
   const [isInWishlist, setIsInWishlist] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
   const navigate = useNavigate();
   const { addToCart, loading: cartLoading } = useCart();
   const { toggleWishlist, checkInWishlist, loading: wishlistLoading } = useWishlist();
@@ -39,11 +40,24 @@ const ProductCard = ({ product, className = "" }) => {
     e.preventDefault();
     e.stopPropagation();
     
-    if (!isAuthenticated) {
+    if (!isAuthenticated || isAddingToCart) {
       return;
     }
     
-    await addToCart(product.id, 1);
+    setIsAddingToCart(true);
+    try {
+      const result = await addToCart(product.id, 1);
+      if (!result.success) {
+        console.error('Failed to add to cart:', result.error);
+      }
+    } catch (error) {
+      console.error('Add to cart error:', error);
+    } finally {
+      // Add a small delay to prevent rapid clicking
+      setTimeout(() => {
+        setIsAddingToCart(false);
+      }, 1000);
+    }
   };
 
   const handleToggleWishlist = async (e) => {
@@ -237,10 +251,10 @@ const ProductCard = ({ product, className = "" }) => {
               {isAuthenticated ? (
                 <Button
                   onClick={handleAddToCart}
-                  disabled={!product.in_stock || cartLoading}
+                  disabled={!product.in_stock || cartLoading || isAddingToCart}
                   className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-300"
                 >
-                  {cartLoading ? (
+                  {(cartLoading || isAddingToCart) ? (
                     <div className="flex items-center space-x-2">
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                       <span>Adding...</span>

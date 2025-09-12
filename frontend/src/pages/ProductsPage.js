@@ -9,11 +9,13 @@ import ProductCard from "../components/ProductCard";
 import ProductDetailModal from "../components/ProductDetailModal";
 import { mockData } from "../data/mockData";
 import SupabaseService from "../services/supabaseService";
+import { useCategories } from "../contexts/CategoryContext";
 
 const ProductsPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { id } = useParams();
+  const { categories: contextCategories } = useCategories();
   
   // console.log('=== PRODUCTS PAGE MOUNTED ==='); // Commented out to reduce console spam
   // console.log('Initial URL:', window.location.href); // Commented out to reduce console spam
@@ -205,115 +207,25 @@ const ProductsPage = () => {
      }
   }, []); // Empty dependency array - only run once on mount
 
-  // Default categories
-  const defaultCategories = [
-    {
-      name: "Forklift",
-      image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=400&h=300&fit=crop",
-      description: "Complete forklifts and forklift solutions for all industrial needs",
-      subcategories: [
-        { name: "Electric Forklifts" },
-        { name: "Diesel Forklifts" },
-        { name: "LPG Forklifts" },
-        { name: "Warehouse Forklifts" }
-      ]
-    },
-    {
-      name: "Engine Parts",
-      image: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400&h=300&fit=crop",
-      description: "High-quality engine components and replacement parts",
-      subcategories: [
-        { name: "Pistons & Rings" },
-        { name: "Crankshafts" },
-        { name: "Cylinder Heads" },
-        { name: "Valves & Springs" }
-      ]
-    },
-    {
-      name: "Cooling Parts",
-      image: "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=400&h=300&fit=crop",
-      description: "Radiators, cooling fans, and thermal management systems",
-      subcategories: [
-        { name: "Radiators" },
-        { name: "Water Pumps" },
-        { name: "Thermostats" },
-        { name: "Cooling Fans" }
-      ]
-    },
-    {
-      name: "Filters",
-      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop",
-      description: "Air, oil, fuel, and hydraulic filters for optimal performance",
-      subcategories: [
-        { name: "Air Filters" },
-        { name: "Oil Filters" },
-        { name: "Fuel Filters" },
-        { name: "Hydraulic Filters" }
-      ]
-    },
-    {
-      name: "Transmission Parts",
-      image: "https://images.unsplash.com/photo-1533038590840-1cde6e668a91?w=400&h=300&fit=crop",
-      description: "Transmission components and drive train solutions",
-      subcategories: [
-        { name: "Gears" },
-        { name: "Clutches" },
-        { name: "Drive Shafts" },
-        { name: "Transmission Cases" }
-      ]
-    },
-    {
-      name: "Hydraulic Parts",
-      image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop",
-      description: "Hydraulic pumps, cylinders, and fluid power components",
-      subcategories: [
-        { name: "Hydraulic Pumps" },
-        { name: "Hydraulic Cylinders" },
-        { name: "Control Valves" },
-        { name: "Hydraulic Hoses" }
-      ]
-    }
-  ];
+  // Categories will be loaded from CategoryContext
 
-  const [categories, setCategories] = useState(defaultCategories);
+  const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Load categories from Supabase
+  // Load categories from CategoryContext
   useEffect(() => {
-    const loadCategories = async () => {
-      try {
-        const supabaseCategories = await SupabaseService.getCategories();
-        if (supabaseCategories && supabaseCategories.length > 0) {
-          // Convert Supabase categories to the format expected by the UI
-          const formattedCategories = supabaseCategories
-            .filter(cat => cat.parent_id === null) // Only main categories
-            .map(mainCat => {
-              const subcategories = supabaseCategories
-                .filter(sub => sub.parent_id === mainCat.id)
-                .map(sub => ({ name: sub.name }));
-              
-              return {
-                name: mainCat.name,
-                image: mainCat.image || mainCat.image_url || "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=400&h=300&fit=crop",
-                description: mainCat.description || "",
-                subcategories: subcategories
-              };
-            });
-          
-          setCategories(formattedCategories);
-          console.log('Categories loaded from Supabase:', formattedCategories);
-        } else {
-          console.log('No categories found in Supabase, using default categories');
-        }
-      } catch (error) {
-        console.error('Error loading categories from Supabase:', error);
-        console.log('Using default categories as fallback');
-      }
-    };
-
-    loadCategories();
-  }, []);
+    if (contextCategories && contextCategories.length > 0) {
+      const formattedCategories = contextCategories.map(cat => ({
+        name: cat.name,
+        image: cat.image || cat.image_url || "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=400&h=300&fit=crop",
+        description: cat.description || "",
+        subcategories: cat.subcategories ? cat.subcategories.map(sub => ({ name: sub.name })) : []
+      }));
+      setCategories(formattedCategories);
+      console.log('Categories loaded from CategoryContext:', formattedCategories);
+    }
+  }, [contextCategories]);
 
   // Load products from Supabase
   useEffect(() => {

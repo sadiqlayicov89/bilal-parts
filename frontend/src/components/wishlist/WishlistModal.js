@@ -107,11 +107,11 @@ const WishlistModal = ({ children }) => {
                     <div key={item.id} className="flex space-x-4 p-4 border rounded-lg">
                       <div className="flex-shrink-0">
                         <img
-                          src={item.product.image || item.product.images?.[0] || '/placeholder-product.jpg'}
+                          src={item.product.image || item.product.images?.[0] || '/data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yNCAyN0g0MFYzOEgyNFYyN1oiIGZpbGw9IiM5Q0EzQUYiLz4KPHBhdGggZD0iTTMyIDIwQzMyIDIwIDMyIDIwIDMyIDIwQzMyIDIwIDMyIDIwIDMyIDIwWiIgZmlsbD0iIzlDQTNBRiIvPgo8L3N2Zz4K'}
                           alt={item.product.name || 'Product'}
                           className="w-16 h-16 object-cover rounded-md"
                           onError={(e) => {
-                            e.target.src = '/placeholder-product.jpg';
+                            e.target.src = '/data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yNCAyN0g0MFYzOEgyNFYyN1oiIGZpbGw9IiM5Q0EzQUYiLz4KPHBhdGggZD0iTTMyIDIwQzMyIDIwIDMyIDIwIDMyIDIwQzMyIDIwIDMyIDIwIDMyIDIwWiIgZmlsbD0iIzlDQTNBRiIvPgo8L3N2Zz4K';
                           }}
                         />
                       </div>

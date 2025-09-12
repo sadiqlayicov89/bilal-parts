@@ -145,7 +145,7 @@ const WishlistPage = () => {
                 <div className="relative">
                   <Link to={`/products/${item.product.id}`}>
                     <img
-                      src={item.product.images?.[0] || '/placeholder-product.jpg'}
+                      src={item.product.images?.[0] || '/data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOTYiIGhlaWdodD0iOTYiIHZpZXdCb3g9IjAgMCA5NiA5NiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9Ijk2IiBoZWlnaHQ9Ijk2IiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0zNiA0MEg2MFY1NkgzNlY0MFoiIGZpbGw9IiM5Q0EzQUYiLz4KPHBhdGggZD0iTTQ4IDI4QzQ4IDI4IDQ4IDI4IDQ4IDI4QzQ4IDI4IDQ4IDI4IDQ4IDI4WiIgZmlsbD0iIzlDQTNBRiIvPgo8L3N2Zz4K'}
                       alt={item.product.name}
                       className="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"
                     />

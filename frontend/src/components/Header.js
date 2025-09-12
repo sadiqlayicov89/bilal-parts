@@ -107,36 +107,19 @@ const Header = () => {
     };
   }, [isSearchOpen]);
 
-  const [productCategories, setProductCategories] = useState([
-    {
-      name: "Forklift",
-      subcategories: ["Electric Forklifts", "Diesel Forklifts", "LPG Forklifts", "Warehouse Forklifts"]
-    },
-    {
-      name: "Engine Parts",
-      subcategories: ["Pistons & Rings", "Crankshafts", "Cylinder Heads", "Valves & Springs"]
-    },
-    {
-      name: "Cooling Parts",
-      subcategories: ["Radiators", "Water Pumps", "Thermostats", "Cooling Fans"]
-    },
-    {
-      name: "Filters",
-      subcategories: ["Air Filters", "Oil Filters", "Fuel Filters", "Hydraulic Filters"]
-    },
-    {
-      name: "Transmission Parts",
-      subcategories: ["Gears", "Clutches", "Drive Shafts", "Transmission Cases"]
-    },
-    {
-      name: "Hydraulic Parts",
-      subcategories: ["Hydraulic Pumps", "Hydraulic Cylinders", "Control Valves", "Hydraulic Hoses"]
-    },
-    {
-      name: "Electrical Parts",
-      subcategories: ["Switches", "Wiring", "Chargers", "Sensors"]
+  const { categories: contextCategories } = useCategories();
+  const [productCategories, setProductCategories] = useState([]);
+
+  // Update productCategories when contextCategories change
+  useEffect(() => {
+    if (contextCategories && contextCategories.length > 0) {
+      const formattedCategories = contextCategories.map(cat => ({
+        name: cat.name,
+        subcategories: cat.subcategories ? cat.subcategories.map(sub => sub.name) : []
+      }));
+      setProductCategories(formattedCategories);
     }
-  ]);
+  }, [contextCategories]);
 
   const handleSearch = (e) => {
     e.preventDefault();

@@ -77,7 +77,7 @@ export const WishlistProvider = ({ children }) => {
                   name: item.name || `Product ${item.id || item.product_id}`,
                   price: item.price || 0,
                   category: item.category || 'General',
-                  image: item.image || '/placeholder-product.jpg',
+                  image: item.image || '/data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yNCAyN0g0MFYzOEgyNFYyN1oiIGZpbGw9IiM5Q0EzQUYiLz4KPHBhdGggZD0iTTMyIDIwQzMyIDIwIDMyIDIwIDMyIDIwQzMyIDIwIDMyIDIwIDMyIDIwWiIgZmlsbD0iIzlDQTNBRiIvPgo8L3N2Zz4K',
                   images: item.image ? [item.image] : [],
                   in_stock: item.in_stock !== undefined ? item.in_stock : true
                 }

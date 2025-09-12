@@ -217,7 +217,7 @@ const InvoiceModal = ({ isOpen, onClose, orderData, cartItems, invoiceNumber: pr
                  </tr>
           <tr>
             <td class="bold">Покупатель:</td>
-            <td>${user?.first_name || ''} ${user?.last_name || ''}, ${orderData?.company || ''}, ИНН ${orderData?.inn || 'N/A'}, ${orderData?.address || 'N/A'}</td>
+            <td>${(userMeta.first_name || user?.first_name || '')} ${(userMeta.last_name || user?.last_name || '')}, ${(orderData?.company || userMeta.company_name || 'N/A')}, ИНН ${(orderData?.inn || userMeta.vat_number || 'N/A')}, ${(orderData?.address || userMeta.address || userMeta.city || 'г. Москва, ул. Примерная, д. 123')}</td>
                  </tr>
              </table>
 
@@ -429,7 +429,7 @@ const InvoiceModal = ({ isOpen, onClose, orderData, cartItems, invoiceNumber: pr
               </tr>
               <tr>
                 <td style={{ fontWeight: 700, padding: '2px 0' }}>Покупатель:</td>
-                <td>{user?.first_name || ''} {user?.last_name || ''}, {orderData?.company || ''}, ИНН {orderData?.inn || 'N/A'}, {orderData?.address || 'N/A'}</td>
+                <td>{userMeta.first_name || user?.first_name || ''} {userMeta.last_name || user?.last_name || ''}, {orderData?.company || userMeta.company_name || 'N/A'}, ИНН {orderData?.inn || userMeta.vat_number || 'N/A'}, {orderData?.address || userMeta.address || userMeta.city || 'г. Москва, ул. Примерная, д. 123'}</td>
               </tr>
             </tbody>
           </table>

@@ -771,49 +771,69 @@ export class SupabaseService {
     try {
       console.log('SupabaseService: Adding to cart - userId:', userId, 'productId:', productId, 'quantity:', quantity);
       
+      // Validate inputs
+      if (!userId || !productId) {
+        throw new Error('User ID and Product ID are required');
+      }
+
       // Check if item already exists in cart
       const { data: existingItem, error: checkError } = await supabase
         .from('cart_items')
         .select('*')
         .eq('user_id', userId)
         .eq('product_id', productId)
-        .single();
+        .maybeSingle();
       
       console.log('SupabaseService: Check existing item result:', { existingItem, checkError });
 
-      if (checkError && checkError.code !== 'PGRST116') {
+      if (checkError && checkError.code && checkError.code !== 'PGRST116') {
+        console.error('SupabaseService: Error checking existing item:', checkError);
         throw checkError;
       }
 
       if (existingItem) {
         // Update existing item quantity
-        const { error: updateError } = await supabase
+        const { data: updatedItem, error: updateError } = await supabase
           .from('cart_items')
           .update({ 
             quantity: existingItem.quantity + quantity,
             updated_at: new Date().toISOString()
           })
-          .eq('id', existingItem.id);
+          .eq('id', existingItem.id)
+          .select()
+          .maybeSingle();
         
-        if (updateError) throw updateError;
+        if (updateError) {
+          console.error('SupabaseService: Error updating cart item:', updateError);
+          throw updateError;
+        }
+        
+        console.log('SupabaseService: Updated existing cart item:', updatedItem);
       } else {
         // Add new item to cart
-        const { error: insertError } = await supabase
+        const { data: newItem, error: insertError } = await supabase
           .from('cart_items')
           .insert({
             user_id: userId,
             product_id: productId,
             quantity: quantity,
             updated_at: new Date().toISOString()
-          });
+          })
+          .select()
+          .maybeSingle();
         
-        if (insertError) throw insertError;
+        if (insertError) {
+          console.error('SupabaseService: Error inserting cart item:', insertError);
+          throw insertError;
+        }
+        
+        console.log('SupabaseService: Added new cart item:', newItem);
       }
 
       return { success: true };
     } catch (error) {
       console.error('SupabaseService: Error adding to cart:', error);
-      throw error;
+      return { success: false, error: error.message || 'Failed to add item to cart' };
     }
   }
 
@@ -830,7 +850,9 @@ export class SupabaseService {
           quantity: quantity,
           updated_at: new Date().toISOString()
         })
-        .eq('id', cartItemId);
+        .eq('id', cartItemId)
+        .select()
+        .maybeSingle();
       
       if (error) throw error;
       return { success: true };
